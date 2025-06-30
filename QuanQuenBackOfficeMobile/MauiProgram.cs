@@ -4,7 +4,7 @@ using QuanQuenBackOfficeMobile.Services.Interfaces;
 using QuanQuenBackOfficeMobile.ViewModels.Stores;
 using QuanQuenBackOfficeMobile.Views.Stores;
 using System.Reflection;
-#if IOS
+#if IOS && ANDROID
 using QuanQuenBackOfficeMobile.Controls;
 #endif
 
@@ -147,7 +147,7 @@ public static class MauiProgram
 #if DEBUG
 		builder.Logging.AddDebug();
 #endif
-		#if IOS
+		#if IOS && ANDROID
     builder.ConfigureMauiHandlers(handlers =>
     {
         handlers.AddHandler(typeof(CustomDropdownPicker), typeof(CustomDropdownPickerHandler));

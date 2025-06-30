@@ -1,11 +1,6 @@
 using QuanQuenBackOfficeMobile.Services.Interfaces;
 using System.Windows.Input;
-using System.Text.Json;
 using Microsoft.Maui.Storage;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.IO;
-using System.Collections.Generic;
 using CommunityToolkit.Maui.Views;
 
 namespace QuanQuenBackOfficeMobile.ViewModels;
@@ -239,41 +234,17 @@ public partial class CreateStoreUserPasswordViewModel : ObservableObject
     {
         try
         {
-            var token = await SecureStorage.GetAsync("auth_token");
-            var client = new HttpClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            // 1. Lấy danh sách CSR
-            var listResponse = await client.GetStringAsync("https://quanquenapi-dev.azurewebsites.net/csr/api/DrivenHtmlPages/GetList");
-            var list = JsonSerializer.Deserialize<List<CsrItem>>(listResponse);
-            var item = list?.FirstOrDefault(x => x.url == url);
-            if (item == null)
-            {
-                await App.Current.MainPage.DisplayAlert("Lỗi", "Không tìm thấy nội dung!", "OK");
-                return;
-            }
-            // 2. Lấy chi tiết
-            var detailResponse = await client.GetStringAsync($"https://quanquenapi-dev.azurewebsites.net/csr/api/DrivenHtmlPages/GetDetail?id={item.id}&url={item.url}");
-            var detail = JsonSerializer.Deserialize<CsrDetail>(detailResponse);
-            // 3. Điều hướng sang trang mới
+            var detail = await _storeUserService.GetCsrDetailAsync(url);
             await App.Current.MainPage.Navigation.PushAsync(
-                new QuanQuenBackOfficeMobile.Views.CsrDetailPage(detail?.title ?? "Chi tiết", detail?.description ?? "Không có nội dung")
+                new QuanQuenBackOfficeMobile.Views.CsrDetailPage(
+                    detail?.title ?? "Chi tiết",
+                    detail?.description ?? "Không có nội dung"
+                )
             );
         }
         catch (Exception ex)
         {
             await App.Current.MainPage.DisplayAlert("Lỗi", $"Không thể tải nội dung: {ex.Message}", "OK");
         }
-    }
-
-    public class CsrItem
-    {
-        public int id { get; set; }
-        public string url { get; set; }
-    }
-
-    public class CsrDetail
-    {
-        public string description { get; set; }
-        public string title { get; set; }
     }
 }

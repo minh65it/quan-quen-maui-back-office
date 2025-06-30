@@ -23,6 +23,9 @@ public partial class CreateStoreViewModel : ObservableObject
     public IAsyncRelayCommand PickLicenseImagesCommand { get; }
     public IAsyncRelayCommand CaptureLicenseImageCommand { get; }
     public bool CanAddMoreLicenseImages => LicenseImages.Count < 4;
+    public string LicenseButtonBackgroundColor => CanAddMoreLicenseImages ? "#F5F5F5" : "Gray";
+    public string LicenseButtonTextColor => CanAddMoreLicenseImages ? "#F58220" : "Gray";
+
 
     [ObservableProperty]
     private ProvinceDto selectedProvince;
@@ -203,6 +206,9 @@ public partial class CreateStoreViewModel : ObservableObject
                 var imgSource = ImageSource.FromFile(copiedPath);
                 LicenseImages.Add(new MyImageModel { LicenseImage = imgSource, LocalPath = copiedPath });
                 System.Diagnostics.Debug.WriteLine($"[LOG] Đã thêm vào LicenseImages (FromFile): {copiedPath}");
+                OnPropertyChanged(nameof(CanAddMoreLicenseImages));
+                OnPropertyChanged(nameof(LicenseButtonBackgroundColor));
+                OnPropertyChanged(nameof(LicenseButtonTextColor));
             }
             catch (Exception ex)
             {
@@ -243,6 +249,9 @@ public partial class CreateStoreViewModel : ObservableObject
                 var imgSource = ImageSource.FromFile(copiedPath);
                 LicenseImages.Add(new MyImageModel { LicenseImage = imgSource, LocalPath = copiedPath });
                 System.Diagnostics.Debug.WriteLine($"[LOG] Đã thêm vào LicenseImages (FromFile): {copiedPath}");
+                OnPropertyChanged(nameof(CanAddMoreLicenseImages));
+                OnPropertyChanged(nameof(LicenseButtonBackgroundColor));
+                OnPropertyChanged(nameof(LicenseButtonTextColor));
             }
             catch (Exception ex)
             {
@@ -267,39 +276,10 @@ public partial class CreateStoreViewModel : ObservableObject
             if (LicenseImageFiles.Count > idx)
                 LicenseImageFiles.RemoveAt(idx);
             OnPropertyChanged(nameof(CanAddMoreLicenseImages));
-            PickLicenseImagesCommand.NotifyCanExecuteChanged();
-            CaptureLicenseImageCommand.NotifyCanExecuteChanged();
+            OnPropertyChanged(nameof(LicenseButtonBackgroundColor));
+            OnPropertyChanged(nameof(LicenseButtonTextColor));
         }
+        PickLicenseImagesCommand.NotifyCanExecuteChanged();
+        CaptureLicenseImageCommand.NotifyCanExecuteChanged();
     }
-}
-
-// Static class to store registration data between pages
-public static class StoreRegistrationData
-{
-    public static string StoreName { get; set; } = string.Empty;
-    public static string RepresentativeName { get; set; } = string.Empty;
-    public static string Province { get; set; } = string.Empty;
-    public static string District { get; set; } = string.Empty;
-    public static string Ward { get; set; } = string.Empty;
-    public static string Address { get; set; } = string.Empty;
-    public static string PhoneNumber { get; set; } = string.Empty;
-    public static string Email { get; set; } = string.Empty;
-    public static string BusinessType { get; set; } = string.Empty;
-    public static string ProvinceId { get; set; } = string.Empty;
-    public static string DistrictId { get; set; } = string.Empty;
-    public static string WardId { get; set; } = string.Empty;
-    public static string Password { get; set; } = string.Empty;
-    public static string StoreId { get; set; } = string.Empty;
-    public static List<FileResult> LicenseImageFiles { get; set; } = new();
-    public static List<string> LicenseImagePaths { get; set; } = new();
-}
-public class MyImageModel
-{
-    public ImageSource LicenseImage { get; set; }
-    public string LocalPath { get; set; }
-}
-
-public class UploadImages
-{
-    public byte[] Image { get; set; }
 }

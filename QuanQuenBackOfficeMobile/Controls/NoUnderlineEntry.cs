@@ -1,6 +1,6 @@
 
 using Microsoft.Maui.Controls;
-#if ANDROID
+#if ANDROID && IOS
 using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
 #endif
@@ -12,7 +12,7 @@ namespace QuanQuenBackOfficeMobile.Controls
         protected override void OnHandlerChanged()
         {
             base.OnHandlerChanged();
-#if ANDROID 
+#if ANDROID && IOS
             if (Handler is IEntryHandler entryHandler)
             {
                 entryHandler.PlatformView.BackgroundTintList =

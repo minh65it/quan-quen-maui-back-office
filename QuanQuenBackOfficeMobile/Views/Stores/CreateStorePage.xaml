@@ -4,7 +4,7 @@
              xmlns:views="clr-namespace:QuanQuenBackOfficeMobile.Views"
              xmlns:viewmodels="clr-namespace:QuanQuenBackOfficeMobile.ViewModels"
              x:Class="QuanQuenBackOfficeMobile.Views.CreateStorePage"
-             xmlns:models="clr-namespace:QuanQuenBackOfficeMobile.ViewModels"
+             xmlns:models="clr-namespace:QuanQuenBackOfficeMobile.Models"
              x:DataType="viewmodels:CreateStoreViewModel"
              xmlns:controls="clr-namespace:QuanQuenBackOfficeMobile.Controls"
              Title="Đăng ký nhà hàng">
@@ -112,7 +112,7 @@
             <Label Text="Loại hình kinh doanh"
                    FontSize="14"
                    TextColor="Black" />
-            <controls:CustomDropdownPicker ItemsSource="{Binding BusinessTypeList}"
+            <controls:CustomDropdownPicker ItemsSource="{Binding BusinessTypeList}" Title="Chọn loại hình kinh doanh"
                     SelectedItem="{Binding SelectedBusinessType}"
                     HeightRequest="44"
                     FontSize="14"
@@ -128,7 +128,7 @@
                         HeightRequest="44"
                         FontSize="16"
                         BackgroundColor="#F5F5F5"
-                        TextColor="#F58220"
+                        TextColor="{Binding LicenseButtonTextColor}"
                         BorderColor="#F58220"
                         CornerRadius="12"/>
                 <Button Text="Chọn ảnh giấy phép"
@@ -137,7 +137,7 @@
                         HeightRequest="44"
                         FontSize="16"
                         BackgroundColor="#F5F5F5"
-                        TextColor="#F58220"
+                        TextColor="{Binding LicenseButtonTextColor}"
                         BorderColor="#F58220"
                         CornerRadius="12"/>
             </HorizontalStackLayout>

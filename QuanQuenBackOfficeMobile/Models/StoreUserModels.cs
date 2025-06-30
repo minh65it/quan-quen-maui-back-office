@@ -64,4 +64,10 @@ public class StoreUserRegistrationResponse
 
     [JsonPropertyName("data")]
     public string StoreId { get; set; } = string.Empty;
+}
+
+public class CsrDetailResponse
+{
+    public string title { get; set; }
+    public string description { get; set; }
 } 

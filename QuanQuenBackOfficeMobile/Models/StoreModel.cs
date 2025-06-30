@@ -1,4 +1,7 @@
 using System.Text.Json.Serialization;
+using Microsoft.Maui.Controls;
+using Microsoft.Maui.Storage;
+using System.Collections.Generic;
 
 namespace QuanQuenBackOfficeMobile.Models
 {
@@ -242,6 +245,37 @@ namespace QuanQuenBackOfficeMobile.Models
 
         [JsonPropertyName("message")]
         public string Message { get; set; }
-        // ... các trường khác nếu có
+    }
+
+    // Static class to store registration data between pages
+    public static class StoreRegistrationData
+    {
+        public static string StoreName { get; set; } = string.Empty;
+        public static string RepresentativeName { get; set; } = string.Empty;
+        public static string Province { get; set; } = string.Empty;
+        public static string District { get; set; } = string.Empty;
+        public static string Ward { get; set; } = string.Empty;
+        public static string Address { get; set; } = string.Empty;
+        public static string PhoneNumber { get; set; } = string.Empty;
+        public static string Email { get; set; } = string.Empty;
+        public static string BusinessType { get; set; } = string.Empty;
+        public static string ProvinceId { get; set; } = string.Empty;
+        public static string DistrictId { get; set; } = string.Empty;
+        public static string WardId { get; set; } = string.Empty;
+        public static string Password { get; set; } = string.Empty;
+        public static string StoreId { get; set; } = string.Empty;
+        public static List<FileResult> LicenseImageFiles { get; set; } = new();
+        public static List<string> LicenseImagePaths { get; set; } = new();
+    }
+
+    public class MyImageModel
+    {
+        public ImageSource LicenseImage { get; set; }
+        public string LocalPath { get; set; }
+    }
+
+    public class UploadImages
+    {
+        public byte[] Image { get; set; }
     }
 } 

@@ -1,14 +1,4 @@
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
-using Microsoft.Maui.Storage;
 using Microsoft.Extensions.Configuration;
-using QuanQuenBackOfficeMobile.Models;
-using System.Text.Json.Serialization;
-using System.Text.Json;
-using System.Diagnostics;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
 
 namespace QuanQuenBackOfficeMobile.Services
@@ -221,14 +211,5 @@ namespace QuanQuenBackOfficeMobile.Services
                 return new ApiResponse { IsSuccess = false, Message = $"Update store failed: {ex.Message}" };
             }
         }
-    }
-
-    public class StoreApiResponse
-    {
-        [JsonPropertyName("result")]
-        public List<StoreModel> Result { get; set; }
-
-        [JsonPropertyName("pagination")]
-        public PaginationInfo Pagination { get; set; }
     }
 } 

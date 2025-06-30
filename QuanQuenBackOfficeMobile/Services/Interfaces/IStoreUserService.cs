@@ -41,4 +41,11 @@ public interface IStoreUserService
     /// Cập nhật level cho nhà hàng
     /// </summary>
     Task<ApiResponse> UpdateStoreLevelAsync(string storeId, int levelId, DateTime startDate, DateTime endDate);
+
+    /// <summary>
+    /// Lấy chi tiết CSR theo URL
+    /// </summary>
+    /// <param name="url">URL của CSR (policy hoặc terms-of-service)</param>
+    /// <returns>Chi tiết CSR</returns>
+    Task<CsrDetailResponse> GetCsrDetailAsync(string url);
 } 

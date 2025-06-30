@@ -1,14 +1,8 @@
-using System;
-using System.Net.Http;
+using Microsoft.Extensions.Configuration;
+using QuanQuenBackOfficeMobile.Services.Interfaces;
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using QuanQuenBackOfficeMobile.Models;
-using QuanQuenBackOfficeMobile.Services.Interfaces;
-using System.Text.Json.Serialization;
-using Microsoft.Maui.Storage;
-using System.Net;
+using System.Text.Json.Nodes;
 
 namespace QuanQuenBackOfficeMobile.Services;
 
@@ -169,13 +163,33 @@ public class StoreUserService : IStoreUserService
             return new ApiResponse { IsSuccess = false, Message = $"Update level failed: {ex.Message}" };
         }
     }
+
+    public async Task<CsrDetailResponse> GetCsrDetailAsync(string url)
+    {
+        try
+        {
+            var token = await SecureStorage.GetAsync("auth_token");
+            var baseUrl = _configuration["API:CSR:BaseUrl"];
+            var path = _configuration["API:CSR:GetDetailCSR"];
+            var apiUrl = $"{baseUrl}{path}?url={Uri.EscapeDataString(url)}";
+
+            var request = new HttpRequestMessage(HttpMethod.Get, apiUrl);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _httpClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+
+            var content = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<CsrDetailResponse>(content, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+            return result;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[StoreUserService] CSR API Error: {ex.Message}");
+            throw;
+        }
+    }
 }
-
-public class ApiResponse
-{
-    [JsonPropertyName("success")]
-    public bool IsSuccess { get; set; }
-
-    [JsonPropertyName("message")]
-    public string Message { get; set; }
-} 
