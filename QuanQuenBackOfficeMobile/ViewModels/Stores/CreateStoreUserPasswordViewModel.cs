@@ -177,8 +177,9 @@ public partial class CreateStoreUserPasswordViewModel : ObservableObject
                 PasswordError = storeResponse?.Message ?? "Tạo cửa hàng thất bại";
                 return;
             }
+            var nameMedia = "Hồ sơ nhà hàng";
             // Lấy categoryMediaId (nên await vì hàm này trả về Task<string>)
-            var categoryMediaId = await _storeMediaService.GetThumbnailCategoryMediaIdAsync(7);
+            var categoryMediaId = await _storeMediaService.GetThumbnailCategoryMediaIdAsync(nameMedia);
 
             // Lấy userName để truyền vào createdBy
             var createdBy = await SecureStorage.GetAsync("userName");

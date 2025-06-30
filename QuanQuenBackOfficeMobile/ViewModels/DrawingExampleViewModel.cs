@@ -32,8 +32,8 @@ public partial class DrawingExampleViewModel : BaseViewModel
         {
             if (imageStream.CanSeek)
                 imageStream.Position = 0;
-
-            var categoryMediaId = await _storeMediaService.GetThumbnailCategoryMediaIdAsync(6);
+            var nameMedia = "Chữ kí"; 
+            var categoryMediaId = await _storeMediaService.GetThumbnailCategoryMediaIdAsync(nameMedia);
             var createdBy = await SecureStorage.GetAsync("userName");
             var storeId = StoreRegistrationData.StoreId;
 

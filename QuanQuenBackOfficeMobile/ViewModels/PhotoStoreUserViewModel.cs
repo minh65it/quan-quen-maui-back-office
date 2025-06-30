@@ -101,8 +101,8 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                 await Shell.Current.DisplayAlert("Lỗi", "Thiếu thông tin xác thực hoặc storeId!", "OK");
                 return;
             }
-
-            var categoryMediaId = await _storeMediaService.GetThumbnailCategoryMediaIdAsync(1);
+            var nameMedia = "Ảnh bìa";
+            var categoryMediaId = await _storeMediaService.GetThumbnailCategoryMediaIdAsync(nameMedia);
             if (string.IsNullOrEmpty(categoryMediaId))
             {
                 await Shell.Current.DisplayAlert("Lỗi", "Không tìm thấy categoryMediaId!", "OK");

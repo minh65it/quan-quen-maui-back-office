@@ -22,7 +22,7 @@ public class StoreMediaService : IStoreMediaService
         _configuration = configuration;
     }
 
-    public async Task<string> GetThumbnailCategoryMediaIdAsync(int position)
+    public async Task<string> GetThumbnailCategoryMediaIdAsync(string nameMedia)
     {
         try
         {
@@ -44,7 +44,7 @@ public class StoreMediaService : IStoreMediaService
             {
                 foreach (var item in resultArray.EnumerateArray())
                 {
-                    if (item.TryGetProperty("position", out var posProp) && posProp.GetInt32() == position)
+                    if (item.TryGetProperty("nameMedia", out var nameProp) && nameProp.GetString() == nameMedia)
                     {
                         return item.GetProperty("categoryMediaId").GetString();
                     }

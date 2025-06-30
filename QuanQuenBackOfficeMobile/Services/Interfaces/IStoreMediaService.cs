@@ -8,7 +8,7 @@ public interface IStoreMediaService
     /// <summary>
     /// Lấy categoryMediaId cho thumbnail
     /// </summary>
-    Task<string> GetThumbnailCategoryMediaIdAsync(int position);
+    Task<string> GetThumbnailCategoryMediaIdAsync(string nameMedia);
 
     /// <summary>
     /// Upload ảnh cho cửa hàng
