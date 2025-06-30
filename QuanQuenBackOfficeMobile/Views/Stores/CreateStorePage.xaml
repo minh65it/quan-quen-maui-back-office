@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:views="clr-namespace:QuanQuenBackOfficeMobile.Views"
+             xmlns:viewmodels="clr-namespace:QuanQuenBackOfficeMobile.ViewModels"
+             x:Class="QuanQuenBackOfficeMobile.Views.CreateStorePage"
+             xmlns:models="clr-namespace:QuanQuenBackOfficeMobile.ViewModels"
+             x:DataType="viewmodels:CreateStoreViewModel"
+             xmlns:controls="clr-namespace:QuanQuenBackOfficeMobile.Controls"
+             Title="Đăng ký nhà hàng">
+    <ScrollView>
+        <VerticalStackLayout Padding="30" Spacing="10">
+            <!-- Logo và tên ứng dụng -->
+            <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
+                <Image Source="logo.png" HeightRequest="80" WidthRequest="80" />
+                <Label Text="QUÁN QUEN"
+               FontSize="24"
+               FontAttributes="Bold"
+               TextColor="#F58220"
+               HorizontalOptions="Center" />
+            </VerticalStackLayout>
+
+            <!-- Tên Nhà hàng/Quán ăn -->
+            <Label Text="Tên Nhà hàng"
+                   FontSize="14"
+                   TextColor="Black" />
+            <Entry Placeholder="Tên Nhà hàng/Quán ăn"
+                   Text="{Binding StoreName}"
+                   HeightRequest="44"
+                   FontSize="16"
+                   BackgroundColor="White" />
+
+            <!-- Tên người đại diện -->
+            <Label Text="Người đại diện"
+                   FontSize="14"
+                   TextColor="Black" />
+            <Entry Placeholder="Nhập tên người đại diện"
+                   Text="{Binding RepresentativeName}"
+                   HeightRequest="44"
+                   FontSize="16"
+                   BackgroundColor="White" />
+
+            <!-- Thành phố -->
+            <Label Text="Thành phố"
+                   FontSize="14"
+                   TextColor="Black" />
+            <controls:CustomDropdownPicker Title="Chọn Thành Phố ..."
+                    ItemsSource="{Binding ProvinceList}"
+                    ItemDisplayBinding="{Binding Name}"
+                    SelectedItem="{Binding SelectedProvince}"
+                    HeightRequest="44"
+                    FontSize="14"
+                    BackgroundColor="White" />
+
+            <!-- Quận -->
+            <Label Text="Quận"
+                   FontSize="14"
+                   TextColor="Black" />
+            <controls:CustomDropdownPicker Title="Chọn Quận ..."
+                    ItemsSource="{Binding DistrictList}"
+                    ItemDisplayBinding="{Binding Name}"
+                    SelectedItem="{Binding SelectedDistrict}"
+                    HeightRequest="44"
+                    FontSize="14"
+                    BackgroundColor="White" />
+
+            <!-- Phường -->
+            <Label Text="Phường"
+                   FontSize="14"
+                   TextColor="Black" />
+            <controls:CustomDropdownPicker Title="Chọn Phường ..."
+                    ItemsSource="{Binding WardList}"
+                    ItemDisplayBinding="{Binding Name}"
+                    SelectedItem="{Binding SelectedWard}"
+                    HeightRequest="44"
+                    FontSize="14"
+                    BackgroundColor="White" />
+
+            <!-- Địa chỉ kinh doanh -->
+            <Label Text="Địa Chỉ"
+                   FontSize="14"
+                   TextColor="Black" />
+            <Entry Placeholder="Địa chỉ kinh doanh"
+                   Text="{Binding Address}"
+                   HeightRequest="44"
+                   FontSize="16"
+                   BackgroundColor="White" />
+
+            <!-- Số điện thoại đăng ký -->
+            <Label Text="Số điện thoại đăng ký *"
+                   FontSize="14"
+                   TextColor="Black" />
+            <Entry Placeholder="Nhập số điện thoại"
+                   Text="{Binding PhoneNumber}"
+                   HeightRequest="44"
+                   FontSize="16"
+                   Keyboard="Telephone"
+                   BackgroundColor="White" />
+
+            <!-- Email đăng ký -->
+            <Label Text="Email đăng ký *"
+                   FontSize="14"
+                   TextColor="Black" />
+            <Entry Placeholder="Nhập email"
+                   Text="{Binding Email}"
+                   HeightRequest="44"
+                   FontSize="16"
+                   Keyboard="Email"
+                   BackgroundColor="White" />
+
+            <!-- Loại hình kinh doanh -->
+            <Label Text="Loại hình kinh doanh"
+                   FontSize="14"
+                   TextColor="Black" />
+            <controls:CustomDropdownPicker ItemsSource="{Binding BusinessTypeList}"
+                    SelectedItem="{Binding SelectedBusinessType}"
+                    HeightRequest="44"
+                    FontSize="14"
+                    BackgroundColor="White" />
+
+            <Label Text="Ảnh giấy phép kinh doanh (tối đa 4 ảnh*)"
+                   FontSize="14"
+                   TextColor="Black" />
+            <HorizontalStackLayout Spacing="10">
+                <Button Text="Chụp ảnh giấy phép"
+                        Command="{Binding CaptureLicenseImageCommand}"
+                        IsEnabled="{Binding CanAddMoreLicenseImages}"
+                        HeightRequest="44"
+                        FontSize="16"
+                        BackgroundColor="#F5F5F5"
+                        TextColor="#F58220"
+                        BorderColor="#F58220"
+                        CornerRadius="12"/>
+                <Button Text="Chọn ảnh giấy phép"
+                        Command="{Binding PickLicenseImagesCommand}"
+                        IsEnabled="{Binding CanAddMoreLicenseImages}"
+                        HeightRequest="44"
+                        FontSize="16"
+                        BackgroundColor="#F5F5F5"
+                        TextColor="#F58220"
+                        BorderColor="#F58220"
+                        CornerRadius="12"/>
+            </HorizontalStackLayout>
+            <CollectionView x:Name="RootPage" ItemsSource="{Binding LicenseImages}" HeightRequest="80" Margin="0,5,0,0">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Horizontal"/>
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate  x:DataType="models:MyImageModel" >
+                        <Border HeightRequest="80" WidthRequest="80" Stroke="#E0E0E0" StrokeThickness="1" Background="White" Margin="5" Padding="0" HorizontalOptions="FillAndExpand" VerticalOptions="Center">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="12"/>
+                            </Border.StrokeShape>
+                            <Grid>
+                                <Image Source="{Binding LicenseImage}" HeightRequest="80" WidthRequest="80" Aspect="AspectFill" Margin="0"/>
+                                <Border Padding="0" HeightRequest="20" WidthRequest="20" Background="White" Stroke="White" StrokeThickness="1" HorizontalOptions="End" VerticalOptions="Start" Margin="2">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="14"/>
+                                    </Border.StrokeShape>
+                                    <ImageButton Source="multiply.png" Command="{Binding BindingContext.RemoveLicenseImageCommand, Source={x:Reference Name=RootPage}}" CommandParameter="{Binding LicenseImage}" BackgroundColor="Transparent" WidthRequest="24" HeightRequest="24" HorizontalOptions="Center" VerticalOptions="Center" Padding="0"/>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+            <!-- Nút Tiếp theo -->
+            <Button Text="Tiếp theo"
+                    Command="{Binding NextCommand}"
+                    IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+                    HeightRequest="50"
+                    FontSize="18"
+                    FontAttributes="Bold"
+                    TextColor="White"
+                    CornerRadius="25"
+                    BackgroundColor="#F58220"
+                    Margin="0,20,0,0"/>
+
+            <!-- Loading indicator -->
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                             IsVisible="{Binding IsBusy}"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"/>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage> 

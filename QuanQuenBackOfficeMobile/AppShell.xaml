@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="QuanQuenBackOfficeMobile.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:QuanQuenBackOfficeMobile"
+    xmlns:views="clr-namespace:QuanQuenBackOfficeMobile.Views"
+    Shell.FlyoutBehavior="Disabled">
+
+    
+    <ShellContent
+        Title="Login"
+        ContentTemplate="{DataTemplate views:LoginPage}"
+        Route="LoginPage" />
+
+    <ShellContent
+        Title="Main"
+        ContentTemplate="{DataTemplate views:MainPage}"
+        Route="MainPage" />
+
+    <ShellContent
+        Title="Sample MediaElement"
+        ContentTemplate="{DataTemplate views:MediaElementPage}"
+        Icon="iconmediaelement.png"
+        Route="MediaElementPage"
+        Shell.NavBarIsVisible="true" />
+    <ShellContent
+        Title="Sample WebView"
+        ContentTemplate="{DataTemplate views:WebViewPage}"
+        Icon="iconwebview.png"
+        Route="WebViewPage"
+        Shell.NavBarIsVisible="true" />
+    <ShellContent
+        Title="About"
+        ContentTemplate="{DataTemplate views:AboutPage}"
+        Icon="iconblank.png"
+        Route="AboutPage"
+        Shell.NavBarIsVisible="true" />
+    <ShellContent
+        Title="Sample Localization"
+        ContentTemplate="{DataTemplate views:LocalizationPage}"
+        Icon="iconlocalization.png"
+        Route="LocalizationPage"
+        Shell.NavBarIsVisible="true" />
+    <ShellContent
+        Title="Sample Map"
+        ContentTemplate="{DataTemplate views:MapPage}"
+        Icon="iconmap.png"
+        Route="MapPage"
+        Shell.NavBarIsVisible="true" />
+    <ShellContent
+        Title="Settings"
+        ContentTemplate="{DataTemplate views:SettingsPage}"
+        Icon="iconlistdetail.png"
+        Route="SettingsPage"
+        Shell.NavBarIsVisible="true" />
+    <ShellContent
+        Title="Example Font AwesomeUsage"
+        ContentTemplate="{DataTemplate views:ExampleFontAwesomeUsagePage}"
+        Icon="iconfontawesome.png"
+        Route="ExampleFontAwesomeUsagePage"
+        Shell.NavBarIsVisible="true" />
+    <ShellContent
+        Title="Example Material Font Usage"
+        ContentTemplate="{DataTemplate views:ExampleMaterialFontUsagePage}"
+        Icon="iconmaterial.png"
+        Route="ExampleMaterialFontUsagePage"
+        Shell.NavBarIsVisible="true" />
+    <ShellContent
+        Title="Lottie"
+        ContentTemplate="{DataTemplate views:LottiePage}"
+        Icon="iconlottie.png"
+        Route="LottiePage"
+        Shell.NavBarIsVisible="true" />
+</Shell>

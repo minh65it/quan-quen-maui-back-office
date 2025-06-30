@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:viewmodels="clr-namespace:QuanQuenBackOfficeMobile.ViewModels"
+    x:Class="QuanQuenBackOfficeMobile.Views.RegisterPage"
+    Title="Đăng ký"
+    BackgroundColor="White">
+
+    <Grid RowDefinitions="Auto,*">
+        <!-- Header with back arrow and gradient -->
+        <Grid Row="0" HeightRequest="50">
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="#FFC107" Offset="0.0" />
+                    <GradientStop Color="#FF5722" Offset="1.0" />
+                </LinearGradientBrush>
+            </Grid.Background>
+            <HorizontalStackLayout Padding="10,0" VerticalOptions="Center">
+                <!-- you can use an ImageButton with your back arrow icon -->
+                <ImageButton
+                    Source="btnbackregister.png"
+                    BackgroundColor="Transparent"
+                    Clicked="OnBackButtonClicked"
+                    WidthRequest="24" HeightRequest="24" />
+                <Label
+                    Text="Quay lại"
+                    TextColor="White"
+                    FontAttributes="Bold"
+                    VerticalOptions="Center"
+                    Margin="5,0,0,0"/>
+            </HorizontalStackLayout>
+        </Grid>
+
+        <!-- Main content -->
+        <!-- Main content -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="30" Spacing="20" VerticalOptions="Start">
+                <!-- Logo -->
+                <Image
+                    Source="logo.png"
+                    HeightRequest="200"
+                    HorizontalOptions="Center" />
+                <Label
+                    Text="Tạo Tài Khoản"
+                    HorizontalTextAlignment="Center"
+                    FontAttributes="Bold"
+                    TextColor="Black"/>
+                <Frame
+                    HasShadow="False"
+                    BorderColor="LightGray"
+                    CornerRadius="30"
+                    HeightRequest="50"
+                    Padding="0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="50" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Image
+                            Source="user.png"
+                            WidthRequest="24"
+                            HeightRequest="24"
+                            VerticalOptions="Center"
+                            HorizontalOptions="Center" />
+
+                        <Entry
+                            Grid.Column="1"
+                            Placeholder="Nhập email hoặc số điện thoại"
+                            Text="{Binding EmailOrPhone}"
+                            BackgroundColor="Transparent"
+                            VerticalOptions="Center"
+                            Margin="0,0,15,0" />
+                    </Grid>
+                </Frame>
+                <!-- (Bạn có thể tạm ẩn lỗi cho đến khi gắn VM) -->
+                <Label
+                    Text="Email/số điện thoại không hợp lệ"
+                    TextColor="Red"
+                    FontSize="Small"
+                    IsVisible="False"
+                    Margin="10,0,0,0" />
+
+                <!-- New Password -->
+                <Frame
+                    HasShadow="False"
+                    BorderColor="LightGray"
+                    CornerRadius="30"
+                    HeightRequest="50"
+                    Padding="0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="50" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="50" />
+                        </Grid.ColumnDefinitions>
+
+                        <Image
+                            Source="pw.png"
+                            WidthRequest="24"
+                            HeightRequest="24"
+                            VerticalOptions="Center"
+                            HorizontalOptions="Center" />
+
+                        <Entry
+                            Grid.Column="1"
+                            Placeholder="Nhập mật khẩu của bạn"
+                            Text="{Binding Password}"
+                            IsPassword="{Binding IsPasswordHidden}"
+                            VerticalOptions="Center"
+                            Margin="0,0,15,0" />
+
+                        <Button
+                            Grid.Column="2"
+                            Command="{Binding TogglePasswordVisibilityCommand}"
+                            Text="{Binding PasswordVisibilityIcon}"
+                            BackgroundColor="Transparent"
+                            VerticalOptions="Center" />
+                    </Grid>
+                </Frame>
+                <Label
+                    Text="Mật khẩu cần ít nhất 6 ký tự"
+                    TextColor="Red"
+                    FontSize="Small"
+                    IsVisible="False"
+                    Margin="10,0,0,0" />
+
+                <!-- Confirm Password -->
+                <Frame
+                    HasShadow="False"
+                    BorderColor="LightGray"
+                    CornerRadius="30"
+                    HeightRequest="50"
+                    Padding="0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="50" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="50" />
+                        </Grid.ColumnDefinitions>
+
+                        <Image
+                            Source="pw.png"
+                            WidthRequest="24"
+                            HeightRequest="24"
+                            VerticalOptions="Center"
+                            HorizontalOptions="Center" />
+
+                        <Entry
+                            Grid.Column="1"
+                            Placeholder="Xác nhận mật khẩu"
+                            Text="{Binding ConfirmPassword}"
+                            IsPassword="{Binding IsConfirmHidden}"
+                            VerticalOptions="Center"
+                            Margin="0,0,15,0" />
+
+                        <Button
+                            Grid.Column="2"
+                            Command="{Binding ToggleConfirmVisibilityCommand}"
+                            Text="{Binding ConfirmVisibilityIcon}"
+                            BackgroundColor="Transparent"
+                            VerticalOptions="Center" />
+                    </Grid>
+                </Frame>
+                <Label
+                    Text="Mật khẩu không trùng khớp"
+                    TextColor="Red"
+                    FontSize="Small"
+                    IsVisible="False"
+                    Margin="10,0,0,0" />
+
+                <!-- Register button -->
+                <Button
+                    Text="Đăng ký"
+                    TextColor="White"
+                    HeightRequest="50"
+                    CornerRadius="25"
+                    Command="{Binding RegisterCommand}">
+                    <Button.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="#FFC107" Offset="0.0" />
+                            <GradientStop Color="#FF5722" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Button.Background>
+                </Button>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

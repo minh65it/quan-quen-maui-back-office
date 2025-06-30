@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36221.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuanQuenBackOfficeMobile", "QuanQuenBackOfficeMobile\QuanQuenBackOfficeMobile.csproj", "{8BD83BC2-FCE1-8AA9-91A0-8CFEF2D1CD03}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuanQuenBackOfficeMobile.Benchmarking", "QuanQuenBackOfficeMobile.Benchmarking\QuanQuenBackOfficeMobile.Benchmarking.csproj", "{191383AB-7AF6-54C0-F8FC-BD8E067A8423}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuanQuenBackOfficeMobile.Tests", "QuanQuenBackOfficeMobile.Tests\QuanQuenBackOfficeMobile.Tests.csproj", "{049118F5-7FCD-A9CC-8ABE-DA2AA742F2C9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8BD83BC2-FCE1-8AA9-91A0-8CFEF2D1CD03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BD83BC2-FCE1-8AA9-91A0-8CFEF2D1CD03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BD83BC2-FCE1-8AA9-91A0-8CFEF2D1CD03}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{8BD83BC2-FCE1-8AA9-91A0-8CFEF2D1CD03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BD83BC2-FCE1-8AA9-91A0-8CFEF2D1CD03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{191383AB-7AF6-54C0-F8FC-BD8E067A8423}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{191383AB-7AF6-54C0-F8FC-BD8E067A8423}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{191383AB-7AF6-54C0-F8FC-BD8E067A8423}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{191383AB-7AF6-54C0-F8FC-BD8E067A8423}.Release|Any CPU.Build.0 = Release|Any CPU
+		{049118F5-7FCD-A9CC-8ABE-DA2AA742F2C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{049118F5-7FCD-A9CC-8ABE-DA2AA742F2C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{049118F5-7FCD-A9CC-8ABE-DA2AA742F2C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{049118F5-7FCD-A9CC-8ABE-DA2AA742F2C9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {421313C6-06B4-4509-A3DD-348975348601}
+	EndGlobalSection
+EndGlobal

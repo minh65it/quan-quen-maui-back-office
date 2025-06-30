@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:xct="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:converters="clr-namespace:QuanQuenBackOfficeMobile.Converters"
+             x:Class="QuanQuenBackOfficeMobile.Views.Stores.StoreLevelPage"
+             xmlns:controls="clr-namespace:QuanQuenBackOfficeMobile.Controls"
+             Title="">
+    <ContentPage.Resources>
+        <converters:EnumDisplayNameConverter x:Key="EnumDisplayNameConverter" />
+    </ContentPage.Resources>
+    <VerticalStackLayout Padding="30" Spacing="20">
+        <Label Text="Chọn Level cho cửa hàng" FontSize="22" FontAttributes="Bold" TextColor="#FF9900" HorizontalOptions="Center" />
+        
+        <Label Text="Chọn Level" FontSize="16" />
+        <Picker x:Name="LevelPicker"
+                Title="Chọn Level"
+                ItemsSource="{Binding LevelNames}"
+                SelectedIndex="{Binding SelectedLevelIndex, Mode=TwoWay}"
+                TextColor="Black" />
+        <Label Text="Chọn Trạng thái" FontSize="16" />
+        
+        <controls:CustomDropdownPicker x:Name="StatusPicker"
+        Title="Chọn Trạng thái"
+        ItemsSource="{Binding StatusNames}"
+        SelectedIndex="{Binding SelectedStatusIndex, Mode=TwoWay}"
+        TextColor="Black"
+        ItemDisplayBinding="{Binding ., Converter={StaticResource EnumDisplayNameConverter}}" />
+        
+        <Label Text="Ngày bắt đầu" TextColor="Black" />
+        <DatePicker
+        x:Name="StartDatePicker"
+        Date="{Binding StartDate, Mode=TwoWay}"
+        BackgroundColor="White"
+        TextColor="Black"
+        HeightRequest="50"
+        Margin="0,0,0,0"
+        HorizontalOptions="Fill"
+        FontSize="18"
+        />
+        <Label Text="Ngày kết thúc" TextColor="Black" />
+        <DatePicker
+        x:Name="EndDatePicker"
+        Date="{Binding EndDate, Mode=TwoWay}"
+        BackgroundColor="White"
+        TextColor="Black"
+        HeightRequest="50"
+        Margin="0,0,0,0"
+        HorizontalOptions="Fill"
+        FontSize="18"
+        />
+
+        <Button Text="Xác nhận" 
+                Command="{Binding ConfirmCommand}" 
+                BackgroundColor="#FF9900" 
+                TextColor="White" 
+                FontAttributes="Bold" 
+                HeightRequest="50" 
+                CornerRadius="25" 
+                FontSize="18" />
+    </VerticalStackLayout>
+</ContentPage> 

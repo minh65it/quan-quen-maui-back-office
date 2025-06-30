@@ -1,0 +1,32 @@
+        <!-- Search Bar -->
+        <Grid Grid.Row="1" 
+              ColumnDefinitions="*,Auto"
+              Margin="0,0,0,5">
+            <Border Grid.Column="0"
+                   Padding="0"
+                   Stroke="{AppThemeBinding Light={StaticResource Orange70Color}, Dark={StaticResource Gray600}}"
+                   CornerRadius="8"
+                   Margin="0,0,5,0"
+                   HeightRequest="40">
+                <Entry Placeholder="Tìm kiếm cửa hàng..." 
+                       Text="{Binding SearchText}"
+                       FontSize="14"
+                       Margin="10,0"
+                       VerticalOptions="Center"
+                       HeightRequest="40"
+                       ReturnCommand="{Binding SearchCommand}"
+                       ReturnType="Search"/>
+            </Border>
+            <Button Grid.Column="1"
+                    Text="🔍" 
+                    Command="{Binding SearchCommand}"
+                    FontSize="18"
+                    Padding="0"
+                    HeightRequest="40"
+                    WidthRequest="40"
+                    CornerRadius="8"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource Orange70Color}, Dark={StaticResource Primary}}"
+                    TextColor="White"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"/>
+        </Grid> 

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:QuanQuenBackOfficeMobile.ViewModels"
+    xmlns:models="clr-namespace:QuanQuenBackOfficeMobile.Models"
+    x:Class="QuanQuenBackOfficeMobile.Views.StorePage"
+    x:DataType="vm:StorePageViewModel">
+    
+    <Grid RowDefinitions="Auto,Auto,*" Padding="10" RowSpacing="10">
+        <!-- Header -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+            <Label Text="Stores" 
+                   FontSize="24" 
+                   FontAttributes="Bold" 
+                   Grid.Column="0"/>
+            <Button Text="➕ Tạo mới"
+                    Command="{Binding CreateStoreCommand}"
+                    Grid.Column="1"
+                    BackgroundColor="{StaticResource Orange70Color}"
+                    TextColor="White"
+                    FontAttributes="Bold"
+                    HeightRequest="40"
+                    CornerRadius="8"/>
+        </Grid>
+
+        <!-- Search Bar -->
+        <Grid Grid.Row="1" 
+              ColumnDefinitions="*,Auto"
+              Margin="0,0,0,5">
+            <Border Stroke="{AppThemeBinding Light={StaticResource Orange70Color}, Dark={StaticResource Gray600}}"
+                    StrokeThickness="1"
+                    BackgroundColor="White"
+                    Padding="0"
+                    Margin="0,0,5,0"
+                    HeightRequest="40">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8"/>
+                </Border.StrokeShape>
+                <Entry Placeholder="Tìm kiếm cửa hàng..." 
+                       Text="{Binding SearchText}"
+                       FontSize="14"
+                       Margin="10,0"
+                       VerticalOptions="Center"
+                       HeightRequest="40"
+                       ReturnCommand="{Binding SearchCommand}"
+                       ReturnType="Search"/>
+            </Border>
+            <Button Grid.Column="1"
+                    Text="🔍" 
+                    Command="{Binding SearchCommand}"
+                    FontSize="18"
+                    Padding="0"
+                    HeightRequest="40"
+                    WidthRequest="40"
+                    CornerRadius="8"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource Orange70Color}, Dark={StaticResource Primary}}"
+                    TextColor="White"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"/>
+        </Grid>
+
+        <!-- Store List -->
+        <Grid Grid.Row="2">
+            <CollectionView Grid.Row="2"
+                        ItemsSource="{Binding Stores}"
+                        RemainingItemsThreshold="5"
+                        RemainingItemsThresholdReached="OnRemainingItemsThresholdReached">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"/>
+                </CollectionView.ItemsLayout>
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
+                        <Label Text="Không có cửa hàng nào"
+                           FontSize="14"
+                           TextColor="Gray"
+                           HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:StoreModel">
+                        <Border
+                                Padding="15"
+                                BackgroundColor="White"
+                                Stroke="{StaticResource Orange70Color}"
+                                StrokeThickness="1">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="16"/>
+                            </Border.StrokeShape>
+                            <VerticalStackLayout Spacing="4">
+                                <Label FormattedText="{Binding StoreName, StringFormat='Tên cửa hàng: {0}'}"
+                                   TextColor="{StaticResource Primary}"
+                                   FontAttributes="Bold" />
+                                <Label FormattedText="{Binding Address, StringFormat='Địa chỉ: {0}'}"
+                                   TextColor="{StaticResource Primary}"
+                                   FontAttributes="Bold" />
+                                <Label FormattedText="{Binding StorePhone, StringFormat='Số điện thoại: {0}'}"
+                                   TextColor="{StaticResource Primary}"
+                                   FontAttributes="Bold" />
+                                <!-- Actions -->
+                                <HorizontalStackLayout HorizontalOptions="End" Spacing="10" Margin="0,0,0,0">
+                                    <Button Text="Chi tiết"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:StorePageViewModel}}, Path=ViewDetailCommand}"
+                                        CommandParameter="{Binding .}"
+                                        TextColor="{StaticResource Black}"
+                                        BackgroundColor="White"
+                                        BorderColor="{StaticResource Primary}"
+                                        BorderWidth="1"
+                                        CornerRadius="10"
+                                        FontSize="14"
+                                        Padding="10,5" />
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+                <CollectionView.Footer>
+                    <Grid IsVisible="{Binding IsLoadingMore}">
+                        <ActivityIndicator IsRunning="True" 
+                                         HorizontalOptions="Center" 
+                                         VerticalOptions="Center" 
+                                         Margin="0,10"/>
+                    </Grid>
+                </CollectionView.Footer>
+            </CollectionView>
+
+            <!-- Loading Overlay -->
+            <Grid IsVisible="{Binding IsLoading}" 
+                  BackgroundColor="#80000000">
+                <ActivityIndicator IsRunning="True" 
+                                 HorizontalOptions="Center" 
+                                 VerticalOptions="Center" 
+                                 Color="White"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,116 @@
+<ContentPage
+    x:Class="QuanQuenBackOfficeMobile.Views.PhotoStoreUser"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:viewmodels="clr-namespace:QuanQuenBackOfficeMobile.ViewModels"
+    xmlns:models="clr-namespace:QuanQuenBackOfficeMobile.Models"
+    xmlns:converters="clr-namespace:QuanQuenBackOfficeMobile.Converters"
+    BackgroundColor="#F5F5F5"
+    x:DataType="viewmodels:PhotoStoreUserViewModel"
+    x:Name="RootPage"
+    Padding="0">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:NullToBoolConverter x:Key="NullToBoolConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, *" ColumnDefinitions="*" Margin="15">
+        <Label
+            Grid.Row="0"
+            Text="Thêm hình ảnh nhà hàng:"
+            FontSize="20"
+            FontAttributes="Bold"
+            TextColor="Black"
+            Margin="0,0,0,10" />
+
+        <Label
+            Grid.Row="1"
+            Text="Ảnh bìa (Tối đa 1 ảnh)"
+            FontSize="16"
+            FontAttributes="Bold"
+            TextColor="Black"
+            Margin="0,0,0,5" />
+
+        <Border
+            Grid.Row="2"
+            HeightRequest="180"
+            Margin="0,0,0,10"
+            Stroke="#E0E0E0"
+            StrokeThickness="1"
+            Background="White"
+            HorizontalOptions="FillAndExpand"
+            VerticalOptions="Center"
+            Padding="0">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="16"/>
+            </Border.StrokeShape>
+            <Grid>
+                <Image Source="{Binding CoverImageSource}" Aspect="AspectFill"/>
+                <StackLayout IsVisible="{Binding CoverImageSource, Converter={StaticResource NullToBoolConverter}}"
+                             VerticalOptions="Center" HorizontalOptions="Center">
+                    <Image Source="add.png" HeightRequest="48" WidthRequest="48"/>
+                    <Label Text="Thêm ảnh hoặc kéo và thả (0/1)" TextColor="#FE8C18" FontSize="14" HorizontalOptions="Center"/>
+                </StackLayout>
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding AddCoverImageCommand}" />
+                </Grid.GestureRecognizers>
+            </Grid>
+        </Border>
+
+        <Label
+            Grid.Row="3"
+            Text="Thêm hình ảnh (Tối đa 8 ảnh)"
+            FontSize="16"
+            FontAttributes="Bold"
+            TextColor="Black"
+            Margin="0,0,0,5" />
+
+        <CollectionView Grid.Row="4" ItemsSource="{Binding GalleryImages}"  SelectionMode="None" VerticalOptions="FillAndExpand"  HorizontalOptions="FillAndExpand" ItemSizingStrategy="MeasureAllItems">
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical" Span="4" HorizontalItemSpacing="10" VerticalItemSpacing="5" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:ImageItem">
+                    <Border  Stroke="#E0E0E0" StrokeThickness="1" Background="White" Margin="5"  HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="12"/>
+                        </Border.StrokeShape>
+                        <Grid>
+                            <Image Source="{Binding Source}"  HorizontalOptions="FillAndExpand"  VerticalOptions="FillAndExpand" Aspect="AspectFill" IsVisible="{Binding Source}" />
+                            <StackLayout IsVisible="{Binding Source, Converter={StaticResource NullToBoolConverter}}" VerticalOptions="Center" HorizontalOptions="Center" Padding="0,30">
+                                <Image Source="add.png" HeightRequest="32" WidthRequest="32" />
+                            </StackLayout>
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding BindingContext.AddGalleryImageAtIndexCommand, Source={x:Reference Name=RootPage}}" CommandParameter="{Binding .}" />
+                            </Grid.GestureRecognizers>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Grid
+            Grid.Row="5"
+            ColumnDefinitions="*, *, *"
+            ColumnSpacing="12"
+            Margin="0,20,0,0">
+            <Button
+                Grid.Column="1"
+                Text="Lưu"
+                Command="{Binding SavePhotoCommand}"
+                HorizontalOptions="FillAndExpand"
+                HeightRequest="48"
+                BackgroundColor="{StaticResource Orange70Color}"
+                TextColor="White"
+                CornerRadius="24"
+                FontAttributes="Bold" />
+        </Grid>
+
+        <BoxView
+            Grid.Row="6"
+            BackgroundColor="Transparent"
+            HeightRequest="0" />
+    </Grid>
+</ContentPage>

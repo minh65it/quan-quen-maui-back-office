@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+			 xmlns:vm="clr-namespace:QuanQuenBackOfficeMobile.ViewModels"
+			 xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+			 x:Class="QuanQuenBackOfficeMobile.Views.DrawingExamplePage"
+			 x:DataType="vm:DrawingExampleViewModel"
+			 BackgroundColor="White">
+	<Grid RowDefinitions="Auto,*,Auto,Auto" Padding="20">
+		<Label 
+			Text="Chữ Ký Nhà Hàng"
+			FontSize="20"
+			FontAttributes="Bold"
+			HorizontalOptions="Center"
+			Margin="0,30,0,30"
+			TextColor="{StaticResource OrangeYellowColor}"/>
+
+        <toolkit:DrawingView
+        Grid.Row="1"
+        Margin="0,10,0,0"
+        Lines="{Binding Lines, Mode=TwoWay}"
+        IsMultiLineModeEnabled="True"
+        BackgroundColor="LightGray"
+        VerticalOptions="FillAndExpand"
+        HorizontalOptions="FillAndExpand"/> 
+
+        <Border Grid.Row="2" Stroke="#E0E0E0" StrokeThickness="1" Background="White" Margin="0,20,0,20" HeightRequest="200" Padding="10">
+			<Border.StrokeShape>
+				<RoundRectangle CornerRadius="8"/>
+			</Border.StrokeShape>
+			<Image
+				x:Name="GeneratedImage"
+				BackgroundColor="White"
+				Aspect="AspectFit"/>
+		</Border>
+
+        <StackLayout Grid.Row="3" Orientation="Horizontal" HorizontalOptions="FillAndExpand" Spacing="20">
+            <Button
+            Command="{Binding ClearCommand}"
+            Text="Xóa"
+            CornerRadius="30"
+            BorderColor="#80000000"
+            BorderWidth="1"
+            BackgroundColor="White"
+            TextColor="Black"
+            FontSize="20"
+            FontAttributes="Bold"
+            HorizontalOptions="FillAndExpand"
+            VerticalOptions="Center" />
+            <Button
+            Clicked="SaveClicked"
+            Text="Lưu"
+            CornerRadius="30"
+            BorderColor="Transparent"
+            BorderWidth="1"
+            TextColor="White"
+            FontSize="20"
+            FontAttributes="Bold"
+            HorizontalOptions="FillAndExpand"
+            VerticalOptions="Center">
+                <Button.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#FEBC18" Offset="0.0" />
+                        <GradientStop Color="#F58220" Offset="1.0" />
+                    </LinearGradientBrush>
+                </Button.Background>
+            </Button>
+        </StackLayout>
+	</Grid>
+</ContentPage>

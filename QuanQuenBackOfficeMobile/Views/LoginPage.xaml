@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:viewmodels="clr-namespace:QuanQuenBackOfficeMobile.ViewModels"
+    xmlns:Controls="clr-namespace:QuanQuenBackOfficeMobile.Controls"
+    x:Class="QuanQuenBackOfficeMobile.Views.LoginPage"
+    x:DataType="viewmodels:LoginViewModel"
+    Title=""
+    
+    BackgroundColor="White">
+
+    <ScrollView>
+        <VerticalStackLayout
+      Padding="30"
+      Spacing="30"
+      VerticalOptions="Center">
+
+            <!-- Logo -->
+            <Image
+        Source="logo.png"
+        HeightRequest="200"
+        HorizontalOptions="Center" />
+
+            <!-- Email / Phone Entry -->
+            <Frame
+        HasShadow="False"
+        BorderColor="Black"
+        CornerRadius="10"
+        Padding="0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="50" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Image
+            Source="user.png"
+            WidthRequest="24"
+            HeightRequest="24"
+            VerticalOptions="Center"
+            HorizontalOptions="Center" />
+
+                    <Controls:NoUnderlineEntry
+            Grid.Column="1"
+            Placeholder="Nhập số điện thoại hoặc email"
+            Text="{Binding EmailOrPhone}"
+            BackgroundColor="Transparent"
+            HeightRequest="50"
+            VerticalOptions="Center"
+            Margin="0,0,15,0"/>
+                </Grid>
+            </Frame>
+            <Label
+      Text="Vui lòng nhập số điện thoại hoặc email"
+      TextColor="Red"
+      IsVisible="{Binding ShowEmptyEmailError}"
+      FontSize="Small"/>
+
+            <!-- Password Entry -->
+            <Frame
+        HasShadow="False"
+        BorderColor="Black"
+        CornerRadius="10"
+        Padding="0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="50" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="50" />
+                    </Grid.ColumnDefinitions>
+
+                    <Image
+            Source="pw.png"
+            WidthRequest="24"
+            HeightRequest="24"
+            VerticalOptions="Center"
+            HorizontalOptions="Center" />
+
+                    <Controls:NoUnderlineEntry
+            Grid.Column="1"
+            Placeholder="Mật khẩu"
+            Text="{Binding Password}"
+            IsPassword="{Binding IsPasswordHidden}"
+            BackgroundColor="Transparent"
+            HeightRequest="50"
+            VerticalOptions="Center"
+            Margin="0,0,15,0"/>
+
+                    <Button
+            Grid.Column="2"
+            Command="{Binding TogglePasswordVisibilityCommand}"
+            Text="{Binding PasswordVisibilityIcon}"
+            BackgroundColor="Transparent"
+            VerticalOptions="Center"/>
+                </Grid>
+            </Frame>
+            <Label
+      Text="Vui lòng nhập mật khẩu"
+      TextColor="Red"
+      IsVisible="{Binding ShowEmptyPasswordError}"
+      FontSize="Small"/>
+            <Label
+      Text="Mật khẩu cần ít nhất 6 ký tự"
+      TextColor="Red"
+      IsVisible="{Binding ShowLengthPasswordError}"
+      FontSize="Small"/>
+            <Label
+      Text="{Binding AuthError}"
+      TextColor="Red"
+      FontSize="Small"
+      IsVisible="{Binding ShowAuthError}"
+      Margin="10,0,0,0"/>
+            <Button
+        Text="Đăng nhập"
+        TextColor="White"
+        HeightRequest="50"
+        CornerRadius="25"
+        Command="{Binding LoginCommand}">
+                <Button.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#FFC107" Offset="0.0" />
+                        <GradientStop Color="#FF5722" Offset="1.0" />
+                    </LinearGradientBrush>
+                </Button.Background>
+            </Button>
+            <HorizontalStackLayout
+      HorizontalOptions="Center"
+      Spacing="5">
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
