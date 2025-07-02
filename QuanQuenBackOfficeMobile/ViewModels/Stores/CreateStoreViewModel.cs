@@ -8,6 +8,7 @@ using QuanQuenBackOfficeMobile.Views.Stores;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Storage;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace QuanQuenBackOfficeMobile.ViewModels;
 
@@ -48,6 +49,24 @@ public partial class CreateStoreViewModel : ObservableObject
     private string email;
 
     [ObservableProperty]
+    private string phoneError = "";
+
+    [ObservableProperty]
+    private string emailError = "";
+
+    [ObservableProperty]
+    private string storeNameError = "";
+
+    [ObservableProperty]
+    private string representativeNameError = "";
+
+    [ObservableProperty]
+    private string addressError = "";
+
+    [ObservableProperty]
+    private string businessTypeError = "";
+
+    [ObservableProperty]
     private bool isBusy;
 
     public ICommand NextCommand { get; }
@@ -77,6 +96,36 @@ public partial class CreateStoreViewModel : ObservableObject
         LoadWardsAsync();
     }
 
+    partial void OnPhoneNumberChanged(string value)
+    {
+        ValidatePhoneNumber();
+    }
+
+    partial void OnEmailChanged(string value)
+    {
+        ValidateEmail();
+    }
+
+    partial void OnStoreNameChanged(string value)
+    {
+        ValidateStoreName();
+    }
+
+    partial void OnRepresentativeNameChanged(string value)
+    {
+        ValidateRepresentativeName();
+    }
+
+    partial void OnAddressChanged(string value)
+    {
+        ValidateAddress();
+    }
+
+    partial void OnSelectedBusinessTypeChanged(string value)
+    {
+        ValidateBusinessType();
+    }
+
     private async void LoadProvincesAsync()
     {
         ProvinceList.Clear();
@@ -102,43 +151,186 @@ public partial class CreateStoreViewModel : ObservableObject
             WardList.Add(w);
     }
 
+    /// <summary>
+    /// Validate số điện thoại Việt Nam
+    /// </summary>
+    private bool IsValidPhoneNumber(string phoneNumber)
+    {
+        if (string.IsNullOrWhiteSpace(phoneNumber))
+            return false;
+
+        // Loại bỏ khoảng trắng và ký tự đặc biệt
+        var cleanPhone = Regex.Replace(phoneNumber, @"[^\d]", "");
+        
+        // Kiểm tra độ dài
+        if (cleanPhone.Length != 10)
+            return false;
+        
+        // Kiểm tra format số điện thoại Việt Nam
+        // Bắt đầu bằng 0, tiếp theo là 3, 5, 7, 8, 9 và có 9 chữ số tiếp theo
+        var phonePattern = @"^0[3|5|7|8|9][0-9]{8}$";
+        return Regex.IsMatch(cleanPhone, phonePattern);
+    }
+
+  
+
+    /// <summary>
+    /// Validate email
+    /// </summary>
+    private bool IsValidEmail(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return false;
+
+        try
+        {
+            var addr = new System.Net.Mail.MailAddress(email);
+            return addr.Address == email;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Validate và cập nhật lỗi cho số điện thoại
+    /// </summary>
+    private void ValidatePhoneNumber()
+    {
+        if (string.IsNullOrWhiteSpace(PhoneNumber))
+        {
+            PhoneError = "Vui lòng nhập số điện thoại";
+        }
+        else if (!IsValidPhoneNumber(PhoneNumber))
+        {
+            PhoneError = "Số điện thoại không hợp lệ. Vui lòng nhập đúng định dạng số điện thoại Việt Nam";
+        }
+        else
+        {
+            PhoneError = "";
+        }
+    }
+
+    /// <summary>
+    /// Validate và cập nhật lỗi cho email
+    /// </summary>
+    private void ValidateEmail()
+    {
+        if (string.IsNullOrWhiteSpace(Email))
+        {
+            EmailError = "Vui lòng nhập email";
+        }
+        else if (!IsValidEmail(Email))
+        {
+            EmailError = "Email không hợp lệ. Vui lòng nhập đúng định dạng email (VD: example@email.com)";
+        }
+        else
+        {
+            EmailError = "";
+        }
+    }
+
+    /// <summary>
+    /// Validate tên cửa hàng
+    /// </summary>
+    private void ValidateStoreName()
+    {
+        if (string.IsNullOrWhiteSpace(StoreName))
+        {
+            StoreNameError = "Vui lòng nhập tên cửa hàng";
+        }
+        else
+        {
+            StoreNameError = "";
+        }
+    }
+
+    /// <summary>
+    /// Validate tên người đại diện
+    /// </summary>
+    private void ValidateRepresentativeName()
+    {
+        if (string.IsNullOrWhiteSpace(RepresentativeName))
+        {
+            RepresentativeNameError = "Vui lòng nhập tên người đại diện";
+        }
+        else if (RepresentativeName.Length < 2)
+        {
+            RepresentativeNameError = "Tên người đại diện phải có ít nhất 2 ký tự";
+        }
+        else
+        {
+            RepresentativeNameError = "";
+        }
+    }
+
+    /// <summary>
+    /// Validate địa chỉ
+    /// </summary>
+    private void ValidateAddress()
+    {
+        if (string.IsNullOrWhiteSpace(Address))
+        {
+            AddressError = "Vui lòng nhập địa chỉ chi tiết";
+        }
+        else
+        {
+            AddressError = "";
+        }
+    }
+
+    /// <summary>
+    /// Validate loại hình kinh doanh
+    /// </summary>
+    private void ValidateBusinessType()
+    {
+        if (string.IsNullOrWhiteSpace(SelectedBusinessType))
+        {
+            BusinessTypeError = "Vui lòng chọn loại hình kinh doanh";
+        }
+        else
+        {
+            BusinessTypeError = "";
+        }
+    }
+
+    /// <summary>
+    /// Validate địa chỉ (tỉnh/thành, quận/huyện, phường/xã)
+    /// </summary>
+    private bool ValidateLocation()
+    {
+        return SelectedProvince != null && SelectedDistrict != null && SelectedWard != null;
+    }
+
+    /// <summary>
+    /// Validate tất cả các trường
+    /// </summary>
+    private bool ValidateAllFields()
+    {
+        ValidateStoreName();
+        ValidateRepresentativeName();
+        ValidatePhoneNumber();
+        ValidateEmail();
+        ValidateAddress();
+        ValidateBusinessType();
+
+        return string.IsNullOrWhiteSpace(StoreNameError) &&
+               string.IsNullOrWhiteSpace(RepresentativeNameError) &&
+               string.IsNullOrWhiteSpace(PhoneError) &&
+               string.IsNullOrWhiteSpace(EmailError) &&
+               string.IsNullOrWhiteSpace(AddressError) &&
+               string.IsNullOrWhiteSpace(BusinessTypeError) &&
+               ValidateLocation();
+    }
+
     private async Task OnNextClicked()
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(StoreName))
+            if (!ValidateAllFields())
             {
-                await App.Current.MainPage.DisplayAlert("Lỗi", "Vui lòng nhập tên cửa hàng", "OK");
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(RepresentativeName))
-            {
-                await App.Current.MainPage.DisplayAlert("Lỗi", "Vui lòng nhập tên người đại diện", "OK");
-                return;
-            }
-
-            if (SelectedProvince == null || SelectedDistrict == null || SelectedWard == null)
-            {
-                await App.Current.MainPage.DisplayAlert("Lỗi", "Vui lòng chọn đầy đủ thông tin địa chỉ", "OK");
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(Address))
-            {
-                await App.Current.MainPage.DisplayAlert("Lỗi", "Vui lòng nhập địa chỉ chi tiết", "OK");
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(PhoneNumber))
-            {
-                await App.Current.MainPage.DisplayAlert("Lỗi", "Vui lòng nhập số điện thoại", "OK");
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(Email))
-            {
-                await App.Current.MainPage.DisplayAlert("Lỗi", "Vui lòng nhập email", "OK");
+                await App.Current.MainPage.DisplayAlert("Lỗi", "Vui lòng khắc phục các lỗi đã nêu", "OK");
                 return;
             }
 

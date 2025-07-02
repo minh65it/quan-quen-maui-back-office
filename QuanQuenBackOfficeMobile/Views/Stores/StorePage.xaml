@@ -4,30 +4,42 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:vm="clr-namespace:QuanQuenBackOfficeMobile.ViewModels"
     xmlns:models="clr-namespace:QuanQuenBackOfficeMobile.Models"
+    xmlns:converters="clr-namespace:QuanQuenBackOfficeMobile.Converters"
     x:Class="QuanQuenBackOfficeMobile.Views.StorePage"
     x:DataType="vm:StorePageViewModel">
     
-    <Grid RowDefinitions="Auto,Auto,*" Padding="10" RowSpacing="10">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:NullOrEmptyToNAConverter x:Key="NullOrEmptyToNAConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="8" RowSpacing="8">
+        <!-- Logo Section -->
+        <VerticalStackLayout Grid.Row="0" Spacing="8" HorizontalOptions="Center" Margin="0,10,0,20">
+            <Image Source="logo_qq_new.png" HeightRequest="80" WidthRequest="80" />
+        </VerticalStackLayout>
+
         <!-- Header -->
-        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto">
             <Label Text="Danh sách nhà hàng" 
-                   FontSize="24" 
+                   FontSize="20" 
                    FontAttributes="Bold" 
                    Grid.Column="0"/>
             <Button Text="➕ Tạo mới"
                     Command="{Binding CreateStoreCommand}"
                     Grid.Column="1"
+                    FontSize="12"
                     BackgroundColor="{StaticResource Orange70Color}"
                     TextColor="White"
                     FontAttributes="Bold"
-                    HeightRequest="40"
+                    HeightRequest="35"
                     CornerRadius="8"/>
         </Grid>
 
         <!-- Search Bar -->
-        <Grid Grid.Row="1" 
+        <Grid Grid.Row="2" 
               ColumnDefinitions="*,Auto"
-              Margin="0,0,0,5">
+              Margin="0,0,0,0">
             <Border Stroke="{AppThemeBinding Light={StaticResource Orange70Color}, Dark={StaticResource Gray600}}"
                     StrokeThickness="1"
                     BackgroundColor="White"
@@ -61,8 +73,8 @@
         </Grid>
 
         <!-- Store List -->
-        <Grid Grid.Row="2">
-            <CollectionView Grid.Row="2"
+        <Grid Grid.Row="3">
+            <CollectionView Grid.Row="0"
                         ItemsSource="{Binding Stores}"
                         RemainingItemsThreshold="5"
                         RemainingItemsThresholdReached="OnRemainingItemsThresholdReached">
@@ -88,15 +100,30 @@
                                 <RoundRectangle CornerRadius="16"/>
                             </Border.StrokeShape>
                             <VerticalStackLayout Spacing="4">
-                                <Label FormattedText="{Binding StoreName, StringFormat='Tên cửa hàng: {0}'}"
-                                   TextColor="{StaticResource Primary}"
-                                   FontAttributes="Bold" />
-                                <Label FormattedText="{Binding Address, StringFormat='Địa chỉ: {0}'}"
-                                   TextColor="{StaticResource Primary}"
-                                   FontAttributes="Bold" />
-                                <Label FormattedText="{Binding StorePhone, StringFormat='Số điện thoại: {0}'}"
-                                   TextColor="{StaticResource Primary}"
-                                   FontAttributes="Bold" />
+                                <Label>
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="Tên cửa hàng: "/>
+                                            <Span Text="{Binding StoreName, Converter={StaticResource NullOrEmptyToNAConverter}}"/>
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                                <Label>
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="Địa chỉ: "/>
+                                            <Span Text="{Binding Address, Converter={StaticResource NullOrEmptyToNAConverter}}"/>
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                                <Label>
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="Số điện thoại: "/>
+                                            <Span Text="{Binding StorePhone, Converter={StaticResource NullOrEmptyToNAConverter}}"/>
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
                                 <!-- Actions -->
                                 <HorizontalStackLayout HorizontalOptions="End" Spacing="10" Margin="0,0,0,0">
                                     <Button Text="Chi tiết"

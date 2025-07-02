@@ -134,7 +134,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiSplashScreen Include="Resources\Splash\logo.svg" Color="Transparent" />
+	  <MauiSplashScreen Include="Resources\Splash\logo_qq_new.png" Color="Transparent" />
 	</ItemGroup>
 
 	<ItemGroup>
