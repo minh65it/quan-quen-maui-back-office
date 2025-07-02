@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Maui.Storage;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
 using System.Diagnostics;
+using System.Linq;
 
 namespace QuanQuenBackOfficeMobile.Services;
 
@@ -26,10 +27,25 @@ public class StoreMediaService : IStoreMediaService
     {
         try
         {
+            if (string.IsNullOrEmpty(nameMedia))
+            {
+                Debug.WriteLine("[StoreMediaService] GetThumbnailCategoryMediaIdAsync - nameMedia is null or empty");
+                return null;
+            }
+
             var token = await SecureStorage.GetAsync("auth_token");
+            if (string.IsNullOrEmpty(token))
+            {
+                Debug.WriteLine("[StoreMediaService] GetThumbnailCategoryMediaIdAsync - No auth token found");
+                return null;
+            }
+
             var baseUrl = _configuration["API:Store:BaseUrl"];
             var path = _configuration["API:Store:GetCategoryMedia"];
             var apiUrl = $"{baseUrl}/{path}?storeId=default";
+
+            Debug.WriteLine($"[StoreMediaService] GetThumbnailCategoryMediaIdAsync - API URL: {apiUrl}");
+            Debug.WriteLine($"[StoreMediaService] GetThumbnailCategoryMediaIdAsync - Looking for nameMedia: {nameMedia}");
 
             var request = new HttpRequestMessage(HttpMethod.Get, apiUrl);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
@@ -38,17 +54,34 @@ public class StoreMediaService : IStoreMediaService
             response.EnsureSuccessStatusCode();
             var result = await response.Content.ReadAsStringAsync();
 
-            using var doc = JsonDocument.Parse(result);
-            var root = doc.RootElement;
-            if (root.TryGetProperty("result", out var resultArray) && resultArray.ValueKind == JsonValueKind.Array)
+            Debug.WriteLine($"[StoreMediaService] GetThumbnailCategoryMediaIdAsync - Response: {result}");
+
+            // Deserialize response thành object
+            var categoryMediaResponse = JsonSerializer.Deserialize<CategoryMediaResponse>(result, new JsonSerializerOptions
             {
-                foreach (var item in resultArray.EnumerateArray())
+                PropertyNameCaseInsensitive = true
+            });
+
+            if (categoryMediaResponse?.Result != null)
+            {
+                Debug.WriteLine($"[StoreMediaService] GetThumbnailCategoryMediaIdAsync - Found {categoryMediaResponse.Result.Count} categories");
+                
+                // Sử dụng LINQ để tìm categoryMediaId
+                var category = categoryMediaResponse.Result.FirstOrDefault(item => item.NameMedia == nameMedia);
+
+                if (category != null)
                 {
-                    if (item.TryGetProperty("nameMedia", out var nameProp) && nameProp.GetString() == nameMedia)
-                    {
-                        return item.GetProperty("categoryMediaId").GetString();
-                    }
+                    Debug.WriteLine($"[StoreMediaService] GetThumbnailCategoryMediaIdAsync - Found categoryMediaId: {category.CategoryMediaId} for nameMedia: {nameMedia}");
+                    return category.CategoryMediaId;
                 }
+                else
+                {
+                    Debug.WriteLine($"[StoreMediaService] GetThumbnailCategoryMediaIdAsync - No categoryMediaId found for nameMedia: {nameMedia}");
+                }
+            }
+            else
+            {
+                Debug.WriteLine("[StoreMediaService] GetThumbnailCategoryMediaIdAsync - Response is null or does not contain result");
             }
         }
         catch (Exception ex)

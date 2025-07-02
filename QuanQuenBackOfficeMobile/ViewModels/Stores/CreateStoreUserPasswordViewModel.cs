@@ -178,8 +178,13 @@ public partial class CreateStoreUserPasswordViewModel : ObservableObject
                 return;
             }
             var nameMedia = "Hồ sơ nhà hàng";
-            // Lấy categoryMediaId (nên await vì hàm này trả về Task<string>)
             var categoryMediaId = await _storeMediaService.GetThumbnailCategoryMediaIdAsync(nameMedia);
+            
+            if (string.IsNullOrEmpty(categoryMediaId))
+            {
+                PasswordError = "Không tìm thấy categoryMediaId cho hồ sơ nhà hàng!";
+                return;
+            }
 
             // Lấy userName để truyền vào createdBy
             var createdBy = await SecureStorage.GetAsync("userName");

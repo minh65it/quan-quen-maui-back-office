@@ -278,4 +278,46 @@ namespace QuanQuenBackOfficeMobile.Models
     {
         public byte[] Image { get; set; }
     }
+
+    public class CategoryMediaItem
+    {
+        [JsonPropertyName("categoryMediaId")]
+        public string CategoryMediaId { get; set; } = string.Empty;
+
+        [JsonPropertyName("nameMedia")]
+        public string NameMedia { get; set; } = string.Empty;
+
+        [JsonPropertyName("storeId")]
+        public string StoreId { get; set; } = string.Empty;
+
+        [JsonPropertyName("countMedia")]
+        public int CountMedia { get; set; }
+
+        [JsonPropertyName("createDate")]
+        public DateTime? CreateDate { get; set; }
+
+        [JsonPropertyName("updateDate")]
+        public DateTime? UpdateDate { get; set; }
+
+        [JsonPropertyName("createBy")]
+        public string CreateBy { get; set; } = string.Empty;
+
+        [JsonPropertyName("updateBy")]
+        public string UpdateBy { get; set; } = string.Empty;
+
+        [JsonPropertyName("isDelete")]
+        public bool? IsDelete { get; set; }
+
+        [JsonPropertyName("position")]
+        public int Position { get; set; }
+    }
+
+    public class CategoryMediaResponse
+    {
+        [JsonPropertyName("pagination")]
+        public PaginationInfo Pagination { get; set; } = new();
+
+        [JsonPropertyName("result")]
+        public List<CategoryMediaItem> Result { get; set; } = new();
+    }
 } 

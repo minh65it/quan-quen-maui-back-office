@@ -61,6 +61,7 @@ public partial class CreateStoreViewModel : ObservableObject
         LoadProvincesAsync();
         BusinessTypeList.Add("Tư Nhân");
         BusinessTypeList.Add("Công Ty");
+        BusinessTypeList.Add("Hộ Kinh Doanh");
         NextCommand = new Command(async () => await OnNextClicked());
         PickLicenseImagesCommand = new AsyncRelayCommand(PickLicenseImagesAsync, () => CanAddMoreLicenseImages);
         CaptureLicenseImageCommand = new AsyncRelayCommand(CaptureLicenseImageAsync, () => CanAddMoreLicenseImages);

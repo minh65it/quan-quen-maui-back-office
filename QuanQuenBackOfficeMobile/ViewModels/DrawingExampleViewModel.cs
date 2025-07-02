@@ -32,10 +32,10 @@ public partial class DrawingExampleViewModel : BaseViewModel
         {
             if (imageStream.CanSeek)
                 imageStream.Position = 0;
+            var storeId = StoreRegistrationData.StoreId;
+            var createdBy = await SecureStorage.GetAsync("userName");
             var nameMedia = "Chữ kí"; 
             var categoryMediaId = await _storeMediaService.GetThumbnailCategoryMediaIdAsync(nameMedia);
-            var createdBy = await SecureStorage.GetAsync("userName");
-            var storeId = StoreRegistrationData.StoreId;
 
             if (string.IsNullOrEmpty(storeId) || string.IsNullOrEmpty(createdBy) || string.IsNullOrEmpty(categoryMediaId))
             {
