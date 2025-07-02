@@ -23,7 +23,7 @@ public partial class DrawingExampleViewModel : BaseViewModel
     [RelayCommand]
 	public void Clear()
 	{
-		Lines.Clear();
+		Lines?.Clear();
 	}
 
     public async Task UploadImageAsync(Stream imageStream)

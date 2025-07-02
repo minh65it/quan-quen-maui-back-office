@@ -18,8 +18,8 @@
 
             <!-- Logo -->
             <Image
-        Source="logo.png"
-        HeightRequest="200"
+        Source="logo_qq_new.png"
+        HeightRequest="100"
         HorizontalOptions="Center" />
 
             <!-- Email / Phone Entry -->

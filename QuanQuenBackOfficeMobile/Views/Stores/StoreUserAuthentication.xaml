@@ -8,7 +8,7 @@
     <ScrollView>
         <VerticalStackLayout Padding="30" Spacing="20" VerticalOptions="Start">
             <!-- Logo -->
-            <Image Source="logo.png"
+            <Image Source="logo_qq_new.png"
                    HeightRequest="120"
                    HorizontalOptions="Center"/>
             <Label Text="QUÁN QUEN"

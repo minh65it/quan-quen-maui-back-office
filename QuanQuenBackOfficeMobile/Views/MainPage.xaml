@@ -19,7 +19,7 @@
             </Grid.ColumnDefinitions>
             
             <!-- Logo and User Info -->
-            <Image Source="logo.png" 
+            <Image Source="logo_qq_new.png" 
                    HeightRequest="60" 
                    WidthRequest="60" 
                    VerticalOptions="Center" />
@@ -51,25 +51,10 @@
     </Shell.FlyoutHeader>
 
     <!-- Sidebar Menu -->
-    <FlyoutItem Title="Stores" >
+    <FlyoutItem Title="Danh sách nhà hàng" >
         <ShellContent ContentTemplate="{DataTemplate views:StorePage}" />
     </FlyoutItem>
-    <FlyoutItem Title="Settings" >
-        <ShellContent ContentTemplate="{DataTemplate views:SettingsPage}" />
-    </FlyoutItem>
-    <FlyoutItem Title="WebView" >
-        <ShellContent ContentTemplate="{DataTemplate views:WebViewPage}" />
-    </FlyoutItem>
-    <FlyoutItem Title="Settings Detail" >
-        <ShellContent ContentTemplate="{DataTemplate views:SettingsDetailPage}" />
-    </FlyoutItem>
-    <FlyoutItem Title="Media" >
-        <ShellContent ContentTemplate="{DataTemplate views:MediaElementPage}" />
-    </FlyoutItem>
-    <FlyoutItem Title="Map" >
-        <ShellContent ContentTemplate="{DataTemplate views:MapPage}" />
-    </FlyoutItem>
-    <FlyoutItem Title="About">
+    <FlyoutItem Title="Về Quán Quen Agent">
         <ShellContent ContentTemplate="{DataTemplate views:AboutPage}" />
     </FlyoutItem>
 </Shell>

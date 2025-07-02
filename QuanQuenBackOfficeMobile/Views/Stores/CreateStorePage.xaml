@@ -7,12 +7,18 @@
              xmlns:models="clr-namespace:QuanQuenBackOfficeMobile.Models"
              x:DataType="viewmodels:CreateStoreViewModel"
              xmlns:controls="clr-namespace:QuanQuenBackOfficeMobile.Controls"
+             xmlns:converters="clr-namespace:QuanQuenBackOfficeMobile.Converters"
              Title="Đăng ký nhà hàng">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:StringToBoolConverter x:Key="StringToBoolConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
     <ScrollView>
         <VerticalStackLayout Padding="30" Spacing="10">
             <!-- Logo và tên ứng dụng -->
             <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
-                <Image Source="logo.png" HeightRequest="80" WidthRequest="80" />
+                <Image Source="logo_qq_new.png" HeightRequest="80" WidthRequest="80" />
                 <Label Text="QUÁN QUEN"
                FontSize="24"
                FontAttributes="Bold"
@@ -21,7 +27,7 @@
             </VerticalStackLayout>
 
             <!-- Tên Nhà hàng/Quán ăn -->
-            <Label Text="Tên Nhà hàng"
+            <Label Text="Tên Nhà hàng *"
                    FontSize="14"
                    TextColor="Black" />
             <Entry Placeholder="Tên Nhà hàng/Quán ăn"
@@ -29,9 +35,14 @@
                    HeightRequest="44"
                    FontSize="16"
                    BackgroundColor="White" />
+            <Label Text="{Binding StoreNameError}"
+                   FontSize="12"
+                   TextColor="Red"
+                   IsVisible="{Binding StoreNameError, Converter={StaticResource StringToBoolConverter}}"
+                   Margin="0,2,0,0"/>
 
             <!-- Tên người đại diện -->
-            <Label Text="Người đại diện"
+            <Label Text="Người đại diện *"
                    FontSize="14"
                    TextColor="Black" />
             <Entry Placeholder="Nhập tên người đại diện"
@@ -39,6 +50,11 @@
                    HeightRequest="44"
                    FontSize="16"
                    BackgroundColor="White" />
+            <Label Text="{Binding RepresentativeNameError}"
+                   FontSize="12"
+                   TextColor="Red"
+                   IsVisible="{Binding RepresentativeNameError, Converter={StaticResource StringToBoolConverter}}"
+                   Margin="0,2,0,0"/>
 
             <!-- Thành phố -->
             <Label Text="Thành phố"
@@ -77,7 +93,7 @@
                     BackgroundColor="White" />
 
             <!-- Địa chỉ kinh doanh -->
-            <Label Text="Địa Chỉ"
+            <Label Text="Địa Chỉ *"
                    FontSize="14"
                    TextColor="Black" />
             <Entry Placeholder="Địa chỉ kinh doanh"
@@ -85,6 +101,11 @@
                    HeightRequest="44"
                    FontSize="16"
                    BackgroundColor="White" />
+            <Label Text="{Binding AddressError}"
+                   FontSize="12"
+                   TextColor="Red"
+                   IsVisible="{Binding AddressError, Converter={StaticResource StringToBoolConverter}}"
+                   Margin="0,2,0,0"/>
 
             <!-- Số điện thoại đăng ký -->
             <Label Text="Số điện thoại đăng ký *"
@@ -96,6 +117,11 @@
                    FontSize="16"
                    Keyboard="Telephone"
                    BackgroundColor="White" />
+            <Label Text="{Binding PhoneError}"
+                   FontSize="12"
+                   TextColor="Red"
+                   IsVisible="{Binding PhoneError, Converter={StaticResource StringToBoolConverter}}"
+                   Margin="0,2,0,0"/>
 
             <!-- Email đăng ký -->
             <Label Text="Email đăng ký *"
@@ -107,9 +133,14 @@
                    FontSize="16"
                    Keyboard="Email"
                    BackgroundColor="White" />
+            <Label Text="{Binding EmailError}"
+                   FontSize="12"
+                   TextColor="Red"
+                   IsVisible="{Binding EmailError, Converter={StaticResource StringToBoolConverter}}"
+                   Margin="0,2,0,0"/>
 
             <!-- Loại hình kinh doanh -->
-            <Label Text="Loại hình kinh doanh"
+            <Label Text="Loại hình kinh doanh *"
                    FontSize="14"
                    TextColor="Black" />
             <controls:CustomDropdownPicker ItemsSource="{Binding BusinessTypeList}" Title="Chọn loại hình kinh doanh"
@@ -117,6 +148,11 @@
                     HeightRequest="44"
                     FontSize="14"
                     BackgroundColor="White" />
+            <Label Text="{Binding BusinessTypeError}"
+                   FontSize="12"
+                   TextColor="Red"
+                   IsVisible="{Binding BusinessTypeError, Converter={StaticResource StringToBoolConverter}}"
+                   Margin="0,2,0,0"/>
 
             <Label Text="Ảnh giấy phép kinh doanh (tối đa 4 ảnh*)"
                    FontSize="14"

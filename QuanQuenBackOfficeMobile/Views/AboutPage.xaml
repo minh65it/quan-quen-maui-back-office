@@ -3,6 +3,28 @@
 			 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
 			 xmlns:vm="clr-namespace:QuanQuenBackOfficeMobile.ViewModels"
 			 x:Class="QuanQuenBackOfficeMobile.Views.AboutPage"
-			 x:DataType="vm:AboutViewModel">
-
+			 x:DataType="vm:AboutViewModel"
+			 BackgroundColor="#FFF9F5">
+    <ScrollView VerticalOptions="FillAndExpand">
+        <VerticalStackLayout Padding="10,20,10,10" Spacing="8" VerticalOptions="Start" HorizontalOptions="Center">
+            <!-- Logo -->
+            <Image Source="logo_qq_new.png" HeightRequest="80" WidthRequest="80" HorizontalOptions="Center"/>
+            <!-- App Name -->
+            <Label Text="QUÁN QUEN BACKOFFICE" FontSize="24" FontAttributes="Bold" TextColor="#F58220" HorizontalOptions="Center"/>
+            <!-- Version -->
+            <Frame BackgroundColor="#FFF3E0" Padding="8,2" CornerRadius="12" HasShadow="False" HorizontalOptions="Center">
+                <Label Text="{Binding Version}" FontSize="14" TextColor="#F58220" HorizontalOptions="Center"/>
+            </Frame>
+            <!-- Description -->
+            <Label Text="Ứng dụng quản lý dành cho nhân viên của quán quen." Padding="20,10,15,5"
+                   FontSize="14" TextColor="#333" HorizontalOptions="Center" HorizontalTextAlignment="Center"/>
+            <!-- Functions -->
+            <Frame BackgroundColor="#FFF3E0" Padding="12" CornerRadius="16" HasShadow="True" HorizontalOptions="Center">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Chức năng nổi bật:" FontSize="16" FontAttributes="Bold" TextColor="#F58220"/>
+                    <Label Text="{Binding AppFunctions}" FontSize="13" TextColor="#333"/>
+                </VerticalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>
