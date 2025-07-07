@@ -10,23 +10,14 @@
         <converters:EnumDisplayNameConverter x:Key="EnumDisplayNameConverter" />
     </ContentPage.Resources>
     <VerticalStackLayout Padding="30" Spacing="20">
-        <Label Text="Chọn Level cho cửa hàng" FontSize="22" FontAttributes="Bold" TextColor="#FF9900" HorizontalOptions="Center" />
-        
-        <Label Text="Chọn Level" FontSize="16" />
-        <Picker x:Name="LevelPicker"
-                Title="Chọn Level"
-                ItemsSource="{Binding LevelNames}"
-                SelectedIndex="{Binding SelectedLevelIndex, Mode=TwoWay}"
-                TextColor="Black" />
+        <Label Text="Cập nhật trạng thái cửa hàng" FontSize="22" FontAttributes="Bold" TextColor="#FF9900" HorizontalOptions="Center" />
         <Label Text="Chọn Trạng thái" FontSize="16" />
-        
         <controls:CustomDropdownPicker x:Name="StatusPicker"
         Title="Chọn Trạng thái"
         ItemsSource="{Binding StatusNames}"
         SelectedIndex="{Binding SelectedStatusIndex, Mode=TwoWay}"
         TextColor="Black"
         ItemDisplayBinding="{Binding ., Converter={StaticResource EnumDisplayNameConverter}}" />
-        
         <Label Text="Ngày bắt đầu" TextColor="Black" />
         <DatePicker
         x:Name="StartDatePicker"
@@ -49,7 +40,6 @@
         HorizontalOptions="Fill"
         FontSize="18"
         />
-
         <Button Text="Xác nhận" 
                 Command="{Binding ConfirmCommand}" 
                 BackgroundColor="#FF9900" 

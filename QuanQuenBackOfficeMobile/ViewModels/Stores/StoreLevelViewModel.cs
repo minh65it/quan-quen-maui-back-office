@@ -16,12 +16,6 @@ public partial class StoreLevelViewModel : ObservableObject
     private ObservableCollection<Status> _statusNames = new();
 
     [ObservableProperty]
-    private ObservableCollection<string> _levelNames = new();
-
-    [ObservableProperty]
-    private int _selectedLevelIndex = -1;
-
-    [ObservableProperty]
     private int _selectedStatusIndex = -1;
 
     [ObservableProperty]
@@ -32,7 +26,6 @@ public partial class StoreLevelViewModel : ObservableObject
 
     public ICommand ConfirmCommand { get; }
 
-    private List<LevelDto> _levels = new();
     private readonly IStoreUserService _storeUserService;
     private readonly IStoreService _storeService;
 
@@ -41,7 +34,6 @@ public partial class StoreLevelViewModel : ObservableObject
         _storeUserService = App.Services.GetService<IStoreUserService>();
         _storeService = App.Services.GetService<IStoreService>();
         ConfirmCommand = new AsyncRelayCommand(OnConfirm);
-        _ = LoadLevelsAsync();
         InitializeStatusList();
     }
 
@@ -50,46 +42,23 @@ public partial class StoreLevelViewModel : ObservableObject
         StatusNames = new ObservableCollection<Status>(Enum.GetValues(typeof(Status)).Cast<Status>());
     }
 
-    private async Task LoadLevelsAsync()
-    {
-        try
-        {
-            var response = await _storeUserService.GetListLevelAsync();
-            if (response?.Result != null)
-            {
-                _levels = response.Result;
-                LevelNames = new ObservableCollection<string>(_levels.Select(l => l.LevelName));
-            }
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"[StoreLevel] LoadLevelsAsync error: {ex.Message}");
-        }
-    }
-
     private async Task OnConfirm()
     {
-        if (_selectedLevelIndex < 0 || _selectedLevelIndex >= _levels.Count)
-        {
-            await App.Current.MainPage.DisplayAlert("Lỗi", "Vui lòng chọn Level", "OK");
-            return;
-        }
-
         if (_selectedStatusIndex < 0 || _selectedStatusIndex >= _statusNames.Count)
         {
             await App.Current.MainPage.DisplayAlert("Lỗi", "Vui lòng chọn Trạng thái", "OK");
             return;
         }
 
-        var selectedLevel = _levels[_selectedLevelIndex];
         var storeId = StoreRegistrationData.StoreId;
+        int levelId = 1;
 
         // 1. Update Level
-        var levelResult = await _storeUserService.UpdateStoreLevelAsync(storeId, selectedLevel.Id, _startDate, _endDate);
+        var levelResult = await _storeUserService.UpdateStoreLevelAsync(storeId, levelId, _startDate, _endDate);
         if (!levelResult.IsSuccess)
         {
             System.Diagnostics.Debug.WriteLine($"[StoreLevel] UpdateStoreLevelAsync failed: {levelResult.Message}");
-            await App.Current.MainPage.DisplayAlert("Lỗi", levelResult.Message ?? "Cập nhật level thất bại", "OK");
+            await App.Current.MainPage.DisplayAlert("Lỗi", levelResult.Message ?? "Có lỗi xảy ra", "OK");
             return;
         }
 

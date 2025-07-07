@@ -166,47 +166,7 @@ namespace QuanQuenBackOfficeMobile.Services
                 using var form = new MultipartFormDataContent();
                 form.Add(new StringContent(storeId), "StoreId");
                 form.Add(new StringContent(((int)status).ToString()), "Status");
-                // Thêm các trường khác với giá trị null
-                form.Add(new StringContent(""), "Avatar");
-                form.Add(new StringContent(""), "CoverImage");
-                form.Add(new StringContent(""), "FrontPicIdentityCard");
-                form.Add(new StringContent(""), "BackPicIdentityCard");
-                form.Add(new StringContent(""), "ImageMenu");
-                form.Add(new StringContent(""), "StoreName");
-                form.Add(new StringContent(""), "StorePhone");
-                form.Add(new StringContent(""), "StorePhone2");
-                form.Add(new StringContent(""), "StoreLandlinePhone");
-                form.Add(new StringContent(""), "StoreLandlinePhone2");
-                form.Add(new StringContent(""), "StoreEmail");
-                form.Add(new StringContent(""), "Address");
-                form.Add(new StringContent(""), "Ward");
-                form.Add(new StringContent(""), "District");
-                form.Add(new StringContent(""), "City");
-                form.Add(new StringContent(""), "NoteAddress");
-                form.Add(new StringContent(""), "Latitude");
-                form.Add(new StringContent(""), "Longitude");
-                form.Add(new StringContent(""), "Hashtag");
-                form.Add(new StringContent(""), "Description");
-                form.Add(new StringContent("false"), "IsRegisterByCompany");
-                form.Add(new StringContent("false"), "IsRegisterByPersonality");
-                form.Add(new StringContent(""), "CompanyName");
-                form.Add(new StringContent(""), "CompanyAddress");
-                form.Add(new StringContent(""), "RepresentativeName");
-                form.Add(new StringContent(""), "RepresentativeEmail");
-                form.Add(new StringContent(""), "RepresentativePhone");
-                form.Add(new StringContent(""), "RepresentativePhoneOther");
-                form.Add(new StringContent(""), "WardId");
-                form.Add(new StringContent(""), "DistrictId");
-                form.Add(new StringContent(""), "CityId");
-                form.Add(new StringContent(""), "CompanyWard");
-                form.Add(new StringContent(""), "CompanyDistrict");
-                form.Add(new StringContent(""), "CompanyCity");
-                form.Add(new StringContent(""), "CompanyWardId");
-                form.Add(new StringContent(""), "CompanyDistrictId");
-                form.Add(new StringContent(""), "CompanyCityId");
-                form.Add(new StringContent(""), "TaxCode");
-                form.Add(new StringContent(""), "ReferralId");
-
+            
                 var request = new HttpRequestMessage(HttpMethod.Put, url)
                 {
                     Content = form
