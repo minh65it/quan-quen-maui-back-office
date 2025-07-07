@@ -28,7 +28,7 @@ public partial class StoreLevelViewModel : ObservableObject
     private DateTime _startDate = DateTime.Today;
 
     [ObservableProperty]
-    private DateTime _endDate = DateTime.Today.AddDays(30);
+    private DateTime _endDate = DateTime.Today.AddDays(90);
 
     public ICommand ConfirmCommand { get; }
 

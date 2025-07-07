@@ -11,6 +11,7 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <converters:NullOrEmptyToNAConverter x:Key="NullOrEmptyToNAConverter" />
+            <converters:AvatarUrlConverter x:Key="AvatarUrlConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
     <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="8" RowSpacing="8">
@@ -74,12 +75,14 @@
 
         <!-- Store List -->
         <Grid Grid.Row="3">
-            <CollectionView Grid.Row="0"
-                        ItemsSource="{Binding Stores}"
-                        RemainingItemsThreshold="5"
-                        RemainingItemsThresholdReached="OnRemainingItemsThresholdReached">
+            <CollectionView
+                ItemsSource="{Binding Stores}"
+                RemainingItemsThreshold="5"
+                RemainingItemsThresholdReached="OnRemainingItemsThresholdReached"
+                Margin="0,10,0,0"
+                SelectionMode="None">
                 <CollectionView.ItemsLayout>
-                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"/>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="14"/>
                 </CollectionView.ItemsLayout>
                 <CollectionView.EmptyView>
                     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
@@ -91,54 +94,40 @@
                 </CollectionView.EmptyView>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:StoreModel">
-                        <Border
-                                Padding="15"
-                                BackgroundColor="White"
-                                Stroke="{StaticResource Orange70Color}"
-                                StrokeThickness="1">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="16"/>
-                            </Border.StrokeShape>
-                            <VerticalStackLayout Spacing="4">
-                                <Label>
-                                    <Label.FormattedText>
-                                        <FormattedString>
-                                            <Span Text="Tên cửa hàng: "/>
-                                            <Span Text="{Binding StoreName, Converter={StaticResource NullOrEmptyToNAConverter}}"/>
-                                        </FormattedString>
-                                    </Label.FormattedText>
-                                </Label>
-                                <Label>
-                                    <Label.FormattedText>
-                                        <FormattedString>
-                                            <Span Text="Địa chỉ: "/>
-                                            <Span Text="{Binding Address, Converter={StaticResource NullOrEmptyToNAConverter}}"/>
-                                        </FormattedString>
-                                    </Label.FormattedText>
-                                </Label>
-                                <Label>
-                                    <Label.FormattedText>
-                                        <FormattedString>
-                                            <Span Text="Số điện thoại: "/>
-                                            <Span Text="{Binding StorePhone, Converter={StaticResource NullOrEmptyToNAConverter}}"/>
-                                        </FormattedString>
-                                    </Label.FormattedText>
-                                </Label>
-                                <!-- Actions -->
-                                <HorizontalStackLayout HorizontalOptions="End" Spacing="10" Margin="0,0,0,0">
+                        <Frame Padding="0" Margin="0,0,0,10" CornerRadius="24" HasShadow="True" BackgroundColor="White" BorderColor="{StaticResource Orange70Color}">
+                            <Grid ColumnDefinitions="90,*,Auto" RowDefinitions="Auto" Padding="18">
+                                <!-- Avatar -->
+                                <Frame Grid.Column="0" Padding="0" HeightRequest="80" WidthRequest="80" CornerRadius="40" HasShadow="False" BackgroundColor="#FFF3E0" VerticalOptions="Center">
+                                    <Image Source="{Binding Avatar, Converter={StaticResource AvatarUrlConverter}}" HeightRequest="80" WidthRequest="80" Aspect="AspectFill"/>
+                                </Frame>
+                                <!-- Info -->
+                                <VerticalStackLayout Grid.Column="1" Spacing="4" Padding="16,0,0,0" VerticalOptions="Center">
+                                    <Label Text="{Binding StoreName}" FontSize="18" FontAttributes="Bold" TextColor="#222" LineBreakMode="TailTruncation"/>
+                                    <Label Text="{Binding Address}" FontSize="14" TextColor="#666" LineBreakMode="TailTruncation"/>
+                                    <Label Text="{Binding StoreType, Converter={StaticResource NullOrEmptyToNAConverter}}" FontSize="13" TextColor="#009688"/>
+                                    <Label Text="{Binding OpeningTime, StringFormat='Giờ mở cửa: {0}'} - {Binding ClosingTime, StringFormat='Đóng: {0}'}" FontSize="13" TextColor="#F58220"/>
+                                </VerticalStackLayout>
+                                <!-- Status + Action -->
+                                <VerticalStackLayout Grid.Column="2" Spacing="10" VerticalOptions="Center" HorizontalOptions="End">
+                                    <Border BackgroundColor="{Binding IsOpen, Converter={x:Static converters:BoolToColorConverter.Instance}}"
+                                            Padding="8,3" Margin="0,0,0,8" >
+                                        <Label Text="{Binding IsOpen, Converter={x:Static converters:BoolToStatusConverter.Instance}}"
+                                               FontSize="13" TextColor="White" FontAttributes="Bold"/>
+                                    </Border>
                                     <Button Text="Chi tiết"
-                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:StorePageViewModel}}, Path=ViewDetailCommand}"
-                                        CommandParameter="{Binding .}"
-                                        TextColor="{StaticResource Black}"
-                                        BackgroundColor="White"
-                                        BorderColor="{StaticResource Primary}"
-                                        BorderWidth="1"
-                                        CornerRadius="10"
-                                        FontSize="14"
-                                        Padding="10,5" />
-                                </HorizontalStackLayout>
-                            </VerticalStackLayout>
-                        </Border>
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:StorePageViewModel}}, Path=ViewDetailCommand}"
+                                            CommandParameter="{Binding .}"
+                                            FontSize="14"
+                                            Padding="10,4"
+                                            BackgroundColor="{StaticResource Orange70Color}"
+                                            TextColor="White"
+                                            CornerRadius="10"
+                                            HeightRequest="34"
+                                            WidthRequest="80"
+                                            HorizontalOptions="End"/>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Frame>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
                 <CollectionView.Footer>

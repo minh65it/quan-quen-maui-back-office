@@ -1,6 +1,5 @@
 using System.Text.Json.Serialization;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.Storage;
+using System;
 using System.Collections.Generic;
 
 namespace QuanQuenBackOfficeMobile.Models
@@ -8,40 +7,34 @@ namespace QuanQuenBackOfficeMobile.Models
     public class StoreModel
     {
         [JsonPropertyName("storeId")]
-        public string StoreId { get; set; }
+        public string? StoreId { get; set; }
 
         [JsonPropertyName("storeName")]
-        public string StoreName { get; set; }
+        public string? StoreName { get; set; }
 
-        [JsonPropertyName("storePhone")]
-        public string StorePhone { get; set; }
-
-        [JsonPropertyName("storePhone2")]
-        public string StorePhone2 { get; set; }
-
-        [JsonPropertyName("storeLandlinePhone")]
-        public string StoreLandlinePhone { get; set; }
-
-        [JsonPropertyName("storeLandlinePhone2")]
-        public string StoreLandlinePhone2 { get; set; }
-
-        [JsonPropertyName("storeEmail")]
-        public string StoreEmail { get; set; }
+        [JsonPropertyName("avatar")]
+        public string? Avatar { get; set; }
 
         [JsonPropertyName("address")]
-        public string Address { get; set; }
+        public string? Address { get; set; }
 
         [JsonPropertyName("ward")]
-        public string Ward { get; set; }
+        public string? Ward { get; set; }
 
         [JsonPropertyName("district")]
-        public string District { get; set; }
+        public string? District { get; set; }
 
         [JsonPropertyName("city")]
-        public string City { get; set; }
+        public string? City { get; set; }
 
-        [JsonPropertyName("noteAddress")]
-        public string NoteAddress { get; set; }
+        [JsonPropertyName("storeType")]
+        public string? StoreType { get; set; }
+
+        [JsonPropertyName("reviewPoint")]
+        public double? ReviewPoint { get; set; }
+
+        [JsonPropertyName("hashtag")]
+        public string? Hashtag { get; set; }
 
         [JsonPropertyName("latitude")]
         public double? Latitude { get; set; }
@@ -49,140 +42,68 @@ namespace QuanQuenBackOfficeMobile.Models
         [JsonPropertyName("longitude")]
         public double? Longitude { get; set; }
 
-        [JsonPropertyName("hashtag")]
-        public string Hashtag { get; set; }
-
-        [JsonPropertyName("avatar")]
-        public string Avatar { get; set; }
-
-        [JsonPropertyName("coverImage")]
-        public string CoverImage { get; set; }
-
-        [JsonPropertyName("reviewPoint")]
-        public double? ReviewPoint { get; set; }
-
-        [JsonPropertyName("imageMenu")]
-        public string ImageMenu { get; set; }
-
-        [JsonPropertyName("frontPicIdentityCard")]
-        public string FrontPicIdentityCard { get; set; }
-
-        [JsonPropertyName("backPicIdentityCard")]
-        public string BackPicIdentityCard { get; set; }
-
-        [JsonPropertyName("isDelete")]
-        public bool? IsDelete { get; set; }
-
-        [JsonPropertyName("description")]
-        public string Description { get; set; }
-
-        [JsonPropertyName("isRegisterByCompany")]
-        public bool? IsRegisterByCompany { get; set; }
-
-        [JsonPropertyName("isRegisterByPersonality")]
-        public bool? IsRegisterByPersonality { get; set; }
-
-        [JsonPropertyName("companyName")]
-        public string CompanyName { get; set; }
-
-        [JsonPropertyName("companyAddress")]
-        public string CompanyAddress { get; set; }
-
-        [JsonPropertyName("representativeName")]
-        public string RepresentativeName { get; set; }
-
-        [JsonPropertyName("representativeEmail")]
-        public string RepresentativeEmail { get; set; }
-
-        [JsonPropertyName("representativePhone")]
-        public string RepresentativePhone { get; set; }
-
-        [JsonPropertyName("representativePhoneOther")]
-        public string RepresentativePhoneOther { get; set; }
-
-        [JsonPropertyName("otherRepresentativePhone")]
-        public string OtherRepresentativePhone { get; set; }
-
-        [JsonPropertyName("taxCode")]
-        public string TaxCode { get; set; }
-
-        [JsonPropertyName("status")]
-        public string Status { get; set; }
-
-        [JsonPropertyName("createBy")]
-        public string CreateBy { get; set; }
-
-        [JsonPropertyName("updateBy")]
-        public string UpdateBy { get; set; }
-
         [JsonPropertyName("createDate")]
         public DateTime? CreateDate { get; set; }
 
-        [JsonPropertyName("updateDate")]
-        public DateTime? UpdateDate { get; set; }
+        [JsonPropertyName("distance")]
+        public string? Distance { get; set; }
 
-        [JsonPropertyName("fullAdrress")]
-        public string FullAddress { get; set; }
-
-        [JsonPropertyName("wardId")]
-        public Guid? WardId { get; set; }
-
-        [JsonPropertyName("districtId")]
-        public Guid? DistrictId { get; set; }
-
-        [JsonPropertyName("cityId")]
-        public Guid? CityId { get; set; }
-
-        [JsonPropertyName("storeTypeIds")]
-        public List<Guid> StoreTypeIds { get; set; }
-
-        [JsonPropertyName("listImageViewDetail")]
-        public List<string> ListImageViewDetail { get; set; }
-
-        [JsonPropertyName("listImageViewDetail1")]
-        public List<object> ListImageViewDetail1 { get; set; }
-
-        [JsonPropertyName("infoQRCode")]
-        public object InfoQRCode { get; set; }
-
-        [JsonPropertyName("companyWard")]
-        public string CompanyWard { get; set; }
-
-        [JsonPropertyName("companyDistrict")]
-        public string CompanyDistrict { get; set; }
-
-        [JsonPropertyName("companyCity")]
-        public string CompanyCity { get; set; }
-
-        [JsonPropertyName("companyWardId")]
-        public Guid? CompanyWardId { get; set; }
-
-        [JsonPropertyName("companyDistrictId")]
-        public Guid? CompanyDistrictId { get; set; }
-
-        [JsonPropertyName("companyCityId")]
-        public Guid? CompanyCityId { get; set; }
+        [JsonPropertyName("favoriteId")]
+        public string? FavoriteId { get; set; }
 
         [JsonPropertyName("favoritesCount")]
         public int? FavoritesCount { get; set; }
 
-        [JsonPropertyName("levelId")]
-        public int? LevelId { get; set; }
+        [JsonPropertyName("promotionId")]
+        public string?    PromotionId { get; set; }
 
-        [JsonPropertyName("createDateLevel")]
-        public DateTime? CreateDateLevel { get; set; }
+        [JsonPropertyName("codePromotion")]
+        public string? CodePromotion { get; set; }
 
-        [JsonPropertyName("startDateLevel")]
-        public DateTime? StartDateLevel { get; set; }
+        [JsonPropertyName("discount")]
+        public double? Discount { get; set; }
 
-        [JsonPropertyName("expirationDateLevel")]
-        public DateTime? ExpirationDateLevel { get; set; }
+        [JsonPropertyName("price")]
+        public double? Price { get; set; }
 
-        [JsonPropertyName("distance")]
-        public string Distance { get; set; }
+        [JsonPropertyName("startDate")]
+        public DateTime? StartDate { get; set; }
 
-        [JsonPropertyName("levelName")]
-        public string LevelName { get; set; }
+        [JsonPropertyName("endDate")]
+        public DateTime? EndDate { get; set; }
+
+        [JsonPropertyName("storeNameWithoutDiacritics")]
+        public string? StoreNameWithoutDiacritics { get; set; }
+
+        [JsonPropertyName("hashTagWithoutDiacritics")]
+        public string? HashTagWithoutDiacritics { get; set; }
+
+        [JsonPropertyName("lstFoodToStore")]
+        public List<object> LstFoodToStore { get; set; } = new();
+
+        [JsonPropertyName("storePackage")]
+        public int? StorePackage { get; set; }
+
+        [JsonPropertyName("infoQRCode")]
+        public object? InfoQRCode { get; set; }
+
+        [JsonPropertyName("dayOfWeek")]
+        public int? DayOfWeek { get; set; }
+
+        [JsonPropertyName("isOpen")]
+        public bool? IsOpen { get; set; }
+
+        [JsonPropertyName("openingTime")]
+        public string? OpeningTime { get; set; }
+
+        [JsonPropertyName("closingTime")]
+        public string? ClosingTime { get; set; }
+
+        [JsonPropertyName("minPrice")]
+        public double? MinPrice { get; set; }
+
+        [JsonPropertyName("maxPrice")]
+        public double? MaxPrice { get; set; }
     }
 
     public class PaginationInfo

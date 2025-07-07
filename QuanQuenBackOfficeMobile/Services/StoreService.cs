@@ -1,5 +1,8 @@
 using Microsoft.Extensions.Configuration;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
+using System.Text.Json;
+using System.Text;
+using Microsoft.Maui.Storage;
 
 namespace QuanQuenBackOfficeMobile.Services
 {
@@ -22,10 +25,14 @@ namespace QuanQuenBackOfficeMobile.Services
                 var path = _configuration["API:Store:GetAllPath"];
                 var url = $"{baseUrl}{path}?PageNumber={page}&PageSize={pageSize}";
 
-                if (!string.IsNullOrWhiteSpace(searchText))
+                // Tạo request body
+                var requestBody = new
                 {
-                    url += $"&searchKey={Uri.EscapeDataString(searchText)}";
-                }
+                    contentSearch = searchText ?? ""
+                };
+
+                var jsonContent = JsonSerializer.Serialize(requestBody);
+                var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
 
                 var token = await SecureStorage.GetAsync("auth_token");
                 System.Diagnostics.Debug.WriteLine($"[StoreService] Token: {token}");
@@ -36,11 +43,19 @@ namespace QuanQuenBackOfficeMobile.Services
 
                 _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.GetAsync(url);
+                // Log request details
+                System.Diagnostics.Debug.WriteLine($"[StoreService] Request URL: {url}");
+                System.Diagnostics.Debug.WriteLine($"[StoreService] Request Method: POST");
+                System.Diagnostics.Debug.WriteLine($"[StoreService] Request Headers: Authorization=Bearer {token.Substring(0, Math.Min(20, token.Length))}...");
+                System.Diagnostics.Debug.WriteLine($"[StoreService] Request Body: {jsonContent}");
+
+                var response = await _httpClient.PostAsync(url, content);
                 response.EnsureSuccessStatusCode();
 
-                var content = await response.Content.ReadAsStringAsync();
-                var result = JsonSerializer.Deserialize<StoreApiResponse>(content, new JsonSerializerOptions
+                var responseContent = await response.Content.ReadAsStringAsync();
+                System.Diagnostics.Debug.WriteLine($"[StoreService] Response: {responseContent}");
+                
+                var result = JsonSerializer.Deserialize<StoreApiResponse>(responseContent, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
                 });
