@@ -108,7 +108,7 @@
                                     <Label Text="{Binding OpeningTime, StringFormat='Giờ mở cửa: {0}'} - {Binding ClosingTime, StringFormat='Đóng: {0}'}" FontSize="13" TextColor="#F58220"/>
                                 </VerticalStackLayout>
                                 <!-- Status + Action -->
-                                <VerticalStackLayout Grid.Column="2" Spacing="10" VerticalOptions="Center" HorizontalOptions="End">
+                                <VerticalStackLayout Grid.Column="2"   Spacing="10" VerticalOptions="Center" HorizontalOptions="End">
                                     <Border BackgroundColor="{Binding IsOpen, Converter={x:Static converters:BoolToColorConverter.Instance}}"
                                             Padding="8,3" Margin="0,0,0,8" >
                                         <Label Text="{Binding IsOpen, Converter={x:Static converters:BoolToStatusConverter.Instance}}"

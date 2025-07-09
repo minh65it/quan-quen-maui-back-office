@@ -91,7 +91,7 @@ public class StoreMediaService : IStoreMediaService
         return null;
     }
 
-    public async Task<ApiResponse> UploadMediasAsync(string storeId, string categoryMediaId, string createdBy, List<byte[]> imageBytesList, bool isSecurity = false)
+    public async Task<ApiResponse> UploadMediasAsync(string storeId, string categoryMediaId, string createdBy, List<byte[]> imageBytesList, bool isSecurity = false, bool isMenu = false)
     {
         try
         {
@@ -112,7 +112,7 @@ public class StoreMediaService : IStoreMediaService
             content.Add(new StringContent(categoryMediaId ?? ""), "CategoryMediaId");
             content.Add(new StringContent(isSecurity ? "true" : "false"), "IsSecurity");
             content.Add(new StringContent(createdBy), "CreateBy");
-            content.Add(new StringContent("false"), "IsMenu");
+            content.Add(new StringContent(isMenu ? "true":"false"), "IsMenu");
 
             foreach (var bytes in imageBytesList)
             {

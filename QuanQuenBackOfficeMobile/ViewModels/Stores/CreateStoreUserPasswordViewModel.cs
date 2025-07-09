@@ -208,7 +208,7 @@ public partial class CreateStoreUserPasswordViewModel : ObservableObject
             }
 
             // Gọi upload ảnh
-            var licenseResponse = await _storeMediaService.UploadMediasAsync(storeId, categoryMediaId, createdBy!, imageBytesList, false);
+            var licenseResponse = await _storeMediaService.UploadMediasAsync(storeId, categoryMediaId, createdBy!, imageBytesList, false,false);
 
             // Xử lý kết quả upload
             if (!licenseResponse.IsSuccess)

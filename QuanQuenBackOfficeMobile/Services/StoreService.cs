@@ -151,7 +151,7 @@ namespace QuanQuenBackOfficeMobile.Services
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();
-            return System.Text.Json.JsonSerializer.Deserialize<StoreDetailModel>(json, new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            return JsonSerializer.Deserialize<StoreDetailModel>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
 
         public async Task<ApiResponse> UpdateStore(string storeId, Status status)

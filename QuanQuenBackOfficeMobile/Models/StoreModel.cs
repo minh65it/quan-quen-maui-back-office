@@ -191,7 +191,7 @@ namespace QuanQuenBackOfficeMobile.Models
 
     public class MyImageModel
     {
-        public ImageSource LicenseImage { get; set; }
+        public ImageSource Images { get; set; }
         public string LocalPath { get; set; }
     }
 

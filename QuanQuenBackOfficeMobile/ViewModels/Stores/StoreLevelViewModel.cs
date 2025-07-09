@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
 using QuanQuenBackOfficeMobile.Models;
+using QuanQuenBackOfficeMobile.Views.Stores;
 
 namespace QuanQuenBackOfficeMobile.ViewModels.Stores;
 
@@ -73,6 +74,6 @@ public partial class StoreLevelViewModel : ObservableObject
         }
 
         await App.Current.MainPage.DisplayAlert("Thành công", "Cập nhật level và trạng thái thành công!", "OK");
-        await App.Current.MainPage.Navigation.PopToRootAsync();
+        await App.Current.MainPage.Navigation.PushAsync(new Views.Stores.StoreMenuPage());
     }
 } 
