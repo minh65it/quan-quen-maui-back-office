@@ -35,14 +35,14 @@
             
             <Label Text="Thêm ảnh menu của nhà hàng để khách hàng có thể xem trước" 
                    FontSize="16" 
-                   TextColor="Gray" 
+                   TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}" 
                    HorizontalOptions="Center" 
                    HorizontalTextAlignment="Center" />
             
             <!-- Upload Status -->
             <Label Text="{Binding UploadStatus}" 
                    FontSize="14" 
-                   TextColor="Blue" 
+                   TextColor="{AppThemeBinding Light={StaticResource BlueColor}, Dark={StaticResource BlueColor}}" 
                    HorizontalOptions="Center" 
                    IsVisible="{Binding UploadStatus, Converter={StaticResource IsNotNullOrEmptyConverter}}" />
             
@@ -50,8 +50,8 @@
             <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
                 <Button Text="📷 Chụp Ảnh" 
                         Command="{Binding TakePhotoCommand}"
-                        BackgroundColor="#2196F3" 
-                        TextColor="White" 
+                        BackgroundColor="{AppThemeBinding Light={StaticResource BlueColor}, Dark={StaticResource BlueColor}}" 
+                        TextColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}" 
                         FontAttributes="Bold" 
                         HeightRequest="45" 
                         CornerRadius="22" 
@@ -59,8 +59,8 @@
                 
                 <Button Text="📁 Chọn Ảnh" 
                         Command="{Binding AddImageCommand}"
-                        BackgroundColor="#4CAF50" 
-                        TextColor="White" 
+                        BackgroundColor="{AppThemeBinding Light={StaticResource GreenColor}, Dark={StaticResource GreenColor}}" 
+                        TextColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}" 
                         FontAttributes="Bold" 
                         HeightRequest="45" 
                         CornerRadius="22" 
@@ -79,8 +79,8 @@
                 
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Frame BackgroundColor="White"
-                               BorderColor="LightGray"
+                        <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
+                               BorderColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
                                CornerRadius="8"
                                Padding="0"
                                Margin="5"
@@ -93,8 +93,8 @@
                                        VerticalOptions="Fill"
                />
                                 <!-- Nút xóa giữ nguyên -->
-                                <Frame BackgroundColor="Transparent"
-                                       BorderColor="{StaticResource Orange70Color}"
+                                <Frame BackgroundColor="{x:Null}"
+                                       BorderColor="{AppThemeBinding Light={StaticResource Orange70Color}, Dark={StaticResource OrangeColor}}"
                                        Padding="0"
                                        CornerRadius="12"
                                        HeightRequest="18"
@@ -131,8 +131,8 @@
                 <!-- Upload Button -->
                 <Button Text="Upload Ảnh Menu" 
                         Command="{Binding UploadImagesCommand}"
-                        BackgroundColor="#FF9900" 
-                        TextColor="White" 
+                        BackgroundColor="{AppThemeBinding Light={StaticResource OrangeColor}, Dark={StaticResource OrangeColor}}" 
+                        TextColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}" 
                         FontAttributes="Bold" 
                         HeightRequest="50" 
                         CornerRadius="25" 

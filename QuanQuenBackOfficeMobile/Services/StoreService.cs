@@ -54,23 +54,23 @@ namespace QuanQuenBackOfficeMobile.Services
 
                 var responseContent = await response.Content.ReadAsStringAsync();
                 System.Diagnostics.Debug.WriteLine($"[StoreService] Response: {responseContent}");
-                
+
                 var result = JsonSerializer.Deserialize<StoreApiResponse>(responseContent, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
                 });
 
-                return result ?? new StoreApiResponse 
-                { 
-                    Pagination = new PaginationInfo 
-                    { 
+                return result ?? new StoreApiResponse
+                {
+                    Pagination = new PaginationInfo
+                    {
                         TotalCount = 0,
                         TotalPage = 0,
                         PageNumber = page,
                         PageSize = pageSize,
                         Skip = (page - 1) * pageSize
                     },
-                    Result = new List<StoreModel>() 
+                    Result = new List<StoreModel>()
                 };
             }
             catch (Exception ex)
@@ -166,7 +166,7 @@ namespace QuanQuenBackOfficeMobile.Services
                 using var form = new MultipartFormDataContent();
                 form.Add(new StringContent(storeId), "StoreId");
                 form.Add(new StringContent(((int)status).ToString()), "Status");
-            
+
                 var request = new HttpRequestMessage(HttpMethod.Put, url)
                 {
                     Content = form
@@ -184,6 +184,189 @@ namespace QuanQuenBackOfficeMobile.Services
             {
                 System.Diagnostics.Debug.WriteLine($"[StoreService] UpdateStore error: {ex.Message}");
                 return new ApiResponse { IsSuccess = false, Message = $"Update store failed: {ex.Message}" };
+            }
+        }
+
+        public async Task<List<FilterStoreModel>> GetUtilitiesAsync()
+        {
+            var baseUrl = _configuration["API:Store:BaseUrl"];
+            var path = _configuration["API:Store:GetUtilities"];
+            var url = $"{baseUrl}{path}?filterType=1";
+            var token = await SecureStorage.GetAsync("auth_token");
+            if (string.IsNullOrEmpty(token))
+                throw new UnauthorizedAccessException("No authentication token found");
+
+            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _httpClient.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(json);
+            var root = doc.RootElement;
+            var result = root.GetProperty("result");
+            var utilities = new List<FilterStoreModel>();
+            foreach (var item in result.EnumerateArray())
+            {
+                utilities.Add(new FilterStoreModel
+                {
+                    FilterStoreId = item.GetProperty("filterStoreId").GetString(),
+                    Name = item.GetProperty("name").GetString(),
+                    Value = item.GetProperty("value").GetString(),
+                    UrlImage = item.GetProperty("urlImage").GetString(),
+                    FilterTypeStore = item.GetProperty("filterTypeStore").GetInt32()
+                });
+            }
+            return utilities;
+        }
+        public async Task<List<FilterStoreModel>> GetSuitabilitiesAsync()
+        {
+            var baseUrl = _configuration["API:Store:BaseUrl"];
+            var path = _configuration["API:Store:GetUtilities"];
+            var url = $"{baseUrl}{path}?filterType=2";
+            var token = await SecureStorage.GetAsync("auth_token");
+            if (string.IsNullOrEmpty(token))
+                throw new UnauthorizedAccessException("No authentication token found");
+
+            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _httpClient.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(json);
+            var root = doc.RootElement;
+            var result = root.GetProperty("result");
+            var utilities = new List<FilterStoreModel>();
+            foreach (var item in result.EnumerateArray())
+            {
+                utilities.Add(new FilterStoreModel
+                {
+                    FilterStoreId = item.GetProperty("filterStoreId").GetString(),
+                    Name = item.GetProperty("name").GetString(),
+                    Value = item.GetProperty("value").GetString(),
+                    UrlImage = item.GetProperty("urlImage").GetString(),
+                    FilterTypeStore = item.GetProperty("filterTypeStore").GetInt32()
+                });
+            }
+            return utilities;
+        }
+
+        public async Task<ApiResponse> CreateStoreTypeAsync(List<string> filterStoreIds, string storeId)
+        {
+            try
+            {
+                var baseUrl = _configuration["API:Store:BaseUrl"];
+                var path = _configuration["API:Store:CreateStoreFilter"];
+                var url = $"{baseUrl}{path}";
+
+                var requestBody = new
+                {
+                    filterStoreIds = filterStoreIds,
+                    storeId = storeId
+                };
+
+                var jsonContent = JsonSerializer.Serialize(requestBody);
+                var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
+
+                var token = await SecureStorage.GetAsync("auth_token");
+                if (string.IsNullOrEmpty(token))
+                    throw new UnauthorizedAccessException("No authentication token found");
+
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.PostAsync(url, content);
+                response.EnsureSuccessStatusCode();
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                System.Diagnostics.Debug.WriteLine($"[StoreService] CreateStoreTypeAsync response: {responseContent}");
+
+                var result = JsonSerializer.Deserialize<ApiResponse>(responseContent, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                return result ?? new ApiResponse { IsSuccess = false, Message = "Failed to deserialize response" };
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[StoreService] CreateStoreTypeAsync error: {ex.Message}");
+                return new ApiResponse { IsSuccess = false, Message = $"Create store type failed: {ex.Message}" };
+            }
+        }
+
+        public async Task<List<StoreTypeModel>> GetStoreTypeAsync()
+        {
+                var baseUrl = _configuration["API:Store:BaseUrl"];
+                var path = _configuration["API:Store:GetStoreType"];
+                var url = $"{baseUrl}{path}";
+                var token = await SecureStorage.GetAsync("auth_token");
+                if (string.IsNullOrEmpty(token))
+                    throw new UnauthorizedAccessException("No authentication token found");
+
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+
+                var json = await response.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(json);
+                var root = doc.RootElement;
+                var result = root.GetProperty("result");
+                var storeTypeList = new List<StoreTypeModel>();
+                foreach (var item in result.EnumerateArray())
+                {
+                    storeTypeList.Add(new StoreTypeModel
+                    {
+                        storeTypeId = item.GetProperty("storeTypeId").GetString(),
+                        storeTypeName = item.GetProperty("storeTypeName").GetString(),
+                        description = item.GetProperty("description").GetString(),
+                        urlImage = item.GetProperty("urlImage").GetString(),
+                    });
+                }
+                return storeTypeList;
+        }
+
+        public async Task<ApiResponse> CreateStoreTypeToStoreAsync(List<string> storeTypeIds, string storeId)
+        {
+            try
+            {
+                var baseUrl = _configuration["API:Store:BaseUrl"];
+                var path = "api/StoreTypeToStore/CreateStoreTypeToStore";
+                var url = $"{baseUrl}{path}";
+
+                var requestBody = new
+                {
+                    storeTypeIds = storeTypeIds,
+                    storeId = storeId
+                };
+
+                var jsonContent = JsonSerializer.Serialize(requestBody);
+                var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
+
+                var token = await SecureStorage.GetAsync("auth_token");
+                if (string.IsNullOrEmpty(token))
+                    throw new UnauthorizedAccessException("No authentication token found");
+
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.PostAsync(url, content);
+                response.EnsureSuccessStatusCode();
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                System.Diagnostics.Debug.WriteLine($"[StoreService] CreateStoreTypeToStoreAsync response: {responseContent}");
+                
+                var result = JsonSerializer.Deserialize<ApiResponse>(responseContent, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                return result ?? new ApiResponse { IsSuccess = false, Message = "Failed to deserialize response" };
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[StoreService] CreateStoreTypeToStoreAsync error: {ex.Message}");
+                return new ApiResponse { IsSuccess = false, Message = $"Create store type to store failed: {ex.Message}" };
             }
         }
     }

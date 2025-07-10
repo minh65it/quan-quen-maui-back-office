@@ -142,6 +142,9 @@ public static class MauiProgram
 		builder.Services.AddTransient<PhotoStoreUserViewModel>();
 		builder.Services.AddTransient<PhotoStoreUser>();
 
+		// Register Converters
+		builder.Services.AddSingleton<Converters.AvatarUrlConverter>();
+
 		builder.Services.UsePageResolver();
 
 #if DEBUG

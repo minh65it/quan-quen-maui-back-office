@@ -6,6 +6,7 @@ using QuanQuenBackOfficeMobile.Models;
 using QuanQuenBackOfficeMobile.Models;
 using System.Collections.Generic;
 using System.Collections.Generic;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace QuanQuenBackOfficeMobile.Models;
 
@@ -58,3 +59,23 @@ namespace QuanQuenBackOfficeMobile.Models;
         [Display(Name = "Đang tạo")]
         Creating
     }
+
+public partial class FilterStoreModel : ObservableObject
+{
+    [ObservableProperty]
+    private bool isSelected;
+    public string FilterStoreId { get; set; }
+    public string Name { get; set; }
+    public string Value { get; set; }
+    public string UrlImage { get; set; }
+    public int FilterTypeStore { get; set; }
+}
+public partial class StoreTypeModel : ObservableObject
+{
+    [ObservableProperty]
+    private bool isSelected;
+    public string storeTypeId { get; set; }
+    public string storeTypeName { get; set; }
+    public string description { get; set; }
+    public string urlImage { get; set; }
+}

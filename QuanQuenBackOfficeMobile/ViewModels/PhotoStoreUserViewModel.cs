@@ -65,7 +65,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels
             if (action == "Chụp ảnh mới")
             {
                 if (MediaPicker.Default.IsCaptureSupported)
-                    fileResult = await MediaPicker.Default.CapturePhotoAsync();
+                    fileResult = await MediaPicker.Default.CapturePhotoAsync();  
             }
             else if (action == "Chọn từ thư viện")
             {
@@ -119,7 +119,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                 if (bytes != null) imageBytesList.Add(bytes);
             }
 
-            var result = await _storeMediaService.UploadMediasAsync(storeId, categoryMediaId, createdBy, imageBytesList,false);
+            var result = await _storeMediaService.UploadMediasAsync(storeId, categoryMediaId, createdBy, imageBytesList, false, false);
             if (result.IsSuccess)
             {
                 await App.Current.MainPage.DisplayAlert("Thành công", "Thêm ảnh bìa nhà hàng thành công!", "OK");

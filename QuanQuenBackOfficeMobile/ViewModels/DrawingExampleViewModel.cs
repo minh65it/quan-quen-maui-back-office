@@ -56,7 +56,8 @@ public partial class DrawingExampleViewModel : BaseViewModel
                 categoryMediaId,
                 createdBy!,
                 new List<byte[]> { imageBytes },
-                true
+                true,
+                false
             );
 
             if (result.IsSuccess)

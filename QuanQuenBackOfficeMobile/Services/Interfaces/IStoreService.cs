@@ -10,4 +10,9 @@ public interface IStoreService
     Task<ApiResponse> CreateStoreAsync(StoreCreateRequest request);
     Task<StoreDetailModel> GetStoreDetailAsync(string storeId);
     Task<ApiResponse> UpdateStore(string storeId, Status status);
+    Task<List<FilterStoreModel>> GetUtilitiesAsync();
+    Task<List<FilterStoreModel>> GetSuitabilitiesAsync();
+    Task<ApiResponse> CreateStoreTypeAsync(List<string> filterStoreIds, string storeId);
+    Task<ApiResponse> CreateStoreTypeToStoreAsync(List<string> storeTypeIds, string storeId);
+    Task<List<StoreTypeModel>> GetStoreTypeAsync();
 }

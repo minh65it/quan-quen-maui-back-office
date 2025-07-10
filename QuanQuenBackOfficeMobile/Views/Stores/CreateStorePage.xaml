@@ -19,11 +19,6 @@
             <!-- Logo và tên ứng dụng -->
             <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
                 <Image Source="logo_qq_new.png" HeightRequest="80" WidthRequest="80" />
-                <Label Text="QUÁN QUEN"
-               FontSize="24"
-               FontAttributes="Bold"
-               TextColor="#F58220"
-               HorizontalOptions="Center" />
             </VerticalStackLayout>
 
             <!-- Tên Nhà hàng/Quán ăn -->

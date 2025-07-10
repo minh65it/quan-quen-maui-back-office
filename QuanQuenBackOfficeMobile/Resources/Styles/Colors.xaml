@@ -28,6 +28,14 @@
 	<Color x:Key="Gray900">#212121</Color>
 	<Color x:Key="Gray950">#141414</Color>
 
+	<!-- Theme-specific colors -->
+	<Color x:Key="TextPrimary">#000000</Color>
+	<Color x:Key="TextPrimaryDark">#FFFFFF</Color>
+	<Color x:Key="BackgroundPrimary">#FFFFFF</Color>
+	<Color x:Key="BackgroundPrimaryDark">#1f1f1f</Color>
+	<Color x:Key="SurfacePrimary">#FFFFFF</Color>
+	<Color x:Key="SurfacePrimaryDark">#2d2d2d</Color>
+
 	<Color x:Key="YellowColor">#FEBE18</Color>
 	<Color x:Key="OrangeColor">#F58220</Color>
 	<Color x:Key="Orange70Color">#B3F58220</Color>

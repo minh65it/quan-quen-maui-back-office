@@ -11,12 +11,6 @@
             <Image Source="logo_qq_new.png"
                    HeightRequest="120"
                    HorizontalOptions="Center"/>
-            <Label Text="QUÁN QUEN"
-                   FontSize="28"
-                   FontAttributes="Bold"
-                   TextColor="#FF9900"
-                   HorizontalOptions="Center"
-                   Margin="0,0,0,10"/>
 
             <!-- Title -->
             <Label Text="Xác thực OTP"
@@ -26,17 +20,17 @@
                    Margin="0,20,0,0"/>
             <Label Text="Nhập mã 6 số được gửi đến Email"
                    FontSize="15"
-                   TextColor="Black"
+                   TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
                    Margin="0,0,0,10"/>
 
             <!-- OTP Entry -->
-            <Frame BorderColor="#FF9900" CornerRadius="8" Padding="0" Margin="0,0,0,10">
+            <Frame BorderColor="{AppThemeBinding Light={StaticResource Orange70Color}, Dark={StaticResource OrangeColor}}" CornerRadius="8" Padding="0" Margin="0,0,0,10">
                 <Entry Placeholder="Nhập mã"
                        Text="{Binding OtpCode}" 
                        Keyboard="Numeric"
                        MaxLength="6"
                        FontSize="16"
-                       BackgroundColor="Transparent"
+                       BackgroundColor="{x:Null}"
                        Margin="10,0"/>
             </Frame>
 
@@ -65,7 +59,7 @@
             <Button Text="Xác thực"
                     Command="{Binding VerifyOtpCommand}"
                     BackgroundColor="#FF9900"
-                    TextColor="White"
+                    TextColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}"
                     FontAttributes="Bold"
                     HeightRequest="50"
                     CornerRadius="25"

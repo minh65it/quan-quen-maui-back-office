@@ -40,6 +40,9 @@ public partial class CreateStoreUserPasswordViewModel : ObservableObject
     [ObservableProperty]
     private bool isBusy;
 
+    [ObservableProperty]
+    private bool isLoading;
+
     public ICommand TogglePasswordVisibilityCommand { get; }
     public ICommand ToggleConfirmPasswordVisibilityCommand { get; }
     public ICommand RegisterCommand { get; }
@@ -86,6 +89,7 @@ public partial class CreateStoreUserPasswordViewModel : ObservableObject
         try
         {
             IsBusy = true;
+            IsLoading = true;
             PasswordError = string.Empty;
 
             // Validate required fields
@@ -98,6 +102,12 @@ public partial class CreateStoreUserPasswordViewModel : ObservableObject
             if (Password.Length < 6)
             {
                 PasswordError = "Mật khẩu phải có ít nhất 6 ký tự";
+                return;
+            }
+
+            if (!(Password.Any(char.IsLetter) && Password.Any(char.IsDigit)))
+            {
+                PasswordError = "Mật khẩu phải chứa cả chữ và số";
                 return;
             }
 
@@ -233,6 +243,7 @@ public partial class CreateStoreUserPasswordViewModel : ObservableObject
         finally
         {
             IsBusy = false;
+            IsLoading = false;
         }
     }
 

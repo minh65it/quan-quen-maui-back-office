@@ -132,16 +132,6 @@ namespace QuanQuenBackOfficeMobile.Models
         [JsonPropertyName("result")]
         public List<StoreModel> Result { get; set; }
     }
-
-    public class StoreTypeModel
-    {
-        public string StoreTypeId { get; set; }
-        public string StoreTypeName { get; set; }
-        public string Description { get; set; }
-        public string UrlImage { get; set; }
-        public int Position { get; set; }
-    }
-
     public class StoreCreateRequest
     {
         public string StoreId { get; set; }
