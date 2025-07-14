@@ -397,7 +397,7 @@ public partial class CreateStoreViewModel : ObservableObject
             {
                 var copiedPath = await CopyFileToAppDirectoryAsync(result);
                 var imgSource = ImageSource.FromFile(copiedPath);
-                LicenseImages.Add(new MyImageModel { LicenseImage = imgSource, LocalPath = copiedPath });
+                LicenseImages.Add(new MyImageModel { Images = imgSource, LocalPath = copiedPath });
                 System.Diagnostics.Debug.WriteLine($"[LOG] Đã thêm vào LicenseImages (FromFile): {copiedPath}");
                 OnPropertyChanged(nameof(CanAddMoreLicenseImages));
                 OnPropertyChanged(nameof(LicenseButtonBackgroundColor));
@@ -440,7 +440,7 @@ public partial class CreateStoreViewModel : ObservableObject
             {
                 var copiedPath = await CopyFileToAppDirectoryAsync(file);
                 var imgSource = ImageSource.FromFile(copiedPath);
-                LicenseImages.Add(new MyImageModel { LicenseImage = imgSource, LocalPath = copiedPath });
+                LicenseImages.Add(new MyImageModel { Images = imgSource, LocalPath = copiedPath });
                 System.Diagnostics.Debug.WriteLine($"[LOG] Đã thêm vào LicenseImages (FromFile): {copiedPath}");
                 OnPropertyChanged(nameof(CanAddMoreLicenseImages));
                 OnPropertyChanged(nameof(LicenseButtonBackgroundColor));
@@ -462,7 +462,7 @@ public partial class CreateStoreViewModel : ObservableObject
 
     private void RemoveLicenseImage(ImageSource img)
     {
-        int idx = LicenseImages.IndexOf(LicenseImages.FirstOrDefault(i => i.LicenseImage == img));
+        int idx = LicenseImages.IndexOf(LicenseImages.FirstOrDefault(i => i.Images == img));
         if (idx >= 0)
         {
             LicenseImages.RemoveAt(idx);

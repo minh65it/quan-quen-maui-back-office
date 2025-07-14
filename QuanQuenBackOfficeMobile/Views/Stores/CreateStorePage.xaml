@@ -19,11 +19,6 @@
             <!-- Logo và tên ứng dụng -->
             <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
                 <Image Source="logo_qq_new.png" HeightRequest="80" WidthRequest="80" />
-                <Label Text="QUÁN QUEN"
-               FontSize="24"
-               FontAttributes="Bold"
-               TextColor="#F58220"
-               HorizontalOptions="Center" />
             </VerticalStackLayout>
 
             <!-- Tên Nhà hàng/Quán ăn -->
@@ -196,7 +191,7 @@
                                 <RoundRectangle CornerRadius="12"/>
                             </Border.StrokeShape>
                             <Grid>
-                                <Image Source="{Binding LicenseImage}" HeightRequest="80" WidthRequest="80" Aspect="AspectFill" Margin="0"/>
+                                <Image Source="{Binding Images}" HeightRequest="80" WidthRequest="80" Aspect="AspectFill" Margin="0"/>
                                 <Border Padding="0" HeightRequest="20" WidthRequest="20" Background="White" Stroke="White" StrokeThickness="1"
                             HorizontalOptions="End" VerticalOptions="Start" Margin="2">
                                     <Border.StrokeShape>
@@ -208,7 +203,7 @@
                                         <Image.GestureRecognizers>
                                             <TapGestureRecognizer
                                     Command="{Binding BindingContext.RemoveLicenseImageCommand, Source={RelativeSource AncestorType={x:Type CollectionView}}}"
-                                    CommandParameter="{Binding LicenseImage}" />
+                                    CommandParameter="{Binding Images}" />
                                         </Image.GestureRecognizers>
                                     </Image>
                                 </Border>

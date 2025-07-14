@@ -25,8 +25,8 @@
         HorizontalOptions="FillAndExpand"/> 
 
         <Border Grid.Row="2" Stroke="#E0E0E0" StrokeThickness="1" Background="White" Margin="0,20,0,20" HeightRequest="200" Padding="10">
-			<Border.StrokeShape>
-				<RoundRectangle CornerRadius="8"/>
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="8"/>
 			</Border.StrokeShape>
 			<Image
 				x:Name="GeneratedImage"

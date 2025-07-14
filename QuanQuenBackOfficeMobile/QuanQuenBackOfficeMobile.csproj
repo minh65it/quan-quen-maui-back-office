@@ -57,6 +57,7 @@
 
 	<ItemGroup>
 	  <EmbeddedResource Include="appsettings.json" />
+	  <EmbeddedResource Include="appsettings.Development.json" />
 	</ItemGroup>
 
 
@@ -137,14 +138,6 @@
 	  <MauiSplashScreen Include="Resources\Splash\logo_qq_new.png" Color="Transparent" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Reference Include="QuanQuenAPIClient">
-	    <HintPath>..\QuanQuenAPIClient.dll</HintPath>
-	  </Reference>
-	  <Reference Include="QuanQuenDataModels">
-	    <HintPath>..\QuanQuenDataModels.dll</HintPath>
-	  </Reference>
-	</ItemGroup>
 
 	<PropertyGroup Label="MauiAppAccelerator">
 		<wizardVersion>v1.8</wizardVersion>

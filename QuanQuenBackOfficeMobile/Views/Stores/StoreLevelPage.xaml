@@ -4,59 +4,123 @@
              xmlns:xct="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:converters="clr-namespace:QuanQuenBackOfficeMobile.Converters"
              x:Class="QuanQuenBackOfficeMobile.Views.Stores.StoreLevelPage"
+             x:Name="StoreLevelPageRef"
              xmlns:controls="clr-namespace:QuanQuenBackOfficeMobile.Controls"
              Title="">
     <ContentPage.Resources>
         <converters:EnumDisplayNameConverter x:Key="EnumDisplayNameConverter" />
+        <converters:ImageUrlConverter x:Key="ImageUrlConverter" />
+        <converters:SelectedBgConverter x:Key="SelectedBgConverter" />
+        <converters:SelectedBorderConverter x:Key="SelectedBorderConverter" />
     </ContentPage.Resources>
-    <VerticalStackLayout Padding="30" Spacing="20">
-        <Label Text="Chọn Level cho cửa hàng" FontSize="22" FontAttributes="Bold" TextColor="#FF9900" HorizontalOptions="Center" />
-        
-        <Label Text="Chọn Level" FontSize="16" />
-        <Picker x:Name="LevelPicker"
-                Title="Chọn Level"
-                ItemsSource="{Binding LevelNames}"
-                SelectedIndex="{Binding SelectedLevelIndex, Mode=TwoWay}"
-                TextColor="Black" />
-        <Label Text="Chọn Trạng thái" FontSize="16" />
-        
-        <controls:CustomDropdownPicker x:Name="StatusPicker"
-        Title="Chọn Trạng thái"
-        ItemsSource="{Binding StatusNames}"
-        SelectedIndex="{Binding SelectedStatusIndex, Mode=TwoWay}"
-        TextColor="Black"
-        ItemDisplayBinding="{Binding ., Converter={StaticResource EnumDisplayNameConverter}}" />
-        
-        <Label Text="Ngày bắt đầu" TextColor="Black" />
-        <DatePicker
-        x:Name="StartDatePicker"
-        Date="{Binding StartDate, Mode=TwoWay}"
-        BackgroundColor="White"
-        TextColor="Black"
-        HeightRequest="50"
-        Margin="0,0,0,0"
-        HorizontalOptions="Fill"
-        FontSize="18"
-        />
-        <Label Text="Ngày kết thúc" TextColor="Black" />
-        <DatePicker
-        x:Name="EndDatePicker"
-        Date="{Binding EndDate, Mode=TwoWay}"
-        BackgroundColor="White"
-        TextColor="Black"
-        HeightRequest="50"
-        Margin="0,0,0,0"
-        HorizontalOptions="Fill"
-        FontSize="18"
-        />
-
-        <Button Text="Xác nhận" 
-                Command="{Binding ConfirmCommand}" 
-                BackgroundColor="#FF9900" 
-                TextColor="White" 
-                FontAttributes="Bold" 
-                HeightRequest="50" 
-                CornerRadius="25" 
-                FontSize="18" />
-    </VerticalStackLayout>
+    <ScrollView>
+        <VerticalStackLayout Padding="30" Spacing="20">
+            <Label Text="Cập nhật trạng thái cửa hàng" FontSize="22" FontAttributes="Bold" TextColor="#FF9900" HorizontalOptions="Center" />
+            <Label Text="Chọn Trạng thái" FontSize="16" />
+            <controls:CustomDropdownPicker x:Name="StatusPicker"
+            Title="Chọn Trạng thái"
+            ItemsSource="{Binding StatusNames}"
+            SelectedIndex="{Binding SelectedStatusIndex, Mode=TwoWay}"
+            TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
+            ItemDisplayBinding="{Binding ., Converter={StaticResource EnumDisplayNameConverter}}" />
+            <Label Text="Chọn tiện ích nhà hàng" FontSize="16" />
+            <CollectionView ItemsSource="{Binding Utilities}" SelectionMode="None" HeightRequest="220">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Orientation="Vertical" Span="3" HorizontalItemSpacing="12" VerticalItemSpacing="12" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Padding="8" Margin="6"
+                               BorderColor="{Binding IsSelected, Converter={StaticResource SelectedBorderConverter}}"
+                               BackgroundColor="{Binding IsSelected, Converter={StaticResource SelectedBgConverter}}"
+                               CornerRadius="12" HasShadow="False"
+                               HeightRequest="80" WidthRequest="90">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding BindingContext.ToggleUtilityCommand, Source={x:Reference StoreLevelPageRef}}" CommandParameter="{Binding .}" />
+                            </Frame.GestureRecognizers>
+                            <StackLayout Orientation="Vertical" HorizontalOptions="Center" VerticalOptions="Center" Spacing="4">
+                                <Image WidthRequest="32" HeightRequest="32" Source="{Binding UrlImage, Converter={StaticResource ImageUrlConverter}}" />
+                                <Label Text="{Binding Name}" FontSize="12" HorizontalOptions="Center" />
+                            </StackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+            <Label Text="Chọn Phù hợp với nhà hàng" FontSize="16" />
+            <CollectionView ItemsSource="{Binding Suitabilities}" SelectionMode="None" HeightRequest="220">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Orientation="Vertical" Span="3" HorizontalItemSpacing="12" VerticalItemSpacing="12" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Padding="8" Margin="6"
+                               BorderColor="{Binding IsSelected, Converter={StaticResource SelectedBorderConverter}}"
+                               BackgroundColor="{Binding IsSelected, Converter={StaticResource SelectedBgConverter}}"
+                               CornerRadius="12" HasShadow="False"
+                               HeightRequest="80" WidthRequest="90">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding BindingContext.ToggleSuitabilityCommand, Source={x:Reference StoreLevelPageRef}}" CommandParameter="{Binding .}" />
+                            </Frame.GestureRecognizers>
+                            <StackLayout Orientation="Vertical" HorizontalOptions="Center" VerticalOptions="Center" Spacing="4">
+                                <Label Text="{Binding Name}" FontSize="12" HorizontalOptions="Center" />
+                            </StackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+            <Label Text="Chọn kiểu nhà hàng" FontSize="16" />
+            <CollectionView ItemsSource="{Binding StoreTypes}" SelectionMode="None" HeightRequest="220">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Orientation="Vertical" Span="3" HorizontalItemSpacing="12" VerticalItemSpacing="12" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Padding="8" Margin="6"
+                               BorderColor="{Binding IsSelected, Converter={StaticResource SelectedBorderConverter}}"
+                               BackgroundColor="{Binding IsSelected, Converter={StaticResource SelectedBgConverter}}"
+                               CornerRadius="12" HasShadow="False"
+                               HeightRequest="80" WidthRequest="90">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding BindingContext.ToggleStoreTypeCommand, Source={x:Reference StoreLevelPageRef}}" CommandParameter="{Binding .}" />
+                            </Frame.GestureRecognizers>
+                            <StackLayout Orientation="Vertical" HorizontalOptions="Center" VerticalOptions="Center" Spacing="4">
+                                <Image WidthRequest="32" HeightRequest="32" Source="{Binding urlImage, Converter={StaticResource ImageUrlConverter}}" />
+                                <Label Text="{Binding storeTypeName}" FontSize="12" HorizontalOptions="Center" />
+                            </StackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+            <Label Text="Ngày bắt đầu" TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
+            <DatePicker
+            x:Name="StartDatePicker"
+            Date="{Binding StartDate, Mode=TwoWay}"
+            BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
+            TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
+            HeightRequest="50"
+            Margin="0,0,0,0"
+            HorizontalOptions="Fill"
+            FontSize="18"
+            />
+            <Label Text="Ngày kết thúc" TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
+            <DatePicker
+            x:Name="EndDatePicker"
+            Date="{Binding EndDate, Mode=TwoWay}"
+            BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
+            TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
+            HeightRequest="50"
+            Margin="0,0,0,0"
+            HorizontalOptions="Fill"
+            FontSize="18"
+            />
+            <Button Text="Xác nhận" 
+                    Command="{Binding ConfirmCommand}" 
+                    BackgroundColor="{AppThemeBinding Light={StaticResource OrangeColor}, Dark={StaticResource OrangeColor}}"
+                    TextColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}"
+                    FontAttributes="Bold" 
+                    HeightRequest="50" 
+                    CornerRadius="25" 
+                    FontSize="18" />
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage> 

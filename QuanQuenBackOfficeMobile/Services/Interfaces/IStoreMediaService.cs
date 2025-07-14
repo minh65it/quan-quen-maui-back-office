@@ -13,5 +13,5 @@ public interface IStoreMediaService
     /// <summary>
     /// Upload ảnh cho cửa hàng
     /// </summary>
-    Task<ApiResponse> UploadMediasAsync(string storeId, string categoryMediaId, string createdBy, List<byte[]> imageBytesList, bool isSecurity = false);
+    Task<ApiResponse> UploadMediasAsync(string storeId, string categoryMediaId, string createdBy, List<byte[]> imageBytesList, bool isSecurity = false, bool isMenu = false);
 } 

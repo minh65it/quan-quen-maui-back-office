@@ -33,8 +33,18 @@ public static class MauiProgram
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
 			});
+
+        // Load configuration based on environment
         var assembly = Assembly.GetExecutingAssembly();
+        
+#if DEBUG
+        // Development environment - load appsettings.Development.json
+        var resourceName = "QuanQuenBackOfficeMobile.appsettings.Development.json";
+#else
+        // Production environment - load appsettings.json
         var resourceName = "QuanQuenBackOfficeMobile.appsettings.json";
+#endif
+
         using var stream = assembly.GetManifestResourceStream(resourceName)
             ?? throw new InvalidOperationException(
                 $"Embedded resource '{resourceName}' not found. " +
@@ -42,40 +52,37 @@ public static class MauiProgram
 
         builder.Configuration.AddJsonStream(stream);
 
+        // Register ConfigurationService
+        builder.Services.AddSingleton<IConfigurationService, ConfigurationService>();
 
         builder.Services.AddHttpClient<IAuthService, AuthService>((sp, client) =>
                {
-                   var cfg = sp.GetRequiredService<IConfiguration>();
-                   var baseUrl = cfg["API:Identity:BaseUrl"]
-                                 ?? throw new InvalidOperationException(
-                                     "Configuration key 'API:Identity:BaseUrl' is missing.");
+                   var configService = sp.GetRequiredService<IConfigurationService>();
+                   var baseUrl = configService.GetApiUrl("Identity");
                    client.BaseAddress = new Uri(baseUrl);
                    client.Timeout = TimeSpan.FromSeconds(30);
                });
 
         builder.Services.AddHttpClient<IStoreService, StoreService>((sp, client) =>
         {
-            var cfg = sp.GetRequiredService<IConfiguration>();
-            var baseUrl = cfg["API:Store:BaseUrl"]
-                          ?? throw new InvalidOperationException("Missing API:Store:BaseUrl");
+            var configService = sp.GetRequiredService<IConfigurationService>();
+            var baseUrl = configService.GetApiUrl("Store");
             client.BaseAddress = new Uri(baseUrl);
             client.Timeout = TimeSpan.FromSeconds(30);
         });
 
         builder.Services.AddHttpClient<IStoreUserService, StoreUserService>((sp, client) =>
         {
-            var cfg = sp.GetRequiredService<IConfiguration>();
-            var baseUrl = cfg["API:Identity:BaseUrl"]
-                          ?? throw new InvalidOperationException("Missing API:Identity:BaseUrl");
+            var configService = sp.GetRequiredService<IConfigurationService>();
+            var baseUrl = configService.GetApiUrl("Identity");
             client.BaseAddress = new Uri(baseUrl);
             client.Timeout = TimeSpan.FromSeconds(30);
         });
 
         builder.Services.AddHttpClient<IStoreMediaService, StoreMediaService>((sp, client) =>
         {
-            var cfg = sp.GetRequiredService<IConfiguration>();
-            var baseUrl = cfg["API:Store:BaseUrl"]
-                          ?? throw new InvalidOperationException("Missing API:Store:BaseUrl");
+            var configService = sp.GetRequiredService<IConfigurationService>();
+            var baseUrl = configService.GetApiUrl("Store");
             client.BaseAddress = new Uri(baseUrl);
             client.Timeout = TimeSpan.FromSeconds(30);
         });
@@ -141,6 +148,9 @@ public static class MauiProgram
 
 		builder.Services.AddTransient<PhotoStoreUserViewModel>();
 		builder.Services.AddTransient<PhotoStoreUser>();
+
+		// Register Converters
+		builder.Services.AddSingleton<Converters.AvatarUrlConverter>();
 
 		builder.Services.UsePageResolver();
 

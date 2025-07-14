@@ -57,4 +57,13 @@
     <FlyoutItem Title="Về Quán Quen Agent">
         <ShellContent ContentTemplate="{DataTemplate views:AboutPage}" />
     </FlyoutItem>
+    <FlyoutItem Title="Test">
+        <ShellContent ContentTemplate="{DataTemplate views:PhotoStoreUser}" />
+    </FlyoutItem>
+    <FlyoutItem Title="Test1">
+        <ShellContent ContentTemplate="{DataTemplate views:Stores.StoreMenuPage}" />
+    </FlyoutItem>
+    <FlyoutItem Title="Test2">
+        <ShellContent ContentTemplate="{DataTemplate views:Stores.StoreLevelPage}" />
+    </FlyoutItem>
 </Shell>

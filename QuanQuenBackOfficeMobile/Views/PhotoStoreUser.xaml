@@ -22,7 +22,7 @@
             Text="Thêm hình ảnh nhà hàng:"
             FontSize="20"
             FontAttributes="Bold"
-            TextColor="Black"
+            TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
             Margin="0,0,0,10" />
 
         <Label
@@ -39,7 +39,6 @@
             Margin="0,0,0,10"
             Stroke="#E0E0E0"
             StrokeThickness="1"
-            Background="White"
             HorizontalOptions="FillAndExpand"
             VerticalOptions="Center"
             Padding="0">
@@ -51,7 +50,7 @@
                 <StackLayout IsVisible="{Binding CoverImageSource, Converter={StaticResource NullToBoolConverter}}"
                              VerticalOptions="Center" HorizontalOptions="Center">
                     <Image Source="add.png" HeightRequest="48" WidthRequest="48"/>
-                    <Label Text="Thêm ảnh hoặc kéo và thả (0/1)" TextColor="#FE8C18" FontSize="14" HorizontalOptions="Center"/>
+                    <Label Text="Thêm ảnh hoặc kéo và thả (0/1)" TextColor="{AppThemeBinding Light={StaticResource OrangeColor}, Dark={StaticResource OrangeColor}}" FontSize="14" HorizontalOptions="Center"/>
                 </StackLayout>
                 <Grid.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding AddCoverImageCommand}" />
@@ -69,17 +68,17 @@
 
         <CollectionView Grid.Row="4" ItemsSource="{Binding GalleryImages}"  SelectionMode="None" VerticalOptions="FillAndExpand"  HorizontalOptions="FillAndExpand" ItemSizingStrategy="MeasureAllItems">
             <CollectionView.ItemsLayout>
-                <GridItemsLayout Orientation="Vertical" Span="4" HorizontalItemSpacing="10" VerticalItemSpacing="5" />
+                <GridItemsLayout Orientation="Vertical" Span="4" HorizontalItemSpacing="10" VerticalItemSpacing="10" />
             </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:ImageItem">
-                    <Border  Stroke="#E0E0E0" StrokeThickness="1" Background="White" Margin="5"  HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+                    <Border  Stroke="#E0E0E0" StrokeThickness="1" Background="White" Margin="5"  HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" HeightRequest="52">
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="12"/>
                         </Border.StrokeShape>
                         <Grid>
-                            <Image Source="{Binding Source}"  HorizontalOptions="FillAndExpand"  VerticalOptions="FillAndExpand" Aspect="AspectFill" IsVisible="{Binding Source}" />
-                            <StackLayout IsVisible="{Binding Source, Converter={StaticResource NullToBoolConverter}}" VerticalOptions="Center" HorizontalOptions="Center" Padding="0,30">
+                            <Image Source="{Binding Source}" Aspect="AspectFill" IsVisible="{Binding Source}" />
+                            <StackLayout IsVisible="{Binding Source, Converter={StaticResource NullToBoolConverter}}" VerticalOptions="Center" HorizontalOptions="Center">
                                 <Image Source="add.png" HeightRequest="32" WidthRequest="32" />
                             </StackLayout>
                             <Grid.GestureRecognizers>
@@ -97,20 +96,30 @@
             ColumnSpacing="12"
             Margin="0,20,0,0">
             <Button
+                Grid.Column="0"
+                Text="Quay video"
+                Command="{Binding RecordVideoCommand}"
+                HorizontalOptions="FillAndExpand"
+                HeightRequest="48"
+                BackgroundColor="{AppThemeBinding Light={StaticResource OrangeColor}, Dark={StaticResource OrangeColor}}"
+                TextColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}"
+                CornerRadius="24"
+                FontAttributes="Bold" />
+            <Button
                 Grid.Column="1"
                 Text="Lưu"
                 Command="{Binding SavePhotoCommand}"
                 HorizontalOptions="FillAndExpand"
                 HeightRequest="48"
-                BackgroundColor="{StaticResource Orange70Color}"
-                TextColor="White"
+                BackgroundColor="{AppThemeBinding Light={StaticResource Orange70Color}, Dark={StaticResource OrangeColor}}"
+                TextColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}"
                 CornerRadius="24"
                 FontAttributes="Bold" />
         </Grid>
 
         <BoxView
             Grid.Row="6"
-            BackgroundColor="Transparent"
+            BackgroundColor="{x:Null}"
             HeightRequest="0" />
     </Grid>
 </ContentPage>

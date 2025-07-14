@@ -20,7 +20,8 @@ public partial class App : Application
 	public App()
 	{
 		InitializeComponent();
-		MainPage = new ContentPage { Content = new ActivityIndicator { IsRunning = true, VerticalOptions = LayoutOptions.Center, HorizontalOptions = LayoutOptions.Center } };
+		Application.Current.UserAppTheme = AppTheme.Light;
+        MainPage = new ContentPage { Content = new ActivityIndicator { IsRunning = true, VerticalOptions = LayoutOptions.Center, HorizontalOptions = LayoutOptions.Center } };
 		CheckTokenAndNavigate();
 	}
 

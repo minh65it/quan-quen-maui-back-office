@@ -4,6 +4,8 @@ namespace QuanQuenBackOfficeMobile.Converters
 {
     public class StringNotNullOrEmptyConverter : IValueConverter
     {
+        public static StringNotNullOrEmptyConverter Instance { get; } = new StringNotNullOrEmptyConverter();
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return !string.IsNullOrEmpty(value as string);

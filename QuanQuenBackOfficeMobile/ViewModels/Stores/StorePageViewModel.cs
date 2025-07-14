@@ -31,6 +31,18 @@ namespace QuanQuenBackOfficeMobile.ViewModels
         [ObservableProperty]
         private bool hasMoreItems = true;
 
+        [ObservableProperty]
+        private string paginationInfo = "";
+
+        [ObservableProperty]
+        private int totalCount = 0;
+
+        [ObservableProperty]
+        private int totalPage = 0;
+
+        [ObservableProperty]
+        private int currentPage = 1;
+
         private int _currentPage = 1;
 
         public IAsyncRelayCommand SearchCommand { get; }
@@ -82,15 +94,23 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                     foreach (var store in newStores)
                         stores.Add(store);
 
-                    hasMoreItems = response.Result.Count == DefaultPageSize;
+                    if (response.Pagination != null)
+                    {
+                        TotalCount = response.Pagination.TotalCount;
+                        TotalPage = response.Pagination.TotalPage;
+                        CurrentPage = response.Pagination.PageNumber;
+                    }
+
+                    hasMoreItems = response.Result.Count == DefaultPageSize && _currentPage < TotalPage;
                     if (hasMoreItems)
                     {
                         _currentPage++;
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"Error loading stores: {ex.Message}");
                 // Hiển thị lỗi nếu cần
             }
             finally
@@ -112,6 +132,8 @@ namespace QuanQuenBackOfficeMobile.ViewModels
         {
             _isLoaded = false;
             stores.Clear();
+            _currentPage = 1;
+            hasMoreItems = true;
             await LoadStoresAsync();
         }
 
@@ -121,6 +143,10 @@ namespace QuanQuenBackOfficeMobile.ViewModels
             _currentPage = 1;
             hasMoreItems = true;
             stores.Clear();
+            TotalCount = 0;
+            TotalPage = 0;
+            CurrentPage = 1;
+            PaginationInfo = "";
         }
 
         private async void OnViewDetail(StoreModel store)
