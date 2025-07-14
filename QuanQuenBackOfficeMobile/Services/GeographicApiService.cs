@@ -1,6 +1,5 @@
-using System.Net.Http;
-using System.Text.Json;
-using Microsoft.Extensions.Configuration;
+using QuanQuenBackOfficeMobile.Services.Interfaces;
+
 
 namespace QuanQuenBackOfficeMobile.Services;
 
@@ -13,13 +12,12 @@ public class GeographicApiService
     private readonly string _districtPath;
     private readonly string _wardPath;
 
-    public GeographicApiService(IConfiguration config)
+    public GeographicApiService(IConfigurationService configService)
     {
-        var geoConfig = config.GetSection("API:Geographic");
-        var baseUrl = geoConfig["BaseUrl"] ?? throw new Exception("Missing Geographic BaseUrl");
-        _provincePath = geoConfig["GetProvincePath"] ?? throw new Exception("Missing GetProvincePath");
-        _districtPath = geoConfig["GetDistrictPath"] ?? throw new Exception("Missing GetDistrictPath");
-        _wardPath = geoConfig["GetWardPath"] ?? throw new Exception("Missing GetWardPath");
+        var baseUrl = configService.GetApiUrl("Geographic");
+        _provincePath = configService.GetApiPath("Geographic", "GetProvincePath");
+        _districtPath = configService.GetApiPath("Geographic", "GetDistrictPath");
+        _wardPath = configService.GetApiPath("Geographic", "GetWardPath");
         _clientId = "GeographicAPI";
         _clientSecret = "ASJD2KAZ31XN1CBQWE";
 
@@ -61,17 +59,17 @@ public class ProvinceDto
 {
     public string zoneId { get; set; }
     public string zoneName { get; set; }
-    public string Name => zoneName; // Để binding cho Picker
+    public string Name => zoneName;
 }
 public class DistrictDto
 {
     public string territoryId { get; set; }
     public string territoryName { get; set; }
-    public string Name => territoryName; // Để binding cho Picker
+    public string Name => territoryName;
 }
 public class WardDto
 {
     public string stateId { get; set; }
     public string stateName { get; set; }
-    public string Name => stateName; // Để binding cho Picker
+    public string Name => stateName;
 } 

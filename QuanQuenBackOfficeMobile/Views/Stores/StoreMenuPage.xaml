@@ -92,7 +92,6 @@
                                        HorizontalOptions="Fill"
                                        VerticalOptions="Fill"
                />
-                                <!-- Nút xóa giữ nguyên -->
                                 <Frame BackgroundColor="{x:Null}"
                                        BorderColor="{AppThemeBinding Light={StaticResource Orange70Color}, Dark={StaticResource OrangeColor}}"
                                        Padding="0"
@@ -136,7 +135,8 @@
                         FontAttributes="Bold" 
                         HeightRequest="50" 
                         CornerRadius="25" 
-                        FontSize="18" />
+                        FontSize="18"
+                        IsVisible="{Binding HasMenuImage}" />
                 
             </VerticalStackLayout>
         </VerticalStackLayout>

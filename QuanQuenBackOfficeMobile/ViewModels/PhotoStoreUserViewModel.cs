@@ -27,6 +27,8 @@ namespace QuanQuenBackOfficeMobile.ViewModels
         [ObservableProperty]
         private ObservableCollection<ImageItem> galleryImages = new(Enumerable.Range(0, 8).Select(_ => new ImageItem()).ToList());
         public bool CanAddMoreImages => GalleryImages.Count(img => img.Source == null) > 0;
+        [ObservableProperty]
+        private bool isLoading = false;
 
         public PhotoStoreUserViewModel(IStoreMediaService storeMediaService)
         {
@@ -119,15 +121,49 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                 if (bytes != null) imageBytesList.Add(bytes);
             }
 
-            var result = await _storeMediaService.UploadMediasAsync(storeId, categoryMediaId, createdBy, imageBytesList, false, false);
-            if (result.IsSuccess)
+            IsLoading = true;
+            OnPropertyChanged(nameof(IsLoading));
+            try
             {
-                await App.Current.MainPage.DisplayAlert("Thành công", "Thêm ảnh bìa nhà hàng thành công!", "OK");
-                await Application.Current.MainPage.Navigation.PushAsync(new QuanQuenBackOfficeMobile.Views.Stores.StoreLevelPage());
+                var result = await _storeMediaService.UploadMediasAsync(storeId, categoryMediaId, createdBy, imageBytesList, false, false);
+                if (result.IsSuccess)
+                {
+                    await App.Current.MainPage.DisplayAlert("Thành công", "Thêm ảnh bìa nhà hàng thành công!", "OK");
+                    await Application.Current.MainPage.Navigation.PushAsync(new QuanQuenBackOfficeMobile.Views.Stores.StoreLevelPage());
+                }
+                else
+                {
+                    await Shell.Current.DisplayAlert("Lỗi", result.Message, "OK");
+                }
             }
-            else
+            finally
             {
-                await Shell.Current.DisplayAlert("Lỗi", result.Message, "OK");
+                IsLoading = false;
+                OnPropertyChanged(nameof(IsLoading));
+            }
+        }
+
+        [RelayCommand]
+        public async Task RecordVideoAsync()
+        {
+            try
+            {
+                if (MediaPicker.Default.IsCaptureSupported)
+                {
+                    var video = await MediaPicker.Default.CaptureVideoAsync();
+                    if (video != null)
+                    {
+                        await Shell.Current.DisplayAlert("Thành công", $"Đã quay video: {video.FullPath}", "OK");
+                    }
+                }
+                else
+                {
+                    await Shell.Current.DisplayAlert("Lỗi", "Thiết bị không hỗ trợ quay video.", "OK");
+                }
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Lỗi", $"Không thể quay video: {ex.Message}", "OK");
             }
         }
 

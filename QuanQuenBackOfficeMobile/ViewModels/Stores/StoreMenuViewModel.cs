@@ -26,6 +26,9 @@ public partial class StoreMenuViewModel : ObservableObject
     [ObservableProperty]
     private string _uploadStatus = "";
 
+    public bool HasMenuImage => MenuImages != null && MenuImages.Count > 0;
+
+
     public ICommand AddImageCommand { get; }
     public ICommand TakePhotoCommand { get; }
     public ICommand RemoveImageCommand { get; }
@@ -48,14 +51,7 @@ public partial class StoreMenuViewModel : ObservableObject
     {
         try
         {
-            var options = new PickOptions
-            {
-                PickerTitle = "Chọn ảnh menu nhà hàng",
-                FileTypes = FilePickerFileType.Images
-            };
-
-            var result = await FilePicker.PickAsync(options);
-            if (result != null)
+            var result = await MediaPicker.Default.PickPhotoAsync();
             {
                 var imageModel = new MyImageModel
                 {
@@ -66,6 +62,7 @@ public partial class StoreMenuViewModel : ObservableObject
                 MenuImages.Add(imageModel);
                 UploadStatus = $"Đã chọn {MenuImages.Count} ảnh";
                 ((AsyncRelayCommand)UploadImagesCommand).NotifyCanExecuteChanged();
+                OnPropertyChanged(nameof(HasMenuImage));
             }
         }
         catch (Exception ex)
@@ -93,6 +90,7 @@ public partial class StoreMenuViewModel : ObservableObject
                     MenuImages.Add(imageModel);
                     UploadStatus = $"Đã chọn {MenuImages.Count} ảnh";
                     ((AsyncRelayCommand)UploadImagesCommand).NotifyCanExecuteChanged();
+                    OnPropertyChanged(nameof(HasMenuImage));
                 }
             }
             else
@@ -114,6 +112,7 @@ public partial class StoreMenuViewModel : ObservableObject
             MenuImages.Remove(image);
             UploadStatus = $"Đã chọn {MenuImages.Count} ảnh";
             ((AsyncRelayCommand)UploadImagesCommand).NotifyCanExecuteChanged();
+            OnPropertyChanged(nameof(HasMenuImage));
         }
     }
 

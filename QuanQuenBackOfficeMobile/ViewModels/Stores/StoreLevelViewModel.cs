@@ -73,12 +73,6 @@ public partial class StoreLevelViewModel : ObservableObject
         LoadStoreTypes();
     }
 
-    partial void OnSelectedUtilitiesChanged(ObservableCollection<FilterStoreModel> value)
-    {
-        foreach (var u in Utilities)
-            u.IsSelected = value.Any(s => s.FilterStoreId == u.FilterStoreId);
-    }
-
     private void ToggleUtility(FilterStoreModel utility)
     {
         if (utility == null) return;

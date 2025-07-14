@@ -24,21 +24,21 @@
             TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
             ItemDisplayBinding="{Binding ., Converter={StaticResource EnumDisplayNameConverter}}" />
             <Label Text="Chọn tiện ích nhà hàng" FontSize="16" />
-            <CollectionView ItemsSource="{Binding Utilities}" SelectionMode="None" HeightRequest="180">
+            <CollectionView ItemsSource="{Binding Utilities}" SelectionMode="None" HeightRequest="220">
                 <CollectionView.ItemsLayout>
-                    <GridItemsLayout Orientation="Vertical" Span="4" />
+                    <GridItemsLayout Orientation="Vertical" Span="3" HorizontalItemSpacing="12" VerticalItemSpacing="12" />
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Frame Padding="8" Margin="6"
                                BorderColor="{Binding IsSelected, Converter={StaticResource SelectedBorderConverter}}"
                                BackgroundColor="{Binding IsSelected, Converter={StaticResource SelectedBgConverter}}"
-                               CornerRadius="12" HasShadow="False">
+                               CornerRadius="12" HasShadow="False"
+                               HeightRequest="80" WidthRequest="90">
                             <Frame.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding BindingContext.ToggleUtilityCommand, Source={x:Reference StoreLevelPageRef}}"
-                                                     CommandParameter="{Binding .}" />
+                                <TapGestureRecognizer Command="{Binding BindingContext.ToggleUtilityCommand, Source={x:Reference StoreLevelPageRef}}" CommandParameter="{Binding .}" />
                             </Frame.GestureRecognizers>
-                            <StackLayout Orientation="Vertical" HorizontalOptions="Center" VerticalOptions="Center">
+                            <StackLayout Orientation="Vertical" HorizontalOptions="Center" VerticalOptions="Center" Spacing="4">
                                 <Image WidthRequest="32" HeightRequest="32" Source="{Binding UrlImage, Converter={StaticResource ImageUrlConverter}}" />
                                 <Label Text="{Binding Name}" FontSize="12" HorizontalOptions="Center" />
                             </StackLayout>
@@ -47,43 +47,43 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
             <Label Text="Chọn Phù hợp với nhà hàng" FontSize="16" />
-            <CollectionView ItemsSource="{Binding Suitabilities}" SelectionMode="None" HeightRequest="180">
+            <CollectionView ItemsSource="{Binding Suitabilities}" SelectionMode="None" HeightRequest="220">
                 <CollectionView.ItemsLayout>
-                    <GridItemsLayout Orientation="Vertical" Span="4" />
+                    <GridItemsLayout Orientation="Vertical" Span="3" HorizontalItemSpacing="12" VerticalItemSpacing="12" />
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Frame Padding="8" Margin="6"
                                BorderColor="{Binding IsSelected, Converter={StaticResource SelectedBorderConverter}}"
                                BackgroundColor="{Binding IsSelected, Converter={StaticResource SelectedBgConverter}}"
-                               CornerRadius="12" HasShadow="False">
+                               CornerRadius="12" HasShadow="False"
+                               HeightRequest="80" WidthRequest="90">
                             <Frame.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding BindingContext.ToggleSuitabilityCommand, Source={x:Reference StoreLevelPageRef}}"
-                                                     CommandParameter="{Binding .}" />
+                                <TapGestureRecognizer Command="{Binding BindingContext.ToggleSuitabilityCommand, Source={x:Reference StoreLevelPageRef}}" CommandParameter="{Binding .}" />
                             </Frame.GestureRecognizers>
-                            <StackLayout Orientation="Vertical" HorizontalOptions="Center" VerticalOptions="Center">
+                            <StackLayout Orientation="Vertical" HorizontalOptions="Center" VerticalOptions="Center" Spacing="4">
                                 <Label Text="{Binding Name}" FontSize="12" HorizontalOptions="Center" />
                             </StackLayout>
                         </Frame>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
-            <Label Text="Chọn loại nhà hàng" FontSize="16" />
-            <CollectionView ItemsSource="{Binding StoreTypes}" SelectionMode="None" HeightRequest="180">
+            <Label Text="Chọn kiểu nhà hàng" FontSize="16" />
+            <CollectionView ItemsSource="{Binding StoreTypes}" SelectionMode="None" HeightRequest="220">
                 <CollectionView.ItemsLayout>
-                    <GridItemsLayout Orientation="Vertical" Span="4" />
+                    <GridItemsLayout Orientation="Vertical" Span="3" HorizontalItemSpacing="12" VerticalItemSpacing="12" />
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Frame Padding="8" Margin="6"
                                BorderColor="{Binding IsSelected, Converter={StaticResource SelectedBorderConverter}}"
                                BackgroundColor="{Binding IsSelected, Converter={StaticResource SelectedBgConverter}}"
-                               CornerRadius="12" HasShadow="False">
+                               CornerRadius="12" HasShadow="False"
+                               HeightRequest="80" WidthRequest="90">
                             <Frame.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding BindingContext.ToggleStoreTypeCommand, Source={x:Reference StoreLevelPageRef}}"
-                                                     CommandParameter="{Binding .}" />
+                                <TapGestureRecognizer Command="{Binding BindingContext.ToggleStoreTypeCommand, Source={x:Reference StoreLevelPageRef}}" CommandParameter="{Binding .}" />
                             </Frame.GestureRecognizers>
-                            <StackLayout Orientation="Vertical" HorizontalOptions="Center" VerticalOptions="Center">
+                            <StackLayout Orientation="Vertical" HorizontalOptions="Center" VerticalOptions="Center" Spacing="4">
                                 <Image WidthRequest="32" HeightRequest="32" Source="{Binding urlImage, Converter={StaticResource ImageUrlConverter}}" />
                                 <Label Text="{Binding storeTypeName}" FontSize="12" HorizontalOptions="Center" />
                             </StackLayout>
