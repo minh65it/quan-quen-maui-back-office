@@ -15,6 +15,9 @@ using System.Collections.Generic;
 using System.Threading;
 using QuanQuenBackOfficeMobile.Models;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
+using QuanQuenBackOfficeMobile.ViewModels.Stores;
+using QuanQuenBackOfficeMobile.Views.Stores;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace QuanQuenBackOfficeMobile.ViewModels
 {
@@ -129,7 +132,8 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                 if (result.IsSuccess)
                 {
                     await App.Current.MainPage.DisplayAlert("Thành công", "Thêm ảnh bìa nhà hàng thành công!", "OK");
-                    await Application.Current.MainPage.Navigation.PushAsync(new QuanQuenBackOfficeMobile.Views.Stores.StoreLevelPage());
+                    var videoPage = Application.Current.MainPage.Handler.MauiContext.Services.GetService<VideoStoreUserPage>();
+                    await Application.Current.MainPage.Navigation.PushAsync(videoPage);
                 }
                 else
                 {
@@ -140,30 +144,6 @@ namespace QuanQuenBackOfficeMobile.ViewModels
             {
                 IsLoading = false;
                 OnPropertyChanged(nameof(IsLoading));
-            }
-        }
-
-        [RelayCommand]
-        public async Task RecordVideoAsync()
-        {
-            try
-            {
-                if (MediaPicker.Default.IsCaptureSupported)
-                {
-                    var video = await MediaPicker.Default.CaptureVideoAsync();
-                    if (video != null)
-                    {
-                        await Shell.Current.DisplayAlert("Thành công", $"Đã quay video: {video.FullPath}", "OK");
-                    }
-                }
-                else
-                {
-                    await Shell.Current.DisplayAlert("Lỗi", "Thiết bị không hỗ trợ quay video.", "OK");
-                }
-            }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlert("Lỗi", $"Không thể quay video: {ex.Message}", "OK");
             }
         }
 

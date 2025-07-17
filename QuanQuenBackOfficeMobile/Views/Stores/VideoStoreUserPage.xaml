@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:QuanQuenBackOfficeMobile.ViewModels.Stores"
+             xmlns:converters="clr-namespace:QuanQuenBackOfficeMobile.Converters"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="QuanQuenBackOfficeMobile.Views.Stores.VideoStoreUserPage"
+             x:DataType="viewmodels:VideoStoreUserViewModel"
+             x:Name="RootPage"
+             BackgroundColor="#F5F5F5"
+             Padding="0"
+             Title="">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+            <Style x:Key="ModernButtonStyle" TargetType="Button">
+                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource OrangeColor}, Dark={StaticResource OrangeColor}}" />
+                <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}" />
+                <Setter Property="CornerRadius" Value="25" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="HeightRequest" Value="50" />
+                <Setter Property="Margin" Value="0,10,0,0" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <Grid RowDefinitions="Auto,*,Auto" ColumnDefinitions="*" Margin="20">
+        <!-- Header -->
+        <StackLayout Grid.Row="0" Margin="0,0,0,20">
+            <Label
+                Text="🎥 Quay Video Nhà Hàng"
+                FontSize="24"
+                FontAttributes="Bold"
+                TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
+                HorizontalOptions="Center"
+                Margin="0,0,0,10" />
+            <Label
+                Text="Tạo video giới thiệu cho nhà hàng của bạn (Tùy chọn)"
+                FontSize="16"
+                TextColor="Gray"
+                HorizontalOptions="Center"
+                HorizontalTextAlignment="Center" />
+            <Label
+                Text="Bạn có thể bỏ qua bước này nếu không muốn quay video"
+                FontSize="14"
+                TextColor="LightGray"
+                HorizontalOptions="Center"
+                HorizontalTextAlignment="Center"
+                Margin="0,5,0,0" />
+        </StackLayout>
+        <!-- Main Content -->
+        <ScrollView Grid.Row="1" VerticalOptions="FillAndExpand">
+            <StackLayout Spacing="20">
+                <!-- Video Preview Area -->
+                <Border
+                    HeightRequest="300"
+                    Stroke="#E0E0E0"
+                    StrokeThickness="2"
+                    BackgroundColor="White"
+                    HorizontalOptions="FillAndExpand">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="20"/>
+                    </Border.StrokeShape>
+                    <Grid>
+                        <!-- Video preview động -->
+                        <toolkit:MediaElement 
+                            ShouldAutoPlay="True"
+                            ShouldShowPlaybackControls="True"
+                            Source="{Binding RecordedVideo.FullPath}"
+                            Aspect="AspectFill"
+                            IsVisible="{Binding HasVideo}" />
+                        <!-- Icon xóa video -->
+                        <Image Source="delete_icon.png"
+                               HeightRequest="32"
+                               WidthRequest="32"
+                               HorizontalOptions="End"
+                               VerticalOptions="Start"
+                               Margin="8"
+                               IsVisible="{Binding HasVideo}">
+                            <Image.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding BindingContext.DeleteVideoCommand, Source={x:Reference RootPage}}"
+                                    CommandParameter="{Binding RecordedVideo}" />
+                            </Image.GestureRecognizers>
+                        </Image>
+                        <!-- Nếu chưa có video -->
+                        <StackLayout 
+                            IsVisible="{Binding HasVideo, Converter={StaticResource InverseBoolConverter}}"
+                            VerticalOptions="Center" 
+                            HorizontalOptions="Center"
+                            Spacing="15">
+                            <Image 
+                                Source="multiply.png" 
+                                HeightRequest="80" 
+                                WidthRequest="80"
+                                Opacity="0.6" />
+                            <Label 
+                                Text="Chưa có video nào được quay" 
+                                TextColor="Gray" 
+                                FontSize="16" 
+                                HorizontalOptions="Center"
+                                HorizontalTextAlignment="Center" />
+                            <Label 
+                                Text="Nhấn nút bên dưới để quay video" 
+                                TextColor="LightGray" 
+                                FontSize="14" 
+                                HorizontalOptions="Center"
+                                HorizontalTextAlignment="Center" />
+                        </StackLayout>
+                    </Grid>
+                </Border>
+                <!-- Video Info -->
+                <StackLayout IsVisible="{Binding HasVideo}" Spacing="10">
+                    <Label
+                        Text="Thông tin video:"
+                        FontSize="18"
+                        FontAttributes="Bold"
+                        TextColor="Black" />
+                    <Border
+                        BackgroundColor="White"
+                        Stroke="#E0E0E0"
+                        StrokeThickness="1"
+                        Padding="15">
+                        <StackLayout Spacing="8">
+                            <Label
+                                Text="{Binding VideoFileName}"
+                                FontSize="16"
+                                FontAttributes="Bold"
+                                TextColor="Black" />
+                            <Label
+                                Text="{Binding VideoDuration}"
+                                FontSize="14"
+                                TextColor="Gray" />
+                            <Label
+                                Text="{Binding VideoSize}"
+                                FontSize="14"
+                                TextColor="Gray" />
+                        </StackLayout>
+                    </Border>
+                </StackLayout>
+                <!-- Recording Controls -->
+                <StackLayout Spacing="15">
+                    <Button
+                        Text="🎥 Quay video"
+                        Command="{Binding StartRecordingCommand}"
+                        Style="{StaticResource ModernButtonStyle}"
+                        IsVisible="{Binding HasVideo, Converter={StaticResource InverseBoolConverter}}" />
+                    <Button
+                        Text="📤 Lưu video"
+                        Command="{Binding SaveVideoCommand}"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Orange70Color}, Dark={StaticResource OrangeColor}}"
+                        Style="{StaticResource ModernButtonStyle}"
+                        IsVisible="{Binding HasVideo}" />
+                    <!-- Skip Button -->
+                    <Button
+                        Text="⏭️ Bỏ qua - Chuyển đến bước tiếp theo"
+                        Command="{Binding SkipVideoCommand}"
+                        BackgroundColor="Transparent"
+                        TextColor="Gray"
+                        BorderColor="Gray"
+                        BorderWidth="1"
+                        Style="{StaticResource ModernButtonStyle}"
+                        Margin="0,20,0,0" />
+                </StackLayout>
+                <!-- Tips Section -->
+                <Border
+                    BackgroundColor="#E8F4FD"
+                    Stroke="#B3D9F2"
+                    StrokeThickness="1"
+                    Padding="15"
+                    Margin="0,20,0,0">
+                    <StackLayout Spacing="8">
+                        <Label
+                            Text="💡 Mẹo quay video:"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            TextColor="#2E86AB" />
+                        <Label
+                            Text="• Quay trong môi trường đủ ánh sáng"
+                            FontSize="14"
+                            TextColor="#2E86AB" />
+                        <Label
+                            Text="• Giữ camera ổn định"
+                            FontSize="14"
+                            TextColor="#2E86AB" />
+                        <Label
+                            Text="• Quay từ nhiều góc độ khác nhau"
+                            FontSize="14"
+                            TextColor="#2E86AB" />
+                        <Label
+                            Text="• Thời lượng video nên từ 30 giây đến 2 phút"
+                            FontSize="14"
+                            TextColor="#2E86AB" />
+                        <Label
+                            Text="• Bạn có thể bỏ qua bước này nếu không muốn quay video"
+                            FontSize="14"
+                            TextColor="#2E86AB"
+                            FontAttributes="Italic" />
+                    </StackLayout>
+                </Border>
+            </StackLayout>
+        </ScrollView>
+        <!-- Loading Indicator -->
+        <ActivityIndicator 
+            Grid.Row="2"
+            IsRunning="{Binding IsLoading}"
+            IsVisible="{Binding IsLoading}"
+            Color="{AppThemeBinding Light={StaticResource OrangeColor}, Dark={StaticResource OrangeColor}}"
+            HorizontalOptions="Center"
+            VerticalOptions="Center" />
+    </Grid>
+</ContentPage>
