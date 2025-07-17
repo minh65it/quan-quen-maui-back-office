@@ -202,29 +202,45 @@ public partial class CreateStoreUserPasswordViewModel : ObservableObject
             // Lấy danh sách file ảnh từ StoreRegistrationData
             List<string> licenseImagePaths = StoreRegistrationData.LicenseImagePaths ?? new List<string>();
 
-            // Đọc file thành mảng byte[]
-            var imageBytesList = new List<byte[]>();
-            foreach (var path in licenseImagePaths)
+            // Kiểm tra xem có ảnh nào để upload không
+            if (licenseImagePaths.Count > 0)
             {
-                if (File.Exists(path))
+                // Đọc file thành mảng byte[]
+                var imageBytesList = new List<byte[]>();
+                foreach (var path in licenseImagePaths)
                 {
-                    var bytes = await File.ReadAllBytesAsync(path);
-                    imageBytesList.Add(bytes);
+                    if (File.Exists(path))
+                    {
+                        var bytes = await File.ReadAllBytesAsync(path);
+                        imageBytesList.Add(bytes);
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[LOG][ERROR] File không tồn tại: {path}");
+                    }
+                }
+
+                // Chỉ upload khi có ảnh thực sự
+                if (imageBytesList.Count > 0)
+                {
+                    // Gọi upload ảnh
+                    var licenseResponse = await _storeMediaService.UploadMediasAsync(storeId, categoryMediaId, createdBy!, imageBytesList, false, false);
+
+                    // Xử lý kết quả upload
+                    if (!licenseResponse.IsSuccess)
+                    {
+                        PasswordError = licenseResponse.Message ?? "Upload ảnh giấy phép kinh doanh thất bại";
+                        return;
+                    }
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine($"[LOG][ERROR] File không tồn tại: {path}");
+                    System.Diagnostics.Debug.WriteLine("[LOG][INFO] Không có ảnh hợp lệ để upload, bỏ qua bước upload");
                 }
             }
-
-            // Gọi upload ảnh
-            var licenseResponse = await _storeMediaService.UploadMediasAsync(storeId, categoryMediaId, createdBy!, imageBytesList, false,false);
-
-            // Xử lý kết quả upload
-            if (!licenseResponse.IsSuccess)
+            else
             {
-                PasswordError = licenseResponse.Message ?? "Upload ảnh giấy phép kinh doanh thất bại";
-                return;
+                System.Diagnostics.Debug.WriteLine("[LOG][INFO] Không có ảnh giấy phép kinh doanh để upload");
             }
             // --- Chỉ khi cả hai API đều thành công mới chuyển trang ---
             if (response.IsSuccess && storeResponse.IsSuccess)
