@@ -61,6 +61,8 @@ public static class MauiProgram
                    var baseUrl = configService.GetApiUrl("Identity");
                    client.BaseAddress = new Uri(baseUrl);
                    client.Timeout = TimeSpan.FromSeconds(30);
+				   client.Timeout = TimeSpan.FromMinutes(5);
+
                });
 
         builder.Services.AddHttpClient<IStoreService, StoreService>((sp, client) =>
@@ -69,6 +71,8 @@ public static class MauiProgram
             var baseUrl = configService.GetApiUrl("Store");
             client.BaseAddress = new Uri(baseUrl);
             client.Timeout = TimeSpan.FromSeconds(30);
+            client.Timeout = TimeSpan.FromMinutes(5); 
+
         });
 
         builder.Services.AddHttpClient<IStoreUserService, StoreUserService>((sp, client) =>
@@ -77,6 +81,8 @@ public static class MauiProgram
             var baseUrl = configService.GetApiUrl("Identity");
             client.BaseAddress = new Uri(baseUrl);
             client.Timeout = TimeSpan.FromSeconds(30);
+            client.Timeout = TimeSpan.FromMinutes(5); 
+
         });
 
         builder.Services.AddHttpClient<IStoreMediaService, StoreMediaService>((sp, client) =>
@@ -85,6 +91,7 @@ public static class MauiProgram
             var baseUrl = configService.GetApiUrl("Store");
             client.BaseAddress = new Uri(baseUrl);
             client.Timeout = TimeSpan.FromSeconds(30);
+            client.Timeout = TimeSpan.FromMinutes(5); 
         });
 
       
@@ -148,6 +155,8 @@ public static class MauiProgram
 
 		builder.Services.AddTransient<PhotoStoreUserViewModel>();
 		builder.Services.AddTransient<PhotoStoreUser>();
+		builder.Services.AddTransient<VideoStoreUserViewModel>();
+		builder.Services.AddTransient<VideoStoreUserPage>();
 
 		// Register Converters
 		builder.Services.AddSingleton<Converters.AvatarUrlConverter>();

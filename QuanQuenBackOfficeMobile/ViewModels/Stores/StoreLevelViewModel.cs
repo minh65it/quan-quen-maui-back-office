@@ -16,6 +16,9 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores;
 public partial class StoreLevelViewModel : ObservableObject
 {
     [ObservableProperty]
+    private bool isLoading = false;
+
+    [ObservableProperty]
     private ObservableCollection<Status> _statusNames = new();
 
     [ObservableProperty]
@@ -170,83 +173,81 @@ public partial class StoreLevelViewModel : ObservableObject
 
     private async Task OnConfirm()
     {
-        if (_selectedStatusIndex < 0 || _selectedStatusIndex >= _statusNames.Count)
-        {
-            await App.Current.MainPage.DisplayAlert("Lỗi", "Vui lòng chọn Trạng thái", "OK");
-            return;
-        }
-
-        var storeId = StoreRegistrationData.StoreId;
-        int levelId = 1;
-
-        // 1. Update Level
-        var levelResult = await _storeUserService.UpdateStoreLevelAsync(storeId, levelId, _startDate, _endDate);
-        if (!levelResult.IsSuccess)
-        {
-            System.Diagnostics.Debug.WriteLine($"[StoreLevel] UpdateStoreLevelAsync failed: {levelResult.Message}");
-            await App.Current.MainPage.DisplayAlert("Lỗi", levelResult.Message ?? "Có lỗi xảy ra", "OK");
-            return;
-        }
-
-        // 2. Update Status
-        var status = StatusNames[_selectedStatusIndex];
-        var storeResult = await _storeService.UpdateStore(storeId, status);
-        if (!storeResult.IsSuccess)
-        {
-            System.Diagnostics.Debug.WriteLine($"[StoreLevel] UpdateStore failed: {storeResult.Message}");
-            await App.Current.MainPage.DisplayAlert("Lỗi", $"Cập nhật level thành công nhưng cập nhật trạng thái thất bại: {storeResult.Message}", "OK");
-            return;
-        }
-
-        // 3. Create Store Type (Utilities and Suitabilities)
+        IsLoading = true;
         try
         {
-            var allSelectedFilterIds = new List<string>();
-            
-            // Thêm các tiện ích đã chọn
-            allSelectedFilterIds.AddRange(SelectedUtilities.Select(u => u.FilterStoreId));
-            
-            // Thêm các phù hợp đã chọn
-            allSelectedFilterIds.AddRange(SelectedSuitabilities.Select(s => s.FilterStoreId));
-            
-            if (allSelectedFilterIds.Any())
+            if (_selectedStatusIndex < 0 || _selectedStatusIndex >= _statusNames.Count)
             {
-                var storeTypeResult = await _storeService.CreateStoreTypeAsync(allSelectedFilterIds, storeId);
-                if (!storeTypeResult.IsSuccess)
+                await App.Current.MainPage.DisplayAlert("Lỗi", "Vui lòng chọn Trạng thái", "OK");
+                return;
+            }
+
+            var storeId = StoreRegistrationData.StoreId;
+            int levelId = 1;
+
+            // 1. Update Level
+            var levelResult = await _storeUserService.UpdateStoreLevelAsync(storeId, levelId, _startDate, _endDate);
+            if (!levelResult.IsSuccess)
+            {
+                System.Diagnostics.Debug.WriteLine($"[StoreLevel] UpdateStoreLevelAsync failed: {levelResult.Message}");
+                await App.Current.MainPage.DisplayAlert("Lỗi", levelResult.Message ?? "Có lỗi xảy ra", "OK");
+                return;
+            }
+
+            // 2. Update Status
+            var status = StatusNames[_selectedStatusIndex];
+            var storeResult = await _storeService.UpdateStore(storeId, status);
+            if (!storeResult.IsSuccess)
+            {
+                System.Diagnostics.Debug.WriteLine($"[StoreLevel] UpdateStore failed: {storeResult.Message}");
+                await App.Current.MainPage.DisplayAlert("Lỗi", $"Cập nhật level thành công nhưng cập nhật trạng thái thất bại: {storeResult.Message}", "OK");
+                return;
+            }
+
+            // 3. Create Store Type (Utilities and Suitabilities)
+            try
+            {
+                var allSelectedFilterIds = new List<string>();
+                allSelectedFilterIds.AddRange(SelectedUtilities.Select(u => u.FilterStoreId));
+                allSelectedFilterIds.AddRange(SelectedSuitabilities.Select(s => s.FilterStoreId));
+                if (allSelectedFilterIds.Any())
                 {
-                    System.Diagnostics.Debug.WriteLine($"[StoreLevel] CreateStoreTypeAsync failed: {storeTypeResult.Message}");
-                    // Không hiển thị lỗi cho user vì đây không phải lỗi nghiêm trọng
+                    var storeTypeResult = await _storeService.CreateStoreTypeAsync(allSelectedFilterIds, storeId);
+                    if (!storeTypeResult.IsSuccess)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[StoreLevel] CreateStoreTypeAsync failed: {storeTypeResult.Message}");
+                    }
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"[StoreLevel] CreateStoreTypeAsync exception: {ex.Message}");
-            // Không hiển thị lỗi cho user vì đây không phải lỗi nghiêm trọng
-        }
-
-        // 4. Create Store Type To Store (StoreTypes)
-        try
-        {
-            var selectedStoreTypeIds = SelectedStoreTypes.Select(st => st.storeTypeId).ToList() ;
-            
-            if (selectedStoreTypeIds.Any())
+            catch (Exception ex)
             {
-                var storeTypeToStoreResult = await _storeService.CreateStoreTypeToStoreAsync(selectedStoreTypeIds, storeId);
-                if (!storeTypeToStoreResult.IsSuccess)
+                System.Diagnostics.Debug.WriteLine($"[StoreLevel] CreateStoreTypeAsync exception: {ex.Message}");
+            }
+
+            // 4. Create Store Type To Store (StoreTypes)
+            try
+            {
+                var selectedStoreTypeIds = SelectedStoreTypes.Select(st => st.storeTypeId).ToList() ;
+                if (selectedStoreTypeIds.Any())
                 {
-                    System.Diagnostics.Debug.WriteLine($"[StoreLevel] CreateStoreTypeToStoreAsync failed: {storeTypeToStoreResult.Message}");
-                    // Không hiển thị lỗi cho user vì đây không phải lỗi nghiêm trọng
+                    var storeTypeToStoreResult = await _storeService.CreateStoreTypeToStoreAsync(selectedStoreTypeIds, storeId);
+                    if (!storeTypeToStoreResult.IsSuccess)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[StoreLevel] CreateStoreTypeToStoreAsync failed: {storeTypeToStoreResult.Message}");
+                    }
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"[StoreLevel] CreateStoreTypeToStoreAsync exception: {ex.Message}");
-            // Không hiển thị lỗi cho user vì đây không phải lỗi nghiêm trọng
-        }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[StoreLevel] CreateStoreTypeToStoreAsync exception: {ex.Message}");
+            }
 
-        await App.Current.MainPage.DisplayAlert("Thành công", "Cập nhật level và trạng thái thành công!", "OK");
-        await App.Current.MainPage.Navigation.PushAsync(new Views.Stores.StoreMenuPage());
+            await App.Current.MainPage.DisplayAlert("Thành công", "Cập nhật level và trạng thái thành công!", "OK");
+            await App.Current.MainPage.Navigation.PushAsync(new Views.Stores.StoreMenuPage());
+        }
+        finally
+        {
+            IsLoading = false;
+        }
     }
 } 
