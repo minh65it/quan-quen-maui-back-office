@@ -14,7 +14,7 @@
 		<ApplicationTitle>QuanQuenBackOfficeMobile</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.companyname.QuanQuenBackOfficeMobile</ApplicationId>
+		<ApplicationId>com.quanquen.boapp</ApplicationId>
 
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
