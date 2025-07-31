@@ -12,29 +12,36 @@ public partial class DrawingExampleViewModel : BaseViewModel
 {
     private readonly IStoreMediaService _storeMediaService;
     [ObservableProperty]
-	public ObservableCollection<IDrawingLine> lines = new();
+    public ObservableCollection<IDrawingLine> contractLines = new();
+    [ObservableProperty]
+    public ObservableCollection<IDrawingLine> appendixLines = new();
 
-	private string _signatureCategoryMediaId;
     public DrawingExampleViewModel(IStoreMediaService storeMediaService)
     {
         _storeMediaService = storeMediaService;
     }
 
     [RelayCommand]
-	public void Clear()
-	{
-		Lines?.Clear();
-	}
+    public void ClearContract()
+    {
+        ContractLines?.Clear();
+    }
 
-    public async Task UploadImageAsync(Stream imageStream)
+    [RelayCommand]
+    public void ClearAppendix()
+    {
+        AppendixLines?.Clear();
+    }
+
+    public async Task UploadBothSignaturesAsync(Stream appendixStream, Stream contractStream)
     {
         try
         {
-            if (imageStream.CanSeek)
-                imageStream.Position = 0;
-            var storeId = StoreRegistrationData.StoreId;
+            if (appendixStream.CanSeek) appendixStream.Position = 0;
+            if (contractStream.CanSeek) contractStream.Position = 0;
+            var storeId = "S00918801";
             var createdBy = await SecureStorage.GetAsync("userName");
-            var nameMedia = "Chữ kí"; 
+            var nameMedia = "Chữ kí";
             var categoryMediaId = await _storeMediaService.GetThumbnailCategoryMediaIdAsync(nameMedia);
 
             if (string.IsNullOrEmpty(storeId) || string.IsNullOrEmpty(createdBy) || string.IsNullOrEmpty(categoryMediaId))
@@ -43,26 +50,22 @@ public partial class DrawingExampleViewModel : BaseViewModel
                 return;
             }
 
-            // Đọc stream thành byte[]
-            byte[] imageBytes;
-            using (var ms = new MemoryStream())
-            {
-                await imageStream.CopyToAsync(ms);
-                imageBytes = ms.ToArray();
-            }
+            byte[] appendixBytes, contractBytes;
+            using (var ms = new MemoryStream()) { await appendixStream.CopyToAsync(ms); appendixBytes = ms.ToArray(); }
+            using (var ms = new MemoryStream()) { await contractStream.CopyToAsync(ms); contractBytes = ms.ToArray(); }
 
             var result = await _storeMediaService.UploadMediasAsync(
                 storeId,
                 categoryMediaId,
                 createdBy!,
-                new List<byte[]> { imageBytes },
+                new List<byte[]> { appendixBytes, contractBytes },
                 true,
                 false
             );
 
             if (result.IsSuccess)
             {
-                await App.Current.MainPage.DisplayAlert("Thành công", "Lưu chữ ký thành công!", "OK");
+                await App.Current.MainPage.DisplayAlert("Thành công", "Lưu hai chữ ký thành công!", "OK");
             }
             else
             {
@@ -71,10 +74,8 @@ public partial class DrawingExampleViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[DEBUG] UploadImageAsync: Exception: {ex}");
+            System.Diagnostics.Debug.WriteLine($"[DEBUG] UploadBothSignaturesAsync: Exception: {ex}");
             await App.Current.MainPage.DisplayAlert("Lỗi", $"Có lỗi khi upload ảnh: {ex.Message}", "OK");
         }
     }
-
-
 }

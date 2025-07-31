@@ -7,6 +7,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.Maui.Controls;
 
 namespace QuanQuenBackOfficeMobile.Views;
 
@@ -27,44 +28,53 @@ public partial class DrawingExamplePage : ContentPage
 		_isBusy = true;
 		try 
 		{
-			System.Diagnostics.Debug.WriteLine("[DEBUG] SaveClicked: Starting signature save process");
 			var vm = BindingContext as DrawingExampleViewModel;
-			var drawingLines = vm?.Lines.ToList();
+			var contractLines = vm?.ContractLines?.ToList();
+			var appendixLines = vm?.AppendixLines?.ToList();
 
-			if (drawingLines is null || drawingLines.Count < 1)
+			if (contractLines == null || contractLines.Count < 1 || appendixLines == null || appendixLines.Count < 1)
 			{
-				System.Diagnostics.Debug.WriteLine("[DEBUG] SaveClicked: No signature drawn");
-				await DisplayAlert("Lỗi", "Vui lòng vẽ chữ ký của bạn", "OK");
+				await DisplayAlert("Lỗi", "Vui lòng vẽ đầy đủ cả hai chữ ký!", "OK");
 				return;
 			}
 
-			var points = drawingLines.SelectMany(x => x.Points).ToList();
+			// Render stream cho chữ ký phụ lục
+			var appendixPoints = appendixLines.SelectMany(x => x.Points).ToList();
+			var appendixStream = await DrawingView.GetImageStream(
+				appendixLines,
+				new Size(appendixPoints.Max(x => x.X) - appendixPoints.Min(x => x.X), appendixPoints.Max(x => x.Y) - appendixPoints.Min(x => x.Y)),
+				Colors.Transparent
+			);
+			var appendixBuffer = new MemoryStream();
+			await appendixStream.CopyToAsync(appendixBuffer);
+			appendixBuffer.Position = 0;
+			appendixStream.Position = 0;
+			AppendixGeneratedImage.Source = ImageSource.FromStream(() => new MemoryStream(appendixBuffer.ToArray()));
+			appendixStream.Position = 0;
 
-			// Render ra stream gốc
-			var originalStream = await DrawingView.GetImageStream(
-				drawingLines,
-				new Size(points.Max(x => x.X) - points.Min(x => x.X), points.Max(x => x.Y) - points.Min(x => x.Y)),
-				Colors.Gray);
+			// Render stream cho chữ ký hợp đồng
+			var contractPoints = contractLines.SelectMany(x => x.Points).ToList();
+			var contractStream = await DrawingView.GetImageStream(
+				contractLines,
+				new Size(contractPoints.Max(x => x.X) - contractPoints.Min(x => x.X), contractPoints.Max(x => x.Y) - contractPoints.Min(x => x.Y)),
+				Colors.Transparent
+			);
+			var contractBuffer = new MemoryStream();
+			await contractStream.CopyToAsync(contractBuffer);
+			contractBuffer.Position = 0;
+			contractStream.Position = 0;
+			ContractGeneratedImage.Source = ImageSource.FromStream(() => new MemoryStream(contractBuffer.ToArray()));
+			contractStream.Position = 0;
 
-			// Copy stream cho ImageSource
-			var imageBuffer = new MemoryStream();
-			await originalStream.CopyToAsync(imageBuffer);
-			imageBuffer.Position = 0;
-			originalStream.Position = 0;
-
-			GeneratedImage.Source = ImageSource.FromStream(() => new MemoryStream(imageBuffer.ToArray()));
-
-			originalStream.Position = 0;
-			System.Diagnostics.Debug.WriteLine("[DEBUG] SaveClicked: Uploading signature...");
-			await vm.UploadImageAsync(originalStream);
+			// Upload: phụ lục trước, hợp đồng sau
+			await vm.UploadBothSignaturesAsync(appendixStream, contractStream);
 			
-			System.Diagnostics.Debug.WriteLine("[DEBUG] SaveClicked: Upload successful, navigating to StoreUserAuthentication");
-			await Navigation.PushAsync(new QuanQuenBackOfficeMobile.Views.Stores.StoreUserAuthentication(StoreRegistrationData.Email));
+			// Chuyển đến trang PhotoStoreUser sau khi lưu thành công
+			await Application.Current.MainPage.Navigation.PushAsync(new PhotoStoreUser());
 		}
 		catch (Exception ex)
 		{
-			System.Diagnostics.Debug.WriteLine($"[DEBUG] SaveClicked error: {ex}");
-			await DisplayAlert("Lỗi", $"Có lỗi xảy ra: {ex.Message}", "OK");
+			await DisplayAlert("Lỗi", ex.Message, "OK");
 		}
 		finally
 		{

@@ -159,6 +159,12 @@ public partial class CreateStoreUserPasswordViewModel : ObservableObject
                 PasswordError = "StoreId bắt buộc có";
                 return;
             }
+            
+            // Lưu StoreUserId (response.StoreId là UserId thực tế)
+            var storeUserId = response.StoreId;
+            StoreRegistrationData.StoreUserId = storeUserId;
+            
+            // Convert UserId thành StoreId (U -> S)
             var storeId = response.StoreId.StartsWith("U") ? ("S" + response.StoreId.Substring(1)) : response.StoreId;
 
             // 3. Gọi API tạo cửa hàng với file giấy phép kinh doanh
@@ -247,8 +253,8 @@ public partial class CreateStoreUserPasswordViewModel : ObservableObject
             {
                 // Lưu StoreId thực tế để dùng cho upload media
                 StoreRegistrationData.StoreId = storeId;
-                // 4. Thành công cả hai, chuyển sang trang vẽ chữ ký
-                await Application.Current.MainPage.Navigation.PushAsync(new QuanQuenBackOfficeMobile.Views.DrawingExamplePage());
+                // 4. Thành công cả hai, chuyển sang trang xác thực OTP
+                await Application.Current.MainPage.Navigation.PushAsync(new QuanQuenBackOfficeMobile.Views.Stores.StoreUserAuthentication(Email));
             }
             // Nếu một trong hai không thành công thì không chuyển trang (đã return ở trên)
         }

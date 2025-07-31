@@ -17,7 +17,8 @@ public partial class App : Application
 {
 	public static IServiceProvider Services { get; private set; }
 
-	public App()
+
+    public App()
 	{
 		InitializeComponent();
 		Application.Current.UserAppTheme = AppTheme.Light;
@@ -27,7 +28,7 @@ public partial class App : Application
 
 	private async void CheckTokenAndNavigate()
 	{
-		var sp = IPlatformApplication.Current.Services;
+        var sp = IPlatformApplication.Current.Services;
 		Services = sp;
 		var tokenService = sp.GetService<ITokenService>();
 		if (tokenService != null && await tokenService.IsTokenValidAsync())

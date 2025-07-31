@@ -4,6 +4,7 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
+using QuanQuenBackOfficeMobile.ViewModels.Stores;
 
 namespace QuanQuenBackOfficeMobile.ViewModels.Stores;
 
@@ -73,7 +74,9 @@ public partial class StoreUserAuthenticationViewModel : ObservableObject
         if (response.IsSuccess)
         {
             await App.Current.MainPage.DisplayAlert("Thành công", "Xác thực thành công!", "OK");
-            await Application.Current.MainPage.Navigation.PushAsync(new QuanQuenBackOfficeMobile.Views.PhotoStoreUser());
+            var contractService = App.Services.GetService<IContractService>();
+            var viewModel = new StoreInformationContractViewModel(contractService);
+            await Application.Current.MainPage.Navigation.PushAsync(new QuanQuenBackOfficeMobile.Views.Stores.StoreInformationContractPage(viewModel));
         }
         else
         {

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:Controls="clr-namespace:QuanQuenBackOfficeMobile.Controls"
+             xmlns:viewmodels="clr-namespace:QuanQuenBackOfficeMobile.ViewModels.Stores"
+             xmlns:converters="clr-namespace:QuanQuenBackOfficeMobile.Converters"
+             x:Class="QuanQuenBackOfficeMobile.Views.Stores.StoreInformationContractPage"
+             x:DataType="viewmodels:StoreInformationContractViewModel"
+             Title="Thông tin hợp đồng">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    
+    <Grid RowDefinitions="Auto,*">
+        <Grid Grid.Row="0" Padding="10" BackgroundColor="#F5F5F5">
+            <Label Text="Thông tin hợp đồng" 
+                   FontSize="16" 
+                   FontAttributes="Bold" 
+                   VerticalOptions="Center"/>
+        </Grid>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="20" Spacing="30">
+            
+            <!-- Hướng dẫn sử dụng -->
+            <Frame BackgroundColor="#E3F2FD" CornerRadius="10" Padding="15" Margin="0,0,0,10">
+                <StackLayout Spacing="5">
+                    <Label Text="📋 HƯỚNG DẪN NHẬP THÔNG TIN BÊN THUÊ DỊCH VỤ" FontAttributes="Bold" FontSize="14" TextColor="#1976D2"/>
+                    <Label Text="• Chọn loại hình kinh doanh: Tổ chức hoặc Hộ kinh doanh" FontSize="12" TextColor="#424242"/>
+                    <Label Text="• Nhập thông tin tương ứng với loại hình đã chọn" FontSize="12" TextColor="#424242"/>
+                    <Label Text="• Chỉ cần nhập thông tin của Bên Thuê Dịch Vụ" FontSize="12" TextColor="#424242"/>
+                    <Label Text="• Các trường có thể để trống nếu không áp dụng" FontSize="12" TextColor="#424242"/>
+                </StackLayout>
+            </Frame>
+            
+            <!-- Section 1: BÊN THUÊ DỊCH VỤ - HỢP ĐỒNG CHÍNH -->
+            <Label Text="BÊN THUÊ DỊCH VỤ - HỢP ĐỒNG CHÍNH" FontAttributes="Bold" FontSize="18" TextColor="#2196F3"/>
+            
+            <!-- Chọn loại hình kinh doanh -->
+            <Controls:CustomDropdownPicker ItemsSource="{Binding BusinessTypeList}"
+                                  Title="Chọn loại hình kinh doanh"
+                                  SelectedItem="{Binding SelectedBusinessType, Mode=TwoWay}"
+                                  HeightRequest="44"
+                                  FontSize="14"
+                                  TextColor="Black"
+                                  BackgroundColor="White" />
+            
+            <!-- Thông tin cho Tổ chức -->
+            <Label Text="Thông tin Tổ chức (nếu chọn Tổ chức)" FontAttributes="Bold" FontSize="14" TextColor="#666"/>
+            <StackLayout Spacing="10">
+                <Entry Placeholder="Tên doanh nghiệp" Text="{Binding CompanyName}" />
+                <Entry Placeholder="Tên cửa hàng" Text="{Binding StoreName}" />
+                <Entry Placeholder="Địa chỉ trụ sở chính doanh nghiệp" Text="{Binding HeadquartersAddress}" />
+                <Entry Placeholder="Số giấy chứng nhận đăng ký doanh nghiệp" Text="{Binding BusinessLicenseNumber}" />
+                <Entry Placeholder="Ngày cấp GCN đăng ký doanh nghiệp" Text="{Binding BusinessLicenseDate}" />
+                <Entry Placeholder="Nơi cấp GCN đăng ký doanh nghiệp" Text="{Binding BusinessLicensePlace}" />
+                <Entry Placeholder="Đại diện bởi (Họ tên)" Text="{Binding RepresentativeName}" />
+                <Entry Placeholder="Chức vụ đại diện" Text="{Binding RepresentativePosition}" />
+                <Entry Placeholder="Số CCCD/CMND/Hộ chiếu đại diện" Text="{Binding RepresentativeIdNumber}" />
+                <Entry Placeholder="Ngày cấp CCCD/CMND/Hộ chiếu đại diện" Text="{Binding RepresentativeIdDate}" />
+                <Entry Placeholder="Nơi cấp CCCD/CMND/Hộ chiếu đại diện" Text="{Binding RepresentativeIdPlace}" />
+                <Entry Placeholder="Địa chỉ thường trú đại diện" Text="{Binding RepresentativePermanentAddress}" />
+                <Entry Placeholder="Địa chỉ tạm trú đại diện" Text="{Binding RepresentativeTemporaryAddress}" />
+                <Entry Placeholder="Địa chỉ trụ sở chính của cửa hàng" Text="{Binding StoreHeadOfficeAddress}" />
+                <Entry Placeholder="Số điện thoại liên hệ" Text="{Binding PhoneNumber}" />
+                <Entry Placeholder="Số tài khoản ngân hàng" Text="{Binding BankAccountNumber}" />
+                <Entry Placeholder="Chủ tài khoản ngân hàng" Text="{Binding BankAccountHolder}" />
+                <Entry Placeholder="Tại ngân hàng" Text="{Binding BankName}" />
+            </StackLayout>
+            
+            <!-- Thông tin cho Hộ kinh doanh -->
+            <Label Text="Thông tin Hộ kinh doanh (nếu chọn Hộ kinh doanh)" FontAttributes="Bold" FontSize="14" TextColor="#666"/>
+            <StackLayout Spacing="10">
+                <Entry Placeholder="Tên cửa hàng (Hộ kinh doanh)" Text="{Binding StoreName}" />
+                <Entry Placeholder="Họ tên chủ hộ kinh doanh (Ông/Bà)" Text="{Binding OwnerName}" />
+                <Entry Placeholder="Giới tính" Text="{Binding OwnerGender}" />
+                <Entry Placeholder="Số CCCD/CMND/Hộ chiếu chủ hộ" Text="{Binding OwnerIdNumber}" />
+                <Entry Placeholder="Ngày cấp CCCD/CMND/Hộ chiếu chủ hộ" Text="{Binding OwnerIdDate}" />
+                <Entry Placeholder="Nơi cấp CCCD/CMND/Hộ chiếu chủ hộ" Text="{Binding OwnerIdPlace}" />
+                <Entry Placeholder="Địa chỉ thường trú chủ hộ" Text="{Binding OwnerPermanentAddress}" />
+                <Entry Placeholder="Địa chỉ tạm trú chủ hộ" Text="{Binding OwnerTemporaryAddress}" />
+                <Entry Placeholder="Địa chỉ trụ sở chính của cửa hàng (Hộ KD)" Text="{Binding StoreHeadOfficeAddress}" />
+                <Entry Placeholder="Số điện thoại liên hệ (Hộ KD)" Text="{Binding PhoneNumber}" />
+                <Entry Placeholder="Số tài khoản ngân hàng (Hộ KD)" Text="{Binding BankAccountNumber}" />
+                <Entry Placeholder="Chủ tài khoản ngân hàng (Hộ KD)" Text="{Binding BankAccountHolder}" />
+                <Entry Placeholder="Tại ngân hàng (Hộ KD)" Text="{Binding BankName}" />
+            </StackLayout>
+
+
+
+            <!-- Buttons -->
+            <HorizontalStackLayout Spacing="10" Margin="0,20,0,0">
+                <Button Text="Xem trước"
+                        Command="{Binding PreviewCommand}"
+                        IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+                        HeightRequest="50"
+                        FontSize="16"
+                        FontAttributes="Bold"
+                        TextColor="White"
+                        CornerRadius="25"
+                        BackgroundColor="#2196F3"
+                        HorizontalOptions="FillAndExpand"/>
+
+
+                <Button Text="Tiếp theo"
+                        Command="{Binding NextCommand}"
+                        IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+                        HeightRequest="50"
+                        FontSize="16"
+                        FontAttributes="Bold"
+                        TextColor="White"
+                        CornerRadius="25"
+                        BackgroundColor="#F58220"
+                        HorizontalOptions="FillAndExpand"/>
+            </HorizontalStackLayout>
+
+            <!-- Loading indicator -->
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                             IsVisible="{Binding IsBusy}"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"/>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage> 

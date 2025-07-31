@@ -18,6 +18,9 @@ using QuanQuenBackOfficeMobile.Services.Interfaces;
 using QuanQuenBackOfficeMobile.ViewModels.Stores;
 using QuanQuenBackOfficeMobile.Views.Stores;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Platform;
+using Microsoft.Maui.Handlers;
 
 namespace QuanQuenBackOfficeMobile.ViewModels
 {
@@ -36,6 +39,11 @@ namespace QuanQuenBackOfficeMobile.ViewModels
         public PhotoStoreUserViewModel(IStoreMediaService storeMediaService)
         {
             _storeMediaService = storeMediaService;
+            GalleryImages = new ObservableCollection<ImageItem>();
+            for (int i = 0; i < 5; i++)
+            {
+                GalleryImages.Add(new ImageItem { Source = null });
+            }
         }
 
         [RelayCommand]
@@ -132,8 +140,10 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                 if (result.IsSuccess)
                 {
                     await App.Current.MainPage.DisplayAlert("Thành công", "Thêm ảnh bìa nhà hàng thành công!", "OK");
-                    var videoPage = Application.Current.MainPage.Handler.MauiContext.Services.GetService<VideoStoreUserPage>();
-                    await Application.Current.MainPage.Navigation.PushAsync(videoPage);
+                    // Chuyển đến trang VideoStoreUserPage
+                    var serviceProvider = Application.Current.MainPage.Handler.MauiContext.Services;
+                    var videoStoreUserPage = serviceProvider.GetRequiredService<VideoStoreUserPage>();
+                    await Application.Current.MainPage.Navigation.PushAsync(videoStoreUserPage);
                 }
                 else
                 {
