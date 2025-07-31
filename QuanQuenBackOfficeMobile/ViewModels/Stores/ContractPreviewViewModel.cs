@@ -1,6 +1,4 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using System.Windows.Input;
 
 namespace QuanQuenBackOfficeMobile.ViewModels.Stores
 {
@@ -27,25 +25,9 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
         [ObservableProperty]
         private string pdfBase64Data; // Raw base64 data
 
-        public ICommand NextCommand { get; }
-
         public ContractPreviewViewModel()
         {
-            NextCommand = new AsyncRelayCommand(OnNextClicked);
-        }
-
-
-        private async Task OnNextClicked()
-        {
-            try
-            {
-                // Chuyển đến trang vẽ chữ ký
-                await Application.Current.MainPage.Navigation.PushAsync(new QuanQuenBackOfficeMobile.Views.DrawingExamplePage());
-            }
-            catch (Exception ex)
-            {
-                await App.Current.MainPage.DisplayAlert("Lỗi", $"Có lỗi xảy ra: {ex.Message}", "OK");
-            }
+            // Constructor không cần NextCommand nữa
         }
 
         /// <summary>

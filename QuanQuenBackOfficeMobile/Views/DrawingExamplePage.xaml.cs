@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Maui.Views;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
+using QuanQuenBackOfficeMobile.ViewModels.Stores;
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -14,12 +15,22 @@ namespace QuanQuenBackOfficeMobile.Views;
 public partial class DrawingExamplePage : ContentPage
 {
 	private bool _isBusy = false;
+	private StoreInformationContractViewModel? _contractData;
 
 	public DrawingExamplePage()
 	{
 		InitializeComponent();
 		var storeMediaService = App.Services.GetService<IStoreMediaService>();
 		BindingContext = new DrawingExampleViewModel(storeMediaService!);
+	}
+
+	// Constructor với contract data
+	public DrawingExamplePage(StoreInformationContractViewModel contractData)
+	{
+		InitializeComponent();
+		var storeMediaService = App.Services.GetService<IStoreMediaService>();
+		BindingContext = new DrawingExampleViewModel(storeMediaService!);
+		_contractData = contractData;
 	}
 
 	private async void SaveClicked(object sender, EventArgs e)
@@ -29,8 +40,8 @@ public partial class DrawingExamplePage : ContentPage
 		try 
 		{
 			var vm = BindingContext as DrawingExampleViewModel;
-			var contractLines = vm?.ContractLines?.ToList();
-			var appendixLines = vm?.AppendixLines?.ToList();
+			var contractLines = vm?.ContractLines;
+			var appendixLines = vm?.AppendixLines;
 
 			if (contractLines == null || contractLines.Count < 1 || appendixLines == null || appendixLines.Count < 1)
 			{
@@ -38,39 +49,33 @@ public partial class DrawingExamplePage : ContentPage
 				return;
 			}
 
-			// Render stream cho chữ ký phụ lục
-			var appendixPoints = appendixLines.SelectMany(x => x.Points).ToList();
-			var appendixStream = await DrawingView.GetImageStream(
+			// Kiểm tra có contract data không
+			if (_contractData == null)
+			{
+				await DisplayAlert("Lỗi", "Không tìm thấy thông tin hợp đồng!", "OK");
+				return;
+			}
+
+			// Generate signature images
+			var contractSignatureBytes = await GenerateSignatureImage(ContractDrawingView);
+			var appendixSignatureBytes = await GenerateSignatureImage(AppendixDrawingView);
+
+			if (contractSignatureBytes == null || appendixSignatureBytes == null)
+			{
+				await DisplayAlert("Lỗi", "Không thể tạo ảnh chữ ký!", "OK");
+				return;
+			}
+
+			// Navigate to ContractStorePage với signatures
+			var contractStorePage = new QuanQuenBackOfficeMobile.Views.Stores.ContractStorePage(
+				_contractData, 
+				contractLines, 
 				appendixLines,
-				new Size(appendixPoints.Max(x => x.X) - appendixPoints.Min(x => x.X), appendixPoints.Max(x => x.Y) - appendixPoints.Min(x => x.Y)),
-				Colors.Transparent
+				contractSignatureBytes,
+				appendixSignatureBytes
 			);
-			var appendixBuffer = new MemoryStream();
-			await appendixStream.CopyToAsync(appendixBuffer);
-			appendixBuffer.Position = 0;
-			appendixStream.Position = 0;
-			AppendixGeneratedImage.Source = ImageSource.FromStream(() => new MemoryStream(appendixBuffer.ToArray()));
-			appendixStream.Position = 0;
 
-			// Render stream cho chữ ký hợp đồng
-			var contractPoints = contractLines.SelectMany(x => x.Points).ToList();
-			var contractStream = await DrawingView.GetImageStream(
-				contractLines,
-				new Size(contractPoints.Max(x => x.X) - contractPoints.Min(x => x.X), contractPoints.Max(x => x.Y) - contractPoints.Min(x => x.Y)),
-				Colors.Transparent
-			);
-			var contractBuffer = new MemoryStream();
-			await contractStream.CopyToAsync(contractBuffer);
-			contractBuffer.Position = 0;
-			contractStream.Position = 0;
-			ContractGeneratedImage.Source = ImageSource.FromStream(() => new MemoryStream(contractBuffer.ToArray()));
-			contractStream.Position = 0;
-
-			// Upload: phụ lục trước, hợp đồng sau
-			await vm.UploadBothSignaturesAsync(appendixStream, contractStream);
-			
-			// Chuyển đến trang PhotoStoreUser sau khi lưu thành công
-			await Application.Current.MainPage.Navigation.PushAsync(new PhotoStoreUser());
+			await Navigation.PushAsync(contractStorePage);
 		}
 		catch (Exception ex)
 		{
@@ -79,6 +84,26 @@ public partial class DrawingExamplePage : ContentPage
 		finally
 		{
 			_isBusy = false;
+		}
+	}
+
+	private async Task<byte[]?> GenerateSignatureImage(CommunityToolkit.Maui.Views.DrawingView drawingView)
+	{
+		try
+		{
+			var imageStream = await drawingView.GetImageStream(200, 100);
+			if (imageStream != null)
+			{
+				using var memoryStream = new MemoryStream();
+				await imageStream.CopyToAsync(memoryStream);
+				return memoryStream.ToArray();
+			}
+			return null;
+		}
+		catch (Exception ex)
+		{
+			System.Diagnostics.Debug.WriteLine($"[DrawingExamplePage] Error generating signature image: {ex.Message}");
+			return null;
 		}
 	}
 }

@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
+using QuanQuenBackOfficeMobile.Models;
 
 namespace QuanQuenBackOfficeMobile.ViewModels;
 
@@ -39,7 +40,7 @@ public partial class DrawingExampleViewModel : BaseViewModel
         {
             if (appendixStream.CanSeek) appendixStream.Position = 0;
             if (contractStream.CanSeek) contractStream.Position = 0;
-            var storeId = "S00918801";
+            var storeId = StoreRegistrationData.StoreId ?? "";
             var createdBy = await SecureStorage.GetAsync("userName");
             var nameMedia = "Chữ kí";
             var categoryMediaId = await _storeMediaService.GetThumbnailCategoryMediaIdAsync(nameMedia);

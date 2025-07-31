@@ -158,7 +158,8 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
                     // Truyền PDF base64 từ API response message
                     previewViewModel.SetApiPdfContent(apiResponse.GetPdfDataUrl());
                     
-                    var previewPage = new QuanQuenBackOfficeMobile.Views.Stores.ContractPreviewPage(previewViewModel);
+                    // Pass contract data để có thể navigate tới signing page
+                    var previewPage = new QuanQuenBackOfficeMobile.Views.Stores.ContractPreviewPage(previewViewModel, this);
                     await Application.Current.MainPage.Navigation.PushAsync(previewPage);
                 }
                 else

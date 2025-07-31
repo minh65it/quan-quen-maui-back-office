@@ -103,6 +103,8 @@ public static class MauiProgram
 		builder.Services.AddTransient<StoreInformationContractViewModel>();
 		builder.Services.AddTransient<ContractPreviewViewModel>();
 		builder.Services.AddTransient<ContractPreviewPage>();
+		builder.Services.AddTransient<ContractStoreViewModel>();
+		builder.Services.AddTransient<ContractStorePage>();
 		
 		// Register Services
 		builder.Services.AddTransient<IContractService, ContractService>();
