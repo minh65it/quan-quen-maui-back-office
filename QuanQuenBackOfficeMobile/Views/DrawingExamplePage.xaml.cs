@@ -2,6 +2,8 @@
 using QuanQuenBackOfficeMobile.Services.Interfaces;
 using QuanQuenBackOfficeMobile.ViewModels.Stores;
 using System;
+using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -91,12 +93,35 @@ public partial class DrawingExamplePage : ContentPage
 	{
 		try
 		{
-			var imageStream = await drawingView.GetImageStream(200, 100);
+			// Get all points from drawing lines
+			var points = drawingView.Lines.SelectMany(x => x.Points).ToList();
+			if (!points.Any())
+			{
+				System.Diagnostics.Debug.WriteLine("[DrawingExamplePage] No points found for signature generation");
+				return null;
+			}
+
+			// Calculate dynamic size based on drawing bounds
+			var dynamicSize = new Microsoft.Maui.Graphics.Size(
+				points.Max(x => x.X) - points.Min(x => x.X), 
+				points.Max(x => x.Y) - points.Min(x => x.Y)
+			);
+
+			// Render stream with transparent background
+			var imageStream = await CommunityToolkit.Maui.Views.DrawingView.GetImageStream(
+				drawingView.Lines,
+				dynamicSize,
+				Colors.Transparent
+			);
+
 			if (imageStream != null)
 			{
-				using var memoryStream = new MemoryStream();
-				await imageStream.CopyToAsync(memoryStream);
-				return memoryStream.ToArray();
+				using var memoryBuffer = new MemoryStream();
+				await imageStream.CopyToAsync(memoryBuffer);
+				memoryBuffer.Position = 0;
+				
+				// Return as byte array
+				return memoryBuffer.ToArray();
 			}
 			return null;
 		}

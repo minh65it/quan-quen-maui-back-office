@@ -138,7 +138,6 @@ public partial class ContractStoreViewModel : ObservableObject
     // Method để copy data từ StoreInformationContractViewModel
     public void LoadContractData(StoreInformationContractViewModel sourceViewModel)
     {
-        SelectedBusinessType = sourceViewModel.SelectedBusinessType ?? string.Empty;
         CompanyName = sourceViewModel.CompanyName ?? string.Empty;
         StoreName = sourceViewModel.StoreName ?? string.Empty;
         HeadquartersAddress = sourceViewModel.HeadquartersAddress ?? string.Empty;
@@ -208,7 +207,6 @@ public partial class ContractStoreViewModel : ObservableObject
                 var assetBaseUrl = _configuration["API:Asset:ImageUrl"];
                 var pdfPath = apiResponse.Message;
                 
-                // Đảm bảo có dấu "/" giữa base URL và path
                 var pdfUrl = $"{assetBaseUrl.TrimEnd('/')}/{pdfPath.TrimStart('/')}";
                 
                 System.Diagnostics.Debug.WriteLine($"[ContractStoreViewModel] Asset Base URL: {assetBaseUrl}");
@@ -241,8 +239,8 @@ public partial class ContractStoreViewModel : ObservableObject
 
     private async Task<PreviewContractRequest> ConvertToPreviewContractRequestAsync()
     {
-        var storeId = StoreRegistrationData.StoreId ?? ""; // Get from registration data
-        var userId = StoreRegistrationData.StoreUserId ?? ""; // Get from registration data
+        var storeId = StoreRegistrationData.StoreId ; // Get from registration data
+        var userId = StoreRegistrationData.StoreUserId ; // Get from registration data
         
         if (string.IsNullOrEmpty(storeId) || string.IsNullOrEmpty(userId))
         {
@@ -255,14 +253,14 @@ public partial class ContractStoreViewModel : ObservableObject
             UserId = userId,
             MainContract = new MainContractDto
             {
-                BusinessType = SelectedBusinessType,
+                BusinessType = StoreRegistrationData.BusinessType,  
                 CompanyName = CompanyName,
-                StoreName = StoreName,
+                StoreName = StoreRegistrationData.StoreName,
                 HeadquartersAddress = HeadquartersAddress,
                 BusinessLicenseNumber = BusinessLicenseNumber,
                 BusinessLicenseDate = BusinessLicenseDate,
                 BusinessLicensePlace = BusinessLicensePlace,
-                RepresentativeName = RepresentativeName,
+                RepresentativeName = StoreRegistrationData.RepresentativeName,
                 RepresentativePosition = RepresentativePosition,
                 RepresentativeIdNumber = RepresentativeIdNumber,
                 RepresentativeIdDate = RepresentativeIdDate,
@@ -284,16 +282,16 @@ public partial class ContractStoreViewModel : ObservableObject
             },
             AppendixContract = new AppendixContractDto
             {
-                BusinessType = SelectedBusinessType,
+                BusinessType = StoreRegistrationData.BusinessType,
                 AppendixSignDate = "dfsfsdfsdf", // User provided hardcoded value
                 AppendixNumber = "adfsdf", 
                 CompanyName = CompanyName,
-                StoreName = StoreName,
-                headquartersAddress = StoreHeadOfficeAddress,
+                StoreName = StoreRegistrationData.StoreName,
+                HeadquartersAddress = StoreHeadOfficeAddress,
                 BusinessLicenseNumber = BusinessLicenseNumber,
                 BusinessLicenseDate = BusinessLicenseDate,
                 BusinessLicensePlace = BusinessLicensePlace,
-                RepresentativeName = RepresentativeName,
+                RepresentativeName = StoreRegistrationData.RepresentativeName,
                 RepresentativePosition = RepresentativePosition,
                 RepresentativeIdNumber = RepresentativeIdNumber,
                 RepresentativeIdDate = RepresentativeIdDate,

@@ -5,26 +5,14 @@
              xmlns:converters="clr-namespace:QuanQuenBackOfficeMobile.Converters"
              x:Class="QuanQuenBackOfficeMobile.Views.Stores.ContractPreviewPage"
              x:DataType="viewmodels:ContractPreviewViewModel"
-             Title="Xem trước hợp đồng">
+             Title="">
     <ContentPage.Resources>
         <ResourceDictionary>
             <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
-    
+
     <Grid RowDefinitions="Auto,*">
-        <!-- Header -->
-        <Frame Grid.Row="0" 
-               CornerRadius="0" 
-               Padding="20" 
-               BackgroundColor="#F5F5F5" 
-               HasShadow="False">
-            <Label Text="Xem trước hợp đồng (PDF.js)" 
-                   FontSize="16" 
-                   FontAttributes="Bold" 
-                   HorizontalOptions="Center"
-                   VerticalOptions="Center"/>
-        </Frame>
 
         <!-- WebView để hiển thị HTML -->
         <WebView Grid.Row="1" 
@@ -57,8 +45,11 @@
                     Command="{Binding RetryCommand}"
                     BackgroundColor="#F58220"
                     TextColor="White"
+                    FontSize="14"
                     HeightRequest="40"
-                    CornerRadius="20"/>
+                    WidthRequest="120"
+                    CornerRadius="20"
+                    HorizontalOptions="Center"/>
         </VerticalStackLayout>
 
         <!-- Sign Contract Button - Overlay when HTML loaded -->
@@ -68,13 +59,14 @@
                 IsVisible="{Binding IsHtmlLoaded}"
                 BackgroundColor="#4CAF50"
                 TextColor="White"
-                FontSize="16"
+                FontSize="14"
                 FontAttributes="Bold"
-                HeightRequest="50"
-                CornerRadius="25"
+                HeightRequest="44"
+                WidthRequest="200"
+                CornerRadius="22"
                 HorizontalOptions="Center"
                 VerticalOptions="End"
-                Margin="20,0,20,30"
+                Margin="20,0,20,25"
                 Clicked="OnSignContractClicked"/>
     </Grid>
 </ContentPage> 

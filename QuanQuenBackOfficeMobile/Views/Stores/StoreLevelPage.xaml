@@ -92,28 +92,7 @@
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
-                <Label Text="Ngày bắt đầu" TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
-                <DatePicker
-                x:Name="StartDatePicker"
-                Date="{Binding StartDate, Mode=TwoWay}"
-                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
-                TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
-                HeightRequest="50"
-                Margin="0,0,0,0"
-                HorizontalOptions="Fill"
-                FontSize="18"
-                />
-                <Label Text="Ngày kết thúc" TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
-                <DatePicker
-                x:Name="EndDatePicker"
-                Date="{Binding EndDate, Mode=TwoWay}"
-                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
-                TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
-                HeightRequest="50"
-                Margin="0,0,0,0"
-                HorizontalOptions="Fill"
-                FontSize="18"
-                />
+
                 <Button Text="Xác nhận" 
                         Command="{Binding ConfirmCommand}" 
                         BackgroundColor="{AppThemeBinding Light={StaticResource OrangeColor}, Dark={StaticResource OrangeColor}}"

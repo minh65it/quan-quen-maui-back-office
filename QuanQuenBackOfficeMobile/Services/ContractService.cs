@@ -88,7 +88,7 @@ namespace QuanQuenBackOfficeMobile.Services
                 formContent.Add(new StringContent(request.AppendixContract.AppendixNumber), "AppendixContract.AppendixNumber");
                 formContent.Add(new StringContent(request.AppendixContract.CompanyName), "AppendixContract.CompanyName");
                 formContent.Add(new StringContent(request.AppendixContract.StoreName), "AppendixContract.StoreName");
-                formContent.Add(new StringContent(request.AppendixContract.headquartersAddress), "AppendixContract.headquartersAddress");
+                formContent.Add(new StringContent(request.AppendixContract.HeadquartersAddress), "AppendixContract.HeadquartersAddress");
                 formContent.Add(new StringContent(request.AppendixContract.BusinessLicenseNumber), "AppendixContract.BusinessLicenseNumber");
                 formContent.Add(new StringContent(request.AppendixContract.BusinessLicenseDate), "AppendixContract.BusinessLicenseDate");
                 formContent.Add(new StringContent(request.AppendixContract.BusinessLicensePlace), "AppendixContract.BusinessLicensePlace");
@@ -156,8 +156,8 @@ namespace QuanQuenBackOfficeMobile.Services
 
         public async Task<PreviewContractRequest> ConvertToPreviewContractRequestAsync(StoreInformationContractViewModel viewModel)
         {
-            var storeId = StoreRegistrationData.StoreId ?? "";
-            var userId = StoreRegistrationData.StoreUserId ?? "";
+            var storeId = StoreRegistrationData.StoreId ;
+            var userId = StoreRegistrationData.StoreUserId ;
             
             if (string.IsNullOrEmpty(storeId) || string.IsNullOrEmpty(userId))
             {
@@ -170,10 +170,16 @@ namespace QuanQuenBackOfficeMobile.Services
                 UserId = userId,
                 MainContract = new MainContractDto
                 {
-                    BusinessType = viewModel.SelectedBusinessType ?? "",
+                    // Bên Cung Cấp Dịch Vụ
+                    ProviderRepresentativeIdNumber = viewModel.ProviderRepresentativeIdNumber ?? "",
+                    ProviderRepresentativeIdDate = viewModel.ProviderRepresentativeIdDate ?? "",
+                    ProviderRepresentativeIdPlace = viewModel.ProviderRepresentativeIdPlace ?? "",
+                    
+                    // Bên Thuê Dịch Vụ
+                    BusinessType = StoreRegistrationData.BusinessType ?? "",
                     CompanyName = viewModel.CompanyName ?? "",
                     StoreName = viewModel.StoreName ?? "",
-                    HeadquartersAddress = viewModel.StoreHeadOfficeAddress ?? "",
+                    HeadquartersAddress = viewModel.HeadquartersAddress ?? "",
                     BusinessLicenseNumber = viewModel.BusinessLicenseNumber ?? "",
                     BusinessLicenseDate = viewModel.BusinessLicenseDate ?? "",
                     BusinessLicensePlace = viewModel.BusinessLicensePlace ?? "",
@@ -201,12 +207,18 @@ namespace QuanQuenBackOfficeMobile.Services
                 },
                 AppendixContract = new AppendixContractDto
                 {
-                    BusinessType = viewModel.SelectedBusinessType ?? "",
-                    AppendixSignDate = "dfsfsdfsdf",
-                    AppendixNumber = "adfsdf",
+                    // Bên Cung Cấp Dịch Vụ
+                    ProviderRepresentativeIdNumber = viewModel.ProviderRepresentativeIdNumber ?? "",
+                    ProviderRepresentativeIdDate = viewModel.ProviderRepresentativeIdDate ?? "",
+                    ProviderRepresentativeIdPlace = viewModel.ProviderRepresentativeIdPlace ?? "",
+                    
+                    // Bên Thuê Dịch Vụ
+                    BusinessType = StoreRegistrationData.BusinessType ?? "",
+                    AppendixSignDate = DateTime.Now.ToString("dd/MM/yyyy"),
+                    AppendixNumber = $"PL-{DateTime.Now:yyyyMMdd}-{Guid.NewGuid().ToString().Substring(0, 6).ToUpper()}",
                     CompanyName = viewModel.CompanyName ?? "",
                     StoreName = viewModel.StoreName ?? "",
-                    headquartersAddress = viewModel.StoreHeadOfficeAddress ?? "", 
+                    HeadquartersAddress = viewModel.HeadquartersAddress ?? "", 
                     BusinessLicenseNumber = viewModel.BusinessLicenseNumber ?? "",
                     BusinessLicenseDate = viewModel.BusinessLicenseDate ?? "",
                     BusinessLicensePlace = viewModel.BusinessLicensePlace ?? "",
@@ -270,6 +282,12 @@ namespace QuanQuenBackOfficeMobile.Services
                 formContent.Add(new StringContent(request.CreatedDate.ToString("MM-dd-yyyy")), "CreatedDate");
 
                 // Add MainContract fields
+                // Bên Cung Cấp Dịch Vụ
+                formContent.Add(new StringContent(request.MainContract.ProviderRepresentativeIdNumber), "MainContract.ProviderRepresentativeIdNumber");
+                formContent.Add(new StringContent(request.MainContract.ProviderRepresentativeIdDate), "MainContract.ProviderRepresentativeIdDate");
+                formContent.Add(new StringContent(request.MainContract.ProviderRepresentativeIdPlace), "MainContract.ProviderRepresentativeIdPlace");
+                
+                // Bên Thuê Dịch Vụ
                 formContent.Add(new StringContent(request.MainContract.BusinessType), "MainContract.BusinessType");
                 formContent.Add(new StringContent(request.MainContract.CompanyName), "MainContract.CompanyName");
                 formContent.Add(new StringContent(request.MainContract.StoreName), "MainContract.StoreName");
@@ -298,12 +316,18 @@ namespace QuanQuenBackOfficeMobile.Services
                 formContent.Add(new StringContent(request.MainContract.OwnerTemporaryAddress), "MainContract.OwnerTemporaryAddress");
 
                 // Add AppendixContract fields
+                // Bên Cung Cấp Dịch Vụ
+                formContent.Add(new StringContent(request.AppendixContract.ProviderRepresentativeIdNumber), "AppendixContract.ProviderRepresentativeIdNumber");
+                formContent.Add(new StringContent(request.AppendixContract.ProviderRepresentativeIdDate), "AppendixContract.ProviderRepresentativeIdDate");
+                formContent.Add(new StringContent(request.AppendixContract.ProviderRepresentativeIdPlace), "AppendixContract.ProviderRepresentativeIdPlace");
+                
+                // Bên Thuê Dịch Vụ
                 formContent.Add(new StringContent(request.AppendixContract.BusinessType), "AppendixContract.BusinessType");
                 formContent.Add(new StringContent(request.AppendixContract.AppendixSignDate), "AppendixContract.AppendixSignDate");
                 formContent.Add(new StringContent(request.AppendixContract.AppendixNumber), "AppendixContract.AppendixNumber");
                 formContent.Add(new StringContent(request.AppendixContract.CompanyName), "AppendixContract.CompanyName");
                 formContent.Add(new StringContent(request.AppendixContract.StoreName), "AppendixContract.StoreName");
-                formContent.Add(new StringContent(request.AppendixContract.headquartersAddress), "AppendixContract.headquartersAddress");
+                formContent.Add(new StringContent(request.AppendixContract.HeadquartersAddress), "AppendixContract.HeadquartersAddress");
                 formContent.Add(new StringContent(request.AppendixContract.BusinessLicenseNumber), "AppendixContract.BusinessLicenseNumber");
                 formContent.Add(new StringContent(request.AppendixContract.BusinessLicenseDate), "AppendixContract.BusinessLicenseDate");
                 formContent.Add(new StringContent(request.AppendixContract.BusinessLicensePlace), "AppendixContract.BusinessLicensePlace");

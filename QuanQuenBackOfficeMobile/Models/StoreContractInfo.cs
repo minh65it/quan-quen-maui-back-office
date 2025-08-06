@@ -100,6 +100,12 @@ namespace QuanQuenBackOfficeMobile.Models
     /// </summary>
     public class MainContractDto
     {
+        // Thông tin Bên Cung Cấp Dịch Vụ
+        public string ProviderRepresentativeIdNumber { get; set; } = string.Empty;
+        public string ProviderRepresentativeIdDate { get; set; } = string.Empty;
+        public string ProviderRepresentativeIdPlace { get; set; } = string.Empty;
+        
+        // Thông tin Bên Thuê Dịch Vụ
         public string BusinessType { get; set; } = string.Empty;
         public string CompanyName { get; set; } = string.Empty;
         public string StoreName { get; set; } = string.Empty;
@@ -135,12 +141,18 @@ namespace QuanQuenBackOfficeMobile.Models
     /// </summary>
     public class AppendixContractDto
     {
+        // Thông tin Bên Cung Cấp Dịch Vụ
+        public string ProviderRepresentativeIdNumber { get; set; } = string.Empty;
+        public string ProviderRepresentativeIdDate { get; set; } = string.Empty;
+        public string ProviderRepresentativeIdPlace { get; set; } = string.Empty;
+        
+        // Thông tin Bên Thuê Dịch Vụ
         public string BusinessType { get; set; } = string.Empty;
         public string AppendixSignDate { get; set; } = string.Empty; // Backend sẽ tự tạo
         public string AppendixNumber { get; set; } = string.Empty; // Backend sẽ tự tạo
         public string CompanyName { get; set; } = string.Empty;
         public string StoreName { get; set; } = string.Empty;
-        public string headquartersAddress { get; set; } = string.Empty; // lowercase h như trong curl
+        public string HeadquartersAddress { get; set; } = string.Empty; // Consistent với MainContract
         public string BusinessLicenseNumber { get; set; } = string.Empty;
         public string BusinessLicenseDate { get; set; } = string.Empty;
         public string BusinessLicensePlace { get; set; } = string.Empty;

@@ -40,7 +40,7 @@ public partial class DrawingExampleViewModel : BaseViewModel
         {
             if (appendixStream.CanSeek) appendixStream.Position = 0;
             if (contractStream.CanSeek) contractStream.Position = 0;
-            var storeId = StoreRegistrationData.StoreId ?? "";
+            var storeId = StoreRegistrationData.StoreId ;
             var createdBy = await SecureStorage.GetAsync("userName");
             var nameMedia = "Chữ kí";
             var categoryMediaId = await _storeMediaService.GetThumbnailCategoryMediaIdAsync(nameMedia);

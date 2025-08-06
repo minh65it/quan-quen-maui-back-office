@@ -5,29 +5,11 @@
              x:Class="QuanQuenBackOfficeMobile.Views.Stores.ContractStorePage"
              x:DataType="vm:ContractStoreViewModel"
              BackgroundColor="White"
-             Title="Hợp Đồng Đã Hoàn Tất">
+             Title="">
     
     <Grid RowDefinitions="Auto,*,Auto">
         
-        <!-- Header -->
-        <Frame Grid.Row="0" 
-               CornerRadius="0" 
-               Padding="20" 
-               BackgroundColor="#E8F5E8" 
-               HasShadow="False">
-            <VerticalStackLayout Spacing="8">
-                <Label Text="✅ HỢP ĐỒNG ĐÃ HOÀN TẤT"
-                       FontSize="18"
-                       FontAttributes="Bold"
-                       HorizontalOptions="Center"
-                       TextColor="#2E7D32"/>
-                <Label Text="Hợp đồng đã được tạo thành công với chữ ký điện tử"
-                       FontSize="14"
-                       HorizontalOptions="Center"
-                       TextColor="#666"/>
-            </VerticalStackLayout>
-        </Frame>
-
+       
         <!-- Loading indicator -->
         <ActivityIndicator Grid.Row="1"
                          IsVisible="{Binding IsBusy}" 
@@ -63,14 +45,15 @@
         <Button Grid.Row="2"
                 IsVisible="{Binding IsHtmlLoaded}"
                 x:Name="NextButton"
-                Text="➡️ Tiếp Theo - Upload Ảnh Cửa Hàng"
-                CornerRadius="0"
+                Text="📸 Upload Ảnh Cửa Hàng"
+                CornerRadius="25"
                 BorderColor="Transparent"
                 BorderWidth="1"
                 TextColor="White"
-                FontSize="18"
+                FontSize="16"
                 FontAttributes="Bold"
-                HeightRequest="60"
+                HeightRequest="50"
+                Margin="20,15,20,15"
                 HorizontalOptions="FillAndExpand"
                 VerticalOptions="End"
                 Clicked="OnNextClicked">
