@@ -31,7 +31,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels
         [ObservableProperty]
         private ImageSource coverImageSource;
         [ObservableProperty]
-        private ObservableCollection<ImageItem> galleryImages = new(Enumerable.Range(0, 8).Select(_ => new ImageItem()).ToList());
+        private ObservableCollection<ImageItem> galleryImages = new(Enumerable.Range(0, 5).Select(_ => new ImageItem()).ToList());
         public bool CanAddMoreImages => GalleryImages.Count(img => img.Source == null) > 0;
         [ObservableProperty]
         private bool isLoading = false;
@@ -72,7 +72,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels
         public async Task AddGalleryImageAtIndexAsync(ImageItem tappedImage)
         {
             int index = GalleryImages.IndexOf(tappedImage);
-            if (index < 0 || index >= 8) return;
+            if (index < 0 || index >= 5) return;
             string action = await Shell.Current.DisplayActionSheet("Thêm ảnh", "Hủy", null, "Chụp ảnh mới", "Chọn từ thư viện");
             FileResult fileResult = null;
             if (action == "Chụp ảnh mới")
@@ -101,9 +101,9 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                 await Shell.Current.DisplayAlert("Lỗi", "Chưa có ảnh bìa!", "OK");
                 return;
             }
-            if (GalleryImages.All(img => img == null))
+            if (GalleryImages.All(img => img?.Source == null))
             {
-                await Shell.Current.DisplayAlert("Lỗi", "Chưa có ảnh bìa !", "OK");
+                await Shell.Current.DisplayAlert("Lỗi", "Chưa có ảnh gallery!", "OK");
                 return;
             }
             var token = await SecureStorage.GetAsync("auth_token");
