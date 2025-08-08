@@ -38,6 +38,16 @@ public partial class ContractStoreViewModel : ObservableObject
     [ObservableProperty]
     private string selectedBusinessType = string.Empty;
 
+    // BÊN CUNG CẤP DỊCH VỤ (Provider) - THÊM VÀO
+    [ObservableProperty]
+    private string providerRepresentativeIdNumber = string.Empty;
+
+    [ObservableProperty]
+    private string providerRepresentativeIdDate = string.Empty;
+
+    [ObservableProperty]
+    private string providerRepresentativeIdPlace = string.Empty;
+
     [ObservableProperty]
     private string companyName = string.Empty;
 
@@ -163,6 +173,9 @@ public partial class ContractStoreViewModel : ObservableObject
         OwnerIdPlace = sourceViewModel.OwnerIdPlace ?? string.Empty;
         OwnerPermanentAddress = sourceViewModel.OwnerPermanentAddress ?? string.Empty;
         OwnerTemporaryAddress = sourceViewModel.OwnerTemporaryAddress ?? string.Empty;
+        ProviderRepresentativeIdNumber = sourceViewModel.ProviderRepresentativeIdNumber ?? string.Empty;
+        ProviderRepresentativeIdDate = sourceViewModel.ProviderRepresentativeIdDate ?? string.Empty;
+        ProviderRepresentativeIdPlace = sourceViewModel.ProviderRepresentativeIdPlace ?? string.Empty;
     }
 
     // Method để set signature data từ DrawingExamplePage
@@ -253,6 +266,12 @@ public partial class ContractStoreViewModel : ObservableObject
             UserId = userId,
             MainContract = new MainContractDto
             {
+                // Bên Cung Cấp Dịch Vụ - THÊM VÀO
+                ProviderRepresentativeIdNumber = ProviderRepresentativeIdNumber ?? "",
+                ProviderRepresentativeIdDate = ProviderRepresentativeIdDate ?? "",
+                ProviderRepresentativeIdPlace = ProviderRepresentativeIdPlace ?? "",
+                
+                // Bên Thuê Dịch Vụ
                 BusinessType = StoreRegistrationData.BusinessType,  
                 CompanyName = CompanyName,
                 StoreName = StoreRegistrationData.StoreName,
@@ -282,34 +301,9 @@ public partial class ContractStoreViewModel : ObservableObject
             },
             AppendixContract = new AppendixContractDto
             {
-                BusinessType = StoreRegistrationData.BusinessType,
-                AppendixSignDate = "dfsfsdfsdf", // User provided hardcoded value
-                AppendixNumber = "adfsdf", 
-                CompanyName = CompanyName,
-                StoreName = StoreRegistrationData.StoreName,
-                HeadquartersAddress = StoreHeadOfficeAddress,
-                BusinessLicenseNumber = BusinessLicenseNumber,
-                BusinessLicenseDate = BusinessLicenseDate,
-                BusinessLicensePlace = BusinessLicensePlace,
-                RepresentativeName = StoreRegistrationData.RepresentativeName,
-                RepresentativePosition = RepresentativePosition,
-                RepresentativeIdNumber = RepresentativeIdNumber,
-                RepresentativeIdDate = RepresentativeIdDate,
-                RepresentativeIdPlace = RepresentativeIdPlace,
-                RepresentativePermanentAddress = RepresentativePermanentAddress,
-                RepresentativeTemporaryAddress = RepresentativeTemporaryAddress,
-                StoreHeadOfficeAddress = StoreHeadOfficeAddress,
-                PhoneNumber = PhoneNumber,
-                BankAccountNumber = BankAccountNumber,
-                BankAccountHolder = BankAccountHolder,
-                BankName = BankName,
-                OwnerName = OwnerName,
-                OwnerGender = OwnerGender,
-                OwnerIdNumber = OwnerIdNumber,
-                OwnerIdDate = OwnerIdDate,
-                OwnerIdPlace = OwnerIdPlace,
-                OwnerPermanentAddress = OwnerPermanentAddress,
-                OwnerTemporaryAddress = OwnerTemporaryAddress
+                // CHỈ 2 FIELDS NHƯ CURL EXAMPLE
+                AppendixSignDate = DateTime.Now.ToString("dd/MM/yyyy"),
+                AppendixNumber = $"PL-{DateTime.Now:yyyyMMdd}-{Guid.NewGuid().ToString().Substring(0, 6).ToUpper()}"
             },
             CreatedDate = DateTime.Now,
             File = null, 

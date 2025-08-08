@@ -54,7 +54,18 @@ namespace QuanQuenBackOfficeMobile.Services
                 formContent.Add(new StringContent(request.UserId), "UserId");
                 formContent.Add(new StringContent(request.CreatedDate.ToString("MM-dd-yyyy")), "CreatedDate");
 
-                // Thêm MainContract fields
+                // Thêm MainContract fields - THÊM PROVIDER FIELDS
+                // Bên Cung Cấp Dịch Vụ
+                formContent.Add(new StringContent(request.MainContract.ProviderRepresentativeIdNumber), "MainContract.ProviderRepresentativeIdNumber");
+                formContent.Add(new StringContent(request.MainContract.ProviderRepresentativeIdDate), "MainContract.ProviderRepresentativeIdDate");
+                formContent.Add(new StringContent(request.MainContract.ProviderRepresentativeIdPlace), "MainContract.ProviderRepresentativeIdPlace");
+                
+                // Debug logging cho Provider fields
+                System.Diagnostics.Debug.WriteLine($"[ContractService] ProviderRepresentativeIdNumber: {request.MainContract.ProviderRepresentativeIdNumber}");
+                System.Diagnostics.Debug.WriteLine($"[ContractService] ProviderRepresentativeIdDate: {request.MainContract.ProviderRepresentativeIdDate}");
+                System.Diagnostics.Debug.WriteLine($"[ContractService] ProviderRepresentativeIdPlace: {request.MainContract.ProviderRepresentativeIdPlace}");
+                
+                // Bên Thuê Dịch Vụ
                 formContent.Add(new StringContent(request.MainContract.BusinessType), "MainContract.BusinessType");
                 formContent.Add(new StringContent(request.MainContract.CompanyName), "MainContract.CompanyName");
                 formContent.Add(new StringContent(request.MainContract.StoreName), "MainContract.StoreName");
@@ -82,35 +93,9 @@ namespace QuanQuenBackOfficeMobile.Services
                 formContent.Add(new StringContent(request.MainContract.OwnerPermanentAddress), "MainContract.OwnerPermanentAddress");
                 formContent.Add(new StringContent(request.MainContract.OwnerTemporaryAddress), "MainContract.OwnerTemporaryAddress");
 
-                // Thêm AppendixContract fields
-                formContent.Add(new StringContent(request.AppendixContract.BusinessType), "AppendixContract.BusinessType");
+                // Thêm AppendixContract fields - CHỈ 2 FIELDS NHƯ CURL EXAMPLE
                 formContent.Add(new StringContent(request.AppendixContract.AppendixSignDate), "AppendixContract.AppendixSignDate");
                 formContent.Add(new StringContent(request.AppendixContract.AppendixNumber), "AppendixContract.AppendixNumber");
-                formContent.Add(new StringContent(request.AppendixContract.CompanyName), "AppendixContract.CompanyName");
-                formContent.Add(new StringContent(request.AppendixContract.StoreName), "AppendixContract.StoreName");
-                formContent.Add(new StringContent(request.AppendixContract.HeadquartersAddress), "AppendixContract.HeadquartersAddress");
-                formContent.Add(new StringContent(request.AppendixContract.BusinessLicenseNumber), "AppendixContract.BusinessLicenseNumber");
-                formContent.Add(new StringContent(request.AppendixContract.BusinessLicenseDate), "AppendixContract.BusinessLicenseDate");
-                formContent.Add(new StringContent(request.AppendixContract.BusinessLicensePlace), "AppendixContract.BusinessLicensePlace");
-                formContent.Add(new StringContent(request.AppendixContract.RepresentativeName), "AppendixContract.RepresentativeName");
-                formContent.Add(new StringContent(request.AppendixContract.RepresentativePosition), "AppendixContract.RepresentativePosition");
-                formContent.Add(new StringContent(request.AppendixContract.RepresentativeIdNumber), "AppendixContract.RepresentativeIdNumber");
-                formContent.Add(new StringContent(request.AppendixContract.RepresentativeIdDate), "AppendixContract.RepresentativeIdDate");
-                formContent.Add(new StringContent(request.AppendixContract.RepresentativeIdPlace), "AppendixContract.RepresentativeIdPlace");
-                formContent.Add(new StringContent(request.AppendixContract.RepresentativePermanentAddress), "AppendixContract.RepresentativePermanentAddress");
-                formContent.Add(new StringContent(request.AppendixContract.RepresentativeTemporaryAddress), "AppendixContract.RepresentativeTemporaryAddress");
-                formContent.Add(new StringContent(request.AppendixContract.StoreHeadOfficeAddress), "AppendixContract.StoreHeadOfficeAddress");
-                formContent.Add(new StringContent(request.AppendixContract.PhoneNumber), "AppendixContract.PhoneNumber");
-                formContent.Add(new StringContent(request.AppendixContract.BankAccountNumber), "AppendixContract.BankAccountNumber");
-                formContent.Add(new StringContent(request.AppendixContract.BankAccountHolder), "AppendixContract.BankAccountHolder");
-                formContent.Add(new StringContent(request.AppendixContract.BankName), "AppendixContract.BankName");
-                formContent.Add(new StringContent(request.AppendixContract.OwnerName), "AppendixContract.OwnerName");
-                formContent.Add(new StringContent(request.AppendixContract.OwnerGender), "AppendixContract.OwnerGender");
-                formContent.Add(new StringContent(request.AppendixContract.OwnerIdNumber), "AppendixContract.OwnerIdNumber");
-                formContent.Add(new StringContent(request.AppendixContract.OwnerIdDate), "AppendixContract.OwnerIdDate");
-                formContent.Add(new StringContent(request.AppendixContract.OwnerIdPlace), "AppendixContract.OwnerIdPlace");
-                formContent.Add(new StringContent(request.AppendixContract.OwnerPermanentAddress), "AppendixContract.OwnerPermanentAddress");
-                formContent.Add(new StringContent(request.AppendixContract.OwnerTemporaryAddress), "AppendixContract.OwnerTemporaryAddress");
 
                 // Thêm File và File2 (empty)
                 formContent.Add(new StringContent(""), "File");
@@ -207,42 +192,9 @@ namespace QuanQuenBackOfficeMobile.Services
                 },
                 AppendixContract = new AppendixContractDto
                 {
-                    // Bên Cung Cấp Dịch Vụ
-                    ProviderRepresentativeIdNumber = viewModel.ProviderRepresentativeIdNumber ?? "",
-                    ProviderRepresentativeIdDate = viewModel.ProviderRepresentativeIdDate ?? "",
-                    ProviderRepresentativeIdPlace = viewModel.ProviderRepresentativeIdPlace ?? "",
-                    
-                    // Bên Thuê Dịch Vụ
-                    BusinessType = StoreRegistrationData.BusinessType ?? "",
+                    // CHỈ 2 FIELDS NHƯ CURL EXAMPLE
                     AppendixSignDate = DateTime.Now.ToString("dd/MM/yyyy"),
-                    AppendixNumber = $"PL-{DateTime.Now:yyyyMMdd}-{Guid.NewGuid().ToString().Substring(0, 6).ToUpper()}",
-                    CompanyName = viewModel.CompanyName ?? "",
-                    StoreName = viewModel.StoreName ?? "",
-                    HeadquartersAddress = viewModel.HeadquartersAddress ?? "", 
-                    BusinessLicenseNumber = viewModel.BusinessLicenseNumber ?? "",
-                    BusinessLicenseDate = viewModel.BusinessLicenseDate ?? "",
-                    BusinessLicensePlace = viewModel.BusinessLicensePlace ?? "",
-                    RepresentativeName = viewModel.RepresentativeName ?? "",
-                    RepresentativePosition = viewModel.RepresentativePosition ?? "",
-                    RepresentativeIdNumber = viewModel.RepresentativeIdNumber ?? "",
-                    RepresentativeIdDate = viewModel.RepresentativeIdDate ?? "",
-                    RepresentativeIdPlace = viewModel.RepresentativeIdPlace ?? "",
-                    RepresentativePermanentAddress = viewModel.RepresentativePermanentAddress ?? "",
-                    RepresentativeTemporaryAddress = viewModel.RepresentativeTemporaryAddress ?? "",
-                    StoreHeadOfficeAddress = viewModel.StoreHeadOfficeAddress ?? "",
-                    PhoneNumber = viewModel.PhoneNumber ?? "",
-                    BankAccountNumber = viewModel.BankAccountNumber ?? "",
-                    BankAccountHolder = viewModel.BankAccountHolder ?? "",
-                    BankName = viewModel.BankName ?? "",
-                    
-                    // Thông tin chủ hộ kinh doanh
-                    OwnerName = viewModel.OwnerName ?? "",
-                    OwnerGender = viewModel.OwnerGender ?? "",
-                    OwnerIdNumber = viewModel.OwnerIdNumber ?? "",
-                    OwnerIdDate = viewModel.OwnerIdDate ?? "",
-                    OwnerIdPlace = viewModel.OwnerIdPlace ?? "",
-                    OwnerPermanentAddress = viewModel.OwnerPermanentAddress ?? "",
-                    OwnerTemporaryAddress = viewModel.OwnerTemporaryAddress ?? ""
+                    AppendixNumber = $"PL-{DateTime.Now:yyyyMMdd}-{Guid.NewGuid().ToString().Substring(0, 6).ToUpper()}"
                 },
                 CreatedDate = DateTime.Now,
                 File = null,
@@ -281,17 +233,21 @@ namespace QuanQuenBackOfficeMobile.Services
                 formContent.Add(new StringContent(request.UserId), "UserId");
                 formContent.Add(new StringContent(request.CreatedDate.ToString("MM-dd-yyyy")), "CreatedDate");
 
-                // Add MainContract fields
+                // Add MainContract fields - MATCH VỚI CURL EXAMPLE
                 // Bên Cung Cấp Dịch Vụ
                 formContent.Add(new StringContent(request.MainContract.ProviderRepresentativeIdNumber), "MainContract.ProviderRepresentativeIdNumber");
                 formContent.Add(new StringContent(request.MainContract.ProviderRepresentativeIdDate), "MainContract.ProviderRepresentativeIdDate");
                 formContent.Add(new StringContent(request.MainContract.ProviderRepresentativeIdPlace), "MainContract.ProviderRepresentativeIdPlace");
                 
+                // Debug logging cho Provider fields
+                System.Diagnostics.Debug.WriteLine($"[ContractService] WithSignatures - ProviderRepresentativeIdNumber: {request.MainContract.ProviderRepresentativeIdNumber}");
+                System.Diagnostics.Debug.WriteLine($"[ContractService] WithSignatures - ProviderRepresentativeIdDate: {request.MainContract.ProviderRepresentativeIdDate}");
+                System.Diagnostics.Debug.WriteLine($"[ContractService] WithSignatures - ProviderRepresentativeIdPlace: {request.MainContract.ProviderRepresentativeIdPlace}");
+                
                 // Bên Thuê Dịch Vụ
                 formContent.Add(new StringContent(request.MainContract.BusinessType), "MainContract.BusinessType");
                 formContent.Add(new StringContent(request.MainContract.CompanyName), "MainContract.CompanyName");
                 formContent.Add(new StringContent(request.MainContract.StoreName), "MainContract.StoreName");
-                formContent.Add(new StringContent(request.MainContract.HeadquartersAddress), "MainContract.HeadquartersAddress");
                 formContent.Add(new StringContent(request.MainContract.BusinessLicenseNumber), "MainContract.BusinessLicenseNumber");
                 formContent.Add(new StringContent(request.MainContract.BusinessLicenseDate), "MainContract.BusinessLicenseDate");
                 formContent.Add(new StringContent(request.MainContract.BusinessLicensePlace), "MainContract.BusinessLicensePlace");
@@ -315,48 +271,16 @@ namespace QuanQuenBackOfficeMobile.Services
                 formContent.Add(new StringContent(request.MainContract.OwnerPermanentAddress), "MainContract.OwnerPermanentAddress");
                 formContent.Add(new StringContent(request.MainContract.OwnerTemporaryAddress), "MainContract.OwnerTemporaryAddress");
 
-                // Add AppendixContract fields
-                // Bên Cung Cấp Dịch Vụ
-                formContent.Add(new StringContent(request.AppendixContract.ProviderRepresentativeIdNumber), "AppendixContract.ProviderRepresentativeIdNumber");
-                formContent.Add(new StringContent(request.AppendixContract.ProviderRepresentativeIdDate), "AppendixContract.ProviderRepresentativeIdDate");
-                formContent.Add(new StringContent(request.AppendixContract.ProviderRepresentativeIdPlace), "AppendixContract.ProviderRepresentativeIdPlace");
-                
-                // Bên Thuê Dịch Vụ
-                formContent.Add(new StringContent(request.AppendixContract.BusinessType), "AppendixContract.BusinessType");
+                // Add AppendixContract fields - CHỈ 2 FIELDS NHƯ CURL EXAMPLE
                 formContent.Add(new StringContent(request.AppendixContract.AppendixSignDate), "AppendixContract.AppendixSignDate");
                 formContent.Add(new StringContent(request.AppendixContract.AppendixNumber), "AppendixContract.AppendixNumber");
-                formContent.Add(new StringContent(request.AppendixContract.CompanyName), "AppendixContract.CompanyName");
-                formContent.Add(new StringContent(request.AppendixContract.StoreName), "AppendixContract.StoreName");
-                formContent.Add(new StringContent(request.AppendixContract.HeadquartersAddress), "AppendixContract.HeadquartersAddress");
-                formContent.Add(new StringContent(request.AppendixContract.BusinessLicenseNumber), "AppendixContract.BusinessLicenseNumber");
-                formContent.Add(new StringContent(request.AppendixContract.BusinessLicenseDate), "AppendixContract.BusinessLicenseDate");
-                formContent.Add(new StringContent(request.AppendixContract.BusinessLicensePlace), "AppendixContract.BusinessLicensePlace");
-                formContent.Add(new StringContent(request.AppendixContract.RepresentativeName), "AppendixContract.RepresentativeName");
-                formContent.Add(new StringContent(request.AppendixContract.RepresentativePosition), "AppendixContract.RepresentativePosition");
-                formContent.Add(new StringContent(request.AppendixContract.RepresentativeIdNumber), "AppendixContract.RepresentativeIdNumber");
-                formContent.Add(new StringContent(request.AppendixContract.RepresentativeIdDate), "AppendixContract.RepresentativeIdDate");
-                formContent.Add(new StringContent(request.AppendixContract.RepresentativeIdPlace), "AppendixContract.RepresentativeIdPlace");
-                formContent.Add(new StringContent(request.AppendixContract.RepresentativePermanentAddress), "AppendixContract.RepresentativePermanentAddress");
-                formContent.Add(new StringContent(request.AppendixContract.RepresentativeTemporaryAddress), "AppendixContract.RepresentativeTemporaryAddress");
-                formContent.Add(new StringContent(request.AppendixContract.StoreHeadOfficeAddress), "AppendixContract.StoreHeadOfficeAddress");
-                formContent.Add(new StringContent(request.AppendixContract.PhoneNumber), "AppendixContract.PhoneNumber");
-                formContent.Add(new StringContent(request.AppendixContract.BankAccountNumber), "AppendixContract.BankAccountNumber");
-                formContent.Add(new StringContent(request.AppendixContract.BankAccountHolder), "AppendixContract.BankAccountHolder");
-                formContent.Add(new StringContent(request.AppendixContract.BankName), "AppendixContract.BankName");
-                formContent.Add(new StringContent(request.AppendixContract.OwnerName), "AppendixContract.OwnerName");
-                formContent.Add(new StringContent(request.AppendixContract.OwnerGender), "AppendixContract.OwnerGender");
-                formContent.Add(new StringContent(request.AppendixContract.OwnerIdNumber), "AppendixContract.OwnerIdNumber");
-                formContent.Add(new StringContent(request.AppendixContract.OwnerIdDate), "AppendixContract.OwnerIdDate");
-                formContent.Add(new StringContent(request.AppendixContract.OwnerIdPlace), "AppendixContract.OwnerIdPlace");
-                formContent.Add(new StringContent(request.AppendixContract.OwnerPermanentAddress), "AppendixContract.OwnerPermanentAddress");
-                formContent.Add(new StringContent(request.AppendixContract.OwnerTemporaryAddress), "AppendixContract.OwnerTemporaryAddress");
 
-                // Add signature files
+                // Add signature files - MATCH VỚI CURL EXAMPLE
                 if (contractSignature != null && contractSignature.Length > 0)
                 {
                     var contractImageContent = new ByteArrayContent(contractSignature);
                     contractImageContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
-                    formContent.Add(contractImageContent, "File", $"contract_signature_{DateTime.Now:yyyyMMddHHmmss}.jpg");
+                    formContent.Add(contractImageContent, "File", "contract_signature.jpg");
                     System.Diagnostics.Debug.WriteLine($"[ContractService] Added contract signature: {contractSignature.Length} bytes");
                 }
                 else
@@ -368,7 +292,7 @@ namespace QuanQuenBackOfficeMobile.Services
                 {
                     var appendixImageContent = new ByteArrayContent(appendixSignature);
                     appendixImageContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
-                    formContent.Add(appendixImageContent, "File2", $"appendix_signature_{DateTime.Now:yyyyMMddHHmmss}.jpg");
+                    formContent.Add(appendixImageContent, "File2", "appendix_signature.jpg");
                     System.Diagnostics.Debug.WriteLine($"[ContractService] Added appendix signature: {appendixSignature.Length} bytes");
                 }
                 else
@@ -409,7 +333,7 @@ namespace QuanQuenBackOfficeMobile.Services
                 return new PreviewContractResponse
                 {
                     IsSuccess = false,
-                    Message = $"Lỗi khi gọi API PreviewContract với chữ ký: {ex.Message}"
+                    Message = $"Lỗi khi gọi API PreviewContract với signatures: {ex.Message}"
                 };
             }
         }
