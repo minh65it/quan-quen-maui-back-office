@@ -167,14 +167,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
             border-radius: 8px;
             margin: 20px;
         }}
-        .success-message {{
-            background: #e8f5e8;
-            color: #2e7d32;
-            padding: 15px;
-            text-align: center;
-            border-radius: 8px;
-            margin: 10px;
-        }}
+
         .progress-bar {{
             width: 250px;
             height: 6px;
@@ -215,15 +208,10 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
     <div id='pdfContainer'>
         <div id='loading' class='loading'>
             <div class='spinner'></div>
-            <p>🔄 Đang tải PDF...</p>
-            <p style='font-size: 12px; color: #666; margin-top: 10px;'>
-                Kích thước: {base64Data.Length} ký tự
-            </p>
         </div>
         
         <div id='error' class='error'>
             <h3>❌ Không thể tải PDF</h3>
-            <p>Có lỗi xảy ra khi hiển thị PDF. Vui lòng thử lại.</p>
         </div>
         
         <div id='pdfPagesContainer' style='display: none; width: 100%; overflow-y: auto; height: 100%;'></div>
@@ -265,15 +253,11 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
             
             // Load PDF document
             const pdf = await pdfjsLib.getDocument({{ data: bytes }}).promise;
-            console.log(`✅ PDF loaded successfully! Pages: ${{pdf.numPages}}`);
+            console.log(`PDF loaded successfully! Pages: ${{pdf.numPages}}`);
             
             // Update loading message
             loadingDiv.innerHTML = `
                 <div class='spinner'></div>
-                <p>🔄 Đang render ${{pdf.numPages}} trang PDF...</p>
-                <p style='font-size: 12px; color: #666; margin-top: 10px;'>
-                    Vui lòng chờ trong giây lát...
-                </p>
             `;
             
             // Render all pages
@@ -316,8 +300,6 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
                 const progressPercent = (pageNum / pdf.numPages) * 100;
                 loadingDiv.innerHTML = `
                     <div class='spinner'></div>
-                    <p>🔄 Đã render ${{pageNum}}/${{pdf.numPages}} trang</p>
-                    <p style='font-size: 12px; color: #666;'>${{progressPercent.toFixed(0)}}% hoàn thành</p>
                     <div class='progress-bar'>
                         <div class='progress-fill' style='width: ${{progressPercent}}%;'></div>
                     </div>
@@ -328,16 +310,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
             loadingDiv.style.display = 'none';
             pagesContainer.style.display = 'block';
             
-            console.log('🎉 All PDF pages rendered successfully!');
-            
-            // Add success message
-            const successMsg = document.createElement('div');
-            successMsg.className = 'success-message';
-            successMsg.innerHTML = `
-                <strong>✅ Hợp đồng đã được tải thành công!</strong><br>
-                📄 Tất cả ${{pdf.numPages}} trang | 📊 Kích thước: {base64Data.Length} ký tự
-            `;
-            document.body.insertBefore(successMsg, document.getElementById('pdfContainer'));
+            console.log('All PDF pages rendered successfully!');
             
             // Setup scroll functionality
             setupScrollFeatures();
@@ -349,9 +322,6 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
             errorDiv.innerHTML = `
                 <h3>❌ Không thể tải PDF</h3>
                 <p>Lỗi: ${{error.message}}</p>
-                <p style='font-size: 12px; margin-top: 10px;'>
-                    Vui lòng thử nhấn nút '📱 Mở PDF' để xem bằng ứng dụng khác.
-                </p>
             `;
         }}
         }}

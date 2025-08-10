@@ -228,8 +228,6 @@ public partial class ContractStoreViewModel : ObservableObject
 
                 // Display PDF trong WebView
                 await DisplayFinalContractAsync(pdfUrl);
-                
-                await App.Current.MainPage.DisplayAlert("Thành công", "Hợp đồng đã được tạo thành công!", "OK");
             }
             else
             {
@@ -336,7 +334,7 @@ public partial class ContractStoreViewModel : ObservableObject
             var pdfBytes = await response.Content.ReadAsByteArrayAsync();
             var base64Pdf = Convert.ToBase64String(pdfBytes);
             
-            System.Diagnostics.Debug.WriteLine($"[ContractStoreViewModel] PDF downloaded successfully: {pdfBytes.Length} bytes");
+            System.Diagnostics.Debug.WriteLine($"[ContractStoreViewModel] PDF downloaded: {pdfBytes.Length} bytes");
 
             // Sử dụng PDF.js để hiển thị như ContractPreviewPage
             var html = GeneratePdfJsHtml(base64Pdf, "Hợp Đồng Đã Hoàn Thành");
@@ -484,23 +482,18 @@ public partial class ContractStoreViewModel : ObservableObject
 <body>
     <div class='header'>
         <h1>{title}</h1>
-        <div class='success-message'>
-            ✅ Hợp đồng đã được tạo thành công với chữ ký điện tử!
-        </div>
     </div>
 
     <div id='pdfContainer'>
         <div id='loading' class='loading'>
             <div class='spinner'></div>
-            <p>Đang tải hợp đồng cuối cùng...</p>
+            <p>Đang tải hợp đồng...</p>
             <div class='progress-bar'>
                 <div id='progressFill' class='progress-fill'></div>
             </div>
-            <p id='loadingText'>Khởi tạo...</p>
         </div>
         <div id='error' class='error'>
             <h3>❌ Không thể tải hợp đồng</h3>
-            <p>Vui lòng thử lại sau hoặc liên hệ hỗ trợ.</p>
         </div>
         <div id='pdfPagesContainer' style='display: none;'></div>
     </div>
@@ -519,7 +512,6 @@ public partial class ContractStoreViewModel : ObservableObject
 
         async function loadPDF() {{
             try {{
-                loadingText.textContent = 'Đang xử lý dữ liệu PDF...';
                 progressFill.style.width = '20%';
 
                 const base64Data = '{base64Data}';
@@ -531,13 +523,11 @@ public partial class ContractStoreViewModel : ObservableObject
                     bytes[i] = binaryString.charCodeAt(i);
                 }}
 
-                loadingText.textContent = 'Đang tải document...';
                 progressFill.style.width = '40%';
 
                 const pdf = await pdfjsLib.getDocument({{ data: bytes }}).promise;
                 console.log('PDF loaded successfully, pages:', pdf.numPages);
 
-                loadingText.textContent = `Đang render ${{pdf.numPages}} trang...`;
                 progressFill.style.width = '60%';
 
                 for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {{
@@ -565,11 +555,9 @@ public partial class ContractStoreViewModel : ObservableObject
                     
                     const progress = 60 + (pageNum / pdf.numPages) * 30;
                     progressFill.style.width = progress + '%';
-                    loadingText.textContent = `Đã render ${{pageNum}}/${{pdf.numPages}} trang`;
                 }}
 
                 progressFill.style.width = '100%';
-                loadingText.textContent = 'Hoàn tất!';
 
                 setTimeout(() => {{
                     loadingDiv.style.display = 'none';

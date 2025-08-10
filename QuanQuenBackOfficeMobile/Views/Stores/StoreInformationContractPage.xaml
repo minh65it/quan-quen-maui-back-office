@@ -34,6 +34,8 @@
                     <Label Text="• Bên Cung Cấp Dịch Vụ: Thông tin đại diện công ty" FontSize="12" TextColor="#424242"/>
                     <Label Text="• Bên Thuê Dịch Vụ: Thông tin cửa hàng đăng ký" FontSize="12" TextColor="#424242"/>
                     <Label Text="• Số điện thoại phải là số Việt Nam hợp lệ (10 số, bắt đầu 03/05/07/08/09)" FontSize="12" TextColor="#424242"/>
+                    <Label Text="• Định dạng ngày tháng: dd/MM/yyyy (ví dụ: 25/12/2024)" FontSize="12" TextColor="#424242"/>
+                    <Label Text="• Ngày tháng phải hợp lệ và không được lớn hơn ngày hiện tại" FontSize="12" TextColor="#424242"/>
                 </StackLayout>
             </Frame>
             
@@ -55,6 +57,11 @@
                             
                             <Label Text="Cấp ngày *" FontSize="14" TextColor="Black"/>
                             <Entry Placeholder="dd/MM/yyyy" Text="{Binding ProviderRepresentativeIdDate}" />
+                            <Label Text="{Binding ProviderRepresentativeIdDateError}"
+                                   FontSize="12"
+                                   TextColor="Red"
+                                   IsVisible="{Binding ProviderRepresentativeIdDateError, Converter={StaticResource StringToBoolConverter}}"
+                                   Margin="0,2,0,0"/>
                             
                             <Label Text="Tại *" FontSize="14" TextColor="Black"/>
                             <Entry Placeholder="Nơi cấp" Text="{Binding ProviderRepresentativeIdPlace}" />
@@ -80,6 +87,11 @@
                                 
                                 <Label Text="Ngày cấp GCN đăng ký doanh nghiệp *" FontSize="14" TextColor="Black"/>
                                 <Entry Placeholder="dd/MM/yyyy" Text="{Binding BusinessLicenseDate}" />
+                                <Label Text="{Binding BusinessLicenseDateError}"
+                                       FontSize="12"
+                                       TextColor="Red"
+                                       IsVisible="{Binding BusinessLicenseDateError, Converter={StaticResource StringToBoolConverter}}"
+                                       Margin="0,2,0,0"/>
                                 
                                 <Label Text="Nơi cấp GCN đăng ký doanh nghiệp *" FontSize="14" TextColor="Black"/>
                                 <Entry Placeholder="Nhập nơi cấp GCN" Text="{Binding BusinessLicensePlace}" />
@@ -95,6 +107,11 @@
                                 
                                 <Label Text="Ngày cấp CCCD/CMND/Hộ chiếu đại diện *" FontSize="14" TextColor="Black"/>
                                 <Entry Placeholder="dd/MM/yyyy" Text="{Binding RepresentativeIdDate}" />
+                                <Label Text="{Binding RepresentativeIdDateError}"
+                                       FontSize="12"
+                                       TextColor="Red"
+                                       IsVisible="{Binding RepresentativeIdDateError, Converter={StaticResource StringToBoolConverter}}"
+                                       Margin="0,2,0,0"/>
                                 
                                 <Label Text="Nơi cấp CCCD/CMND/Hộ chiếu đại diện *" FontSize="14" TextColor="Black"/>
                                 <Entry Placeholder="Nhập nơi cấp" Text="{Binding RepresentativeIdPlace}" />
@@ -152,6 +169,11 @@
                                 
                                 <Label Text="Ngày cấp CCCD/CMND/Hộ chiếu chủ hộ *" FontSize="14" TextColor="Black"/>
                                 <Entry Placeholder="dd/MM/yyyy" Text="{Binding OwnerIdDate}" />
+                                <Label Text="{Binding OwnerIdDateError}"
+                                       FontSize="12"
+                                       TextColor="Red"
+                                       IsVisible="{Binding OwnerIdDateError, Converter={StaticResource StringToBoolConverter}}"
+                                       Margin="0,2,0,0"/>
                                 
                                 <Label Text="Nơi cấp CCCD/CMND/Hộ chiếu chủ hộ *" FontSize="14" TextColor="Black"/>
                                 <Entry Placeholder="Nhập nơi cấp" Text="{Binding OwnerIdPlace}" />
@@ -206,6 +228,11 @@
                             
                             <Label Text="Cấp ngày *" FontSize="14" TextColor="Black"/>
                             <Entry Placeholder="dd/MM/yyyy" Text="{Binding ProviderRepresentativeIdDate}" />
+                            <Label Text="{Binding ProviderRepresentativeIdDateError}"
+                                   FontSize="12"
+                                   TextColor="Red"
+                                   IsVisible="{Binding ProviderRepresentativeIdDateError, Converter={StaticResource StringToBoolConverter}}"
+                                   Margin="0,2,0,0"/>
                             
                             <Label Text="Tại *" FontSize="14" TextColor="Black"/>
                             <Entry Placeholder="Nơi cấp" Text="{Binding ProviderRepresentativeIdPlace}" />
@@ -234,6 +261,11 @@
                                 
                                 <Label Text="Ngày cấp GCN đăng ký doanh nghiệp *" FontSize="14" TextColor="Black"/>
                                 <Entry Placeholder="dd/MM/yyyy" Text="{Binding BusinessLicenseDate}" />
+                                <Label Text="{Binding BusinessLicenseDateError}"
+                                       FontSize="12"
+                                       TextColor="Red"
+                                       IsVisible="{Binding BusinessLicenseDateError, Converter={StaticResource StringToBoolConverter}}"
+                                       Margin="0,2,0,0"/>
                                 
                                 <Label Text="Nơi cấp GCN đăng ký doanh nghiệp *" FontSize="14" TextColor="Black"/>
                                 <Entry Placeholder="Nhập nơi cấp GCN" Text="{Binding BusinessLicensePlace}" />
@@ -281,6 +313,11 @@
                                 
                                 <Label Text="Ngày cấp *" FontSize="14" TextColor="Black"/>
                                 <Entry Placeholder="dd/MM/yyyy" Text="{Binding OwnerIdDate}" />
+                                <Label Text="{Binding OwnerIdDateError}"
+                                       FontSize="12"
+                                       TextColor="Red"
+                                       IsVisible="{Binding OwnerIdDateError, Converter={StaticResource StringToBoolConverter}}"
+                                       Margin="0,2,0,0"/>
                                 
                                 <Label Text="Nơi cấp *" FontSize="14" TextColor="Black"/>
                                 <Entry Placeholder="Nhập nơi cấp" Text="{Binding OwnerIdPlace}" />
