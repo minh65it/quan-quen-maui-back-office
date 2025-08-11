@@ -6,17 +6,25 @@
              x:Class="QuanQuenBackOfficeMobile.Views.DrawingExamplePage"
              x:DataType="vm:DrawingExampleViewModel"
              BackgroundColor="White">
+
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="32">
+
             <!-- Chữ ký Hợp Đồng -->
             <Frame CornerRadius="16" Padding="16" BackgroundColor="#FFF8E1" HasShadow="True">
                 <VerticalStackLayout Spacing="12">
-                    <Label Text="Chữ Ký Hợp Đồng"
-                           FontSize="20"
-                           FontAttributes="Bold"
-                           HorizontalOptions="Center"
-                           TextColor="#F58220"/>
-                    <Border Stroke="#E0E0E0" StrokeThickness="1" Background="#F9F9F9" >
+
+                    <!-- Header + Clear -->
+                    <Grid ColumnDefinitions="*,Auto,*" Padding="0,0,0,4">
+                        <Label Text="Chữ Ký Hợp Đồng"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="#F58220"
+                               VerticalOptions="Center" />
+
+                    </Grid>
+
+                    <Border Stroke="#E0E0E0" StrokeThickness="1" Background="#F9F9F9">
                         <toolkit:DrawingView
                             x:Name="ContractDrawingView"
                             HeightRequest="180"
@@ -25,27 +33,39 @@
                             BackgroundColor="Transparent"
                             VerticalOptions="Fill"
                             HorizontalOptions="FillAndExpand"
-                            StyleClass="signatureBox"/>
+                            StyleClass="signatureBox" />
                     </Border>
-                    <Border Stroke="#E0E0E0" StrokeThickness="1" Background="White" HeightRequest="120" Padding="6">
-                        <Image x:Name="ContractGeneratedImage"
-                               BackgroundColor="White"
-                               Aspect="AspectFit"
-                               VerticalOptions="Center"
-                               HorizontalOptions="Center"/>
-                    </Border>
+                    <Button Grid.Column="1"
+                             Command="{Binding ClearContractCommand}"
+                             Text="Xóa chữ ký hợp đồng"
+                             CornerRadius="18"
+                             BorderColor="#80000000"
+                             BorderWidth="1"
+                             BackgroundColor="White"
+                             TextColor="Black"
+                             FontSize="14"
+                             FontAttributes="Bold"
+                             HeightRequest="36"
+                             Padding="14,6" />
+
                 </VerticalStackLayout>
             </Frame>
 
             <!-- Chữ ký Phụ Lục -->
             <Frame CornerRadius="16" Padding="16" BackgroundColor="#E3F2FD" HasShadow="True">
                 <VerticalStackLayout Spacing="12">
-                    <Label Text="Chữ Ký Phụ Lục"
-                           FontSize="20"
-                           FontAttributes="Bold"
-                           HorizontalOptions="Center"
-                           TextColor="#1976D2"/>
-                    <Border Stroke="#E0E0E0" StrokeThickness="1" Background="#F9F9F9" >
+
+                    <!-- Header + Clear -->
+                    <Grid ColumnDefinitions="*,Auto,*" Padding="0,0,0,4">
+                        <Label Text="Chữ Ký Phụ Lục"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="#1976D2"
+                               VerticalOptions="Center" />
+
+                    </Grid>
+
+                    <Border Stroke="#E0E0E0" StrokeThickness="1" Background="#F9F9F9">
                         <toolkit:DrawingView
                             x:Name="AppendixDrawingView"
                             HeightRequest="180"
@@ -54,47 +74,25 @@
                             BackgroundColor="Transparent"
                             VerticalOptions="Fill"
                             HorizontalOptions="FillAndExpand"
-                            StyleClass="signatureBox"/>
+                            StyleClass="signatureBox" />
                     </Border>
-                    <Border Stroke="#E0E0E0" StrokeThickness="1" Background="White" HeightRequest="120" Padding="6" >
-                        <Image x:Name="AppendixGeneratedImage"
-                               BackgroundColor="White"
-                               Aspect="AspectFit"
-                               VerticalOptions="Center"
-                               HorizontalOptions="Center"/>
-                    </Border>
+                    <Button Grid.Column="1"
+                            Command="{Binding ClearAppendixCommand}"
+                            Text="Xóa chữ ký phụ lục"
+                            CornerRadius="18"
+                            BorderColor="#80000000"
+                            BorderWidth="1"
+                            BackgroundColor="White"
+                            TextColor="Black"
+                            FontSize="14"
+                            FontAttributes="Bold"
+                            HeightRequest="36"
+                            Padding="14,6" />
+
                 </VerticalStackLayout>
             </Frame>
 
-            <!-- Nút chức năng -->
-            <HorizontalStackLayout Spacing="20" HorizontalOptions="FillAndExpand" Margin="0,20,0,0">
-                <Button
-                    Command="{Binding ClearContractCommand}"
-                    Text="Xóa Hợp Đồng"
-                    CornerRadius="20"
-                    BorderColor="#80000000"
-                    BorderWidth="1"
-                    BackgroundColor="White"
-                    TextColor="Black"
-                    FontSize="14"
-                    FontAttributes="Bold"
-                    HeightRequest="40"
-                    HorizontalOptions="FillAndExpand"
-                    VerticalOptions="Center" />
-                <Button
-                    Command="{Binding ClearAppendixCommand}"
-                    Text="Xóa Phụ Lục"
-                    CornerRadius="20"
-                    BorderColor="#80000000"
-                    BorderWidth="1"
-                    BackgroundColor="White"
-                    TextColor="Black"
-                    FontSize="14"
-                    FontAttributes="Bold"
-                    HeightRequest="40"
-                    HorizontalOptions="FillAndExpand"
-                    VerticalOptions="Center" />
-            </HorizontalStackLayout>
+            <!-- Nút Lưu -->    
             <Button
                 Clicked="SaveClicked"
                 Text="💾 Lưu"
@@ -115,6 +113,7 @@
                     </LinearGradientBrush>
                 </Button.Background>
             </Button>
+
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

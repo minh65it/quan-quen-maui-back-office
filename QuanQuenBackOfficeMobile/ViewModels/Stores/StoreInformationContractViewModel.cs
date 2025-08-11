@@ -10,6 +10,7 @@ using QuanQuenBackOfficeMobile.Services.Interfaces;
 using System;
 using System.Text.RegularExpressions;
 using System.Linq;
+using System.Globalization;
 
 namespace QuanQuenBackOfficeMobile.ViewModels.Stores
 {
@@ -29,6 +30,12 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
 
         [ObservableProperty]
         private string validationError = string.Empty;
+
+        // ---- Error cho các ngày (thêm mới) ----
+        [ObservableProperty] private string providerRepresentativeIdDateError = string.Empty;
+        [ObservableProperty] private string businessLicenseDateError = string.Empty;
+        [ObservableProperty] private string representativeIdDateError = string.Empty;
+        [ObservableProperty] private string ownerIdDateError = string.Empty;
 
         // BÊN CUNG CẤP DỊCH VỤ (Provider) - Common for both contracts
         [ObservableProperty]
@@ -117,33 +124,25 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
         [ObservableProperty]
         private string ownerTemporaryAddress;
 
-
-
         public ICommand NextCommand { get; }
         public ICommand PreviewCommand { get; }
-
 
         public StoreInformationContractViewModel(IContractService contractService)
         {
             _contractService = contractService;
             NextCommand = new AsyncRelayCommand(OnNextClicked);
             PreviewCommand = new AsyncRelayCommand(OnPreviewClicked);
-            
+
             // Auto-load data từ StoreRegistrationData
             LoadDataFromRegistration();
         }
-
-
 
         private async Task OnNextClicked()
         {
             try
             {
                 IsBusy = true;
-                // Lưu thông tin hợp đồng vào database hoặc local storage
-                // TODO: Implement save logic
-                
-                // Chuyển đến trang vẽ chữ ký
+                // TODO: Lưu thông tin hợp đồng (DB/local)
                 await Application.Current.MainPage.Navigation.PushAsync(new QuanQuenBackOfficeMobile.Views.DrawingExamplePage());
             }
             catch (Exception ex)
@@ -163,27 +162,82 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
                 IsBusy = true;
                 ValidationError = string.Empty; // Clear previous validation errors
 
-                // Validate required fields first
+                // 1) Validate required fields
                 if (!ValidateRequiredFields())
                 {
-                    return; // ValidationError message is already set in ValidateRequiredFields()
+                    return;
                 }
 
-                // Convert ViewModel data to API request
+                // 2) Validate các trường ngày theo chuẩn dd/MM/yyyy và không lớn hơn hôm nay
+                bool allDateOk = true;
+
+                if (!TryValidateDate_ddMMyyyy(ProviderRepresentativeIdDate, out var normProv, out var errProv))
+                {
+                    ProviderRepresentativeIdDateError = errProv;
+                    allDateOk = false;
+                }
+                else
+                {
+                    ProviderRepresentativeIdDateError = string.Empty;
+                    if (ProviderRepresentativeIdDate != normProv) ProviderRepresentativeIdDate = normProv;
+                }
+
+                if (!TryValidateDate_ddMMyyyy(BusinessLicenseDate, out var normBiz, out var errBiz))
+                {
+                    BusinessLicenseDateError = errBiz;
+                    allDateOk = false;
+                }
+                else
+                {
+                    BusinessLicenseDateError = string.Empty;
+                    if (BusinessLicenseDate != normBiz) BusinessLicenseDate = normBiz;
+                }
+
+                if (!TryValidateDate_ddMMyyyy(RepresentativeIdDate, out var normRep, out var errRep))
+                {
+                    RepresentativeIdDateError = errRep;
+                    allDateOk = false;
+                }
+                else
+                {
+                    RepresentativeIdDateError = string.Empty;
+                    if (RepresentativeIdDate != normRep) RepresentativeIdDate = normRep;
+                }
+
+                if (!string.IsNullOrEmpty(StoreRegistrationData.BusinessType) &&
+                    StoreRegistrationData.BusinessType.Contains("Hộ"))
+                {
+                    if (!TryValidateDate_ddMMyyyy(OwnerIdDate, out var normOwner, out var errOwner))
+                    {
+                        OwnerIdDateError = errOwner;
+                        allDateOk = false;
+                    }
+                    else
+                    {
+                        OwnerIdDateError = string.Empty;
+                        if (OwnerIdDate != normOwner) OwnerIdDate = normOwner;
+                    }
+                }
+
+                if (!allDateOk)
+                {
+                    await App.Current.MainPage.DisplayAlert("Thiếu/ Sai thông tin",
+                        "Vui lòng kiểm tra lại các ngày theo định dạng dd/MM/yyyy và không lớn hơn ngày hiện tại.",
+                        "OK");
+                    return;
+                }
+
+                // 3) Convert ViewModel data to API request
                 var apiRequest = await _contractService.ConvertToPreviewContractRequestAsync(this);
 
-                // Call PreviewContract API
+                // 4) Call PreviewContract API
                 var apiResponse = await _contractService.CallPreviewContractApiAsync(apiRequest);
 
                 if (apiResponse.IsSuccess)
                 {
-                    // Chuyển đến trang preview với PDF từ API
                     var previewViewModel = new ContractPreviewViewModel();
-                    
-                    // Truyền PDF base64 từ API response message
                     previewViewModel.SetApiPdfContent(apiResponse.GetPdfDataUrl());
-                    
-                    // Pass contract data để có thể navigate tới signing page
+
                     var previewPage = new QuanQuenBackOfficeMobile.Views.Stores.ContractPreviewPage(previewViewModel, this);
                     await Application.Current.MainPage.Navigation.PushAsync(previewPage);
                 }
@@ -248,7 +302,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
                 missingFields.Add("Địa chỉ trụ sở chính doanh nghiệp");
 
             // Validate Individual Business fields if applicable
-            if (!string.IsNullOrEmpty(StoreRegistrationData.BusinessType) && 
+            if (!string.IsNullOrEmpty(StoreRegistrationData.BusinessType) &&
                 StoreRegistrationData.BusinessType.Contains("Hộ"))
             {
                 if (string.IsNullOrWhiteSpace(OwnerName))
@@ -283,26 +337,25 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
                 StoreName = StoreRegistrationData.StoreName ?? string.Empty;
                 RepresentativeName = StoreRegistrationData.RepresentativeName ?? string.Empty;
                 PhoneNumber = StoreRegistrationData.PhoneNumber ?? string.Empty;
-                
+
                 // Auto-fill địa chỉ (combine từ Address + Ward + District + Province)
                 var fullAddress = BuildFullAddress();
                 StoreHeadOfficeAddress = fullAddress;
                 HeadquartersAddress = fullAddress; // Dùng chung cho trụ sở chính
-                // RepresentativePermanentAddress không auto-fill vì là địa chỉ cá nhân của người đại diện
-                
+
                 // Auto-fill thông tin chủ hộ kinh doanh (nếu là hộ KD)
-                if (!string.IsNullOrEmpty(StoreRegistrationData.BusinessType) && 
+                if (!string.IsNullOrEmpty(StoreRegistrationData.BusinessType) &&
                     StoreRegistrationData.BusinessType.Contains("Hộ"))
                 {
                     OwnerName = StoreRegistrationData.RepresentativeName ?? string.Empty;
                 }
-                
-                // Auto-fill tên công ty mặc định từ tên cửa hàng (có thể edit sau)
+
+                // Auto-fill tên công ty mặc định từ tên cửa hàng
                 if (string.IsNullOrEmpty(CompanyName) && !string.IsNullOrEmpty(StoreName))
                 {
                     CompanyName = StoreName;
                 }
-                
+
                 System.Diagnostics.Debug.WriteLine($"[StoreInformationContract] Auto-loaded: {StoreName}, {RepresentativeName}, {PhoneNumber}");
             }
             catch (Exception ex)
@@ -317,19 +370,19 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
         private string BuildFullAddress()
         {
             var addressParts = new List<string>();
-            
+
             if (!string.IsNullOrEmpty(StoreRegistrationData.Address))
                 addressParts.Add(StoreRegistrationData.Address);
-                
+
             if (!string.IsNullOrEmpty(StoreRegistrationData.Ward))
                 addressParts.Add(StoreRegistrationData.Ward);
-                
+
             if (!string.IsNullOrEmpty(StoreRegistrationData.District))
                 addressParts.Add(StoreRegistrationData.District);
-                
+
             if (!string.IsNullOrEmpty(StoreRegistrationData.Province))
                 addressParts.Add(StoreRegistrationData.Province);
-            
+
             return string.Join(", ", addressParts);
         }
 
@@ -368,16 +421,104 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
 
             // Loại bỏ khoảng trắng và ký tự đặc biệt
             var cleanPhone = Regex.Replace(phoneNumber, @"[^\d]", "");
-            
+
             // Kiểm tra độ dài
             if (cleanPhone.Length != 10)
                 return false;
-            
+
             // Kiểm tra format số điện thoại Việt Nam
-            // Bắt đầu bằng 0, tiếp theo là 3, 5, 7, 8, 9 và có 9 chữ số tiếp theo
-            var phonePattern = @"^0[3|5|7|8|9][0-9]{8}$";
+            // Bắt đầu bằng 0, tiếp theo là 3, 5, 7, 8, 9 và có 8 chữ số tiếp theo
+            var phonePattern = @"^0[35789][0-9]{8}$";
             return Regex.IsMatch(cleanPhone, phonePattern);
         }
 
+        // ---------- DATE VALIDATION (dd/MM/yyyy) ----------
+        private static bool TryValidateDate_ddMMyyyy(string input, out string normalized, out string error)
+        {
+            normalized = string.Empty;
+            error = string.Empty;
+
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                error = "Vui lòng nhập ngày theo định dạng dd/MM/yyyy.";
+                return false;
+            }
+
+            if (!DateTime.TryParseExact(input.Trim(),
+                                        "dd/MM/yyyy",
+                                        CultureInfo.InvariantCulture,
+                                        DateTimeStyles.None,
+                                        out var date))
+            {
+                error = "Sai định dạng ngày. Định dạng đúng: dd/MM/yyyy (ví dụ: 25/12/2024).";
+                return false;
+            }
+
+            if (date.Date > DateTime.Today)
+            {
+                error = "Ngày không được lớn hơn ngày hiện tại.";
+                return false;
+            }
+
+            normalized = date.ToString("dd/MM/yyyy");
+            return true;
+        }
+
+        // Thay đổi từng trường ngày -> validate ngay và chuẩn hóa
+        partial void OnProviderRepresentativeIdDateChanged(string value)
+        {
+            if (TryValidateDate_ddMMyyyy(value, out var normalized, out var err))
+            {
+                ProviderRepresentativeIdDateError = string.Empty;
+                if (ProviderRepresentativeIdDate != normalized)
+                    ProviderRepresentativeIdDate = normalized;
+            }
+            else
+            {
+                ProviderRepresentativeIdDateError = err;
+            }
+        }
+
+        partial void OnBusinessLicenseDateChanged(string value)
+        {
+            if (TryValidateDate_ddMMyyyy(value, out var normalized, out var err))
+            {
+                BusinessLicenseDateError = string.Empty;
+                if (BusinessLicenseDate != normalized)
+                    BusinessLicenseDate = normalized;
+            }
+            else
+            {
+                BusinessLicenseDateError = err;
+            }
+        }
+
+        partial void OnRepresentativeIdDateChanged(string value)
+        {
+            if (TryValidateDate_ddMMyyyy(value, out var normalized, out var err))
+            {
+                RepresentativeIdDateError = string.Empty;
+                if (RepresentativeIdDate != normalized)
+                    RepresentativeIdDate = normalized;
+            }
+            else
+            {
+                RepresentativeIdDateError = err;
+            }
+        }
+
+        partial void OnOwnerIdDateChanged(string value)
+        {
+            if (TryValidateDate_ddMMyyyy(value, out var normalized, out var err))
+            {
+                OwnerIdDateError = string.Empty;
+                if (OwnerIdDate != normalized)
+                    OwnerIdDate = normalized;
+            }
+            else
+            {
+                OwnerIdDateError = err;
+            }
+        }
     }
-} 
+}
