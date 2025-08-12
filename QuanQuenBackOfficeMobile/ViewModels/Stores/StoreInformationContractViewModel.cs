@@ -24,6 +24,15 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
         [ObservableProperty]
         private bool isBusy;
 
+        // ==== TOGGLE for HỢP ĐỒNG ====
+        // Mặc định mở; nếu bạn bind IsVisible cho ContractContent thì dùng property này.
+        [ObservableProperty]
+        private bool isContractOpen = true;
+
+        // Text hiển thị trên nút toggle: "−" khi mở, "+" khi thu gọn
+        [ObservableProperty]
+        private string contractToggleText = "−";
+
         // Error properties cho validation
         [ObservableProperty]
         private string phoneError = string.Empty;
@@ -127,14 +136,33 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
         public ICommand NextCommand { get; }
         public ICommand PreviewCommand { get; }
 
+        // Command để toggle trạng thái mở/thu của phần Hợp đồng
+        public IRelayCommand ToggleContractCommand { get; }
+
         public StoreInformationContractViewModel(IContractService contractService)
         {
             _contractService = contractService;
             NextCommand = new AsyncRelayCommand(OnNextClicked);
             PreviewCommand = new AsyncRelayCommand(OnPreviewClicked);
 
+            // Toggle command
+            ToggleContractCommand = new RelayCommand(ToggleContract);
+
             // Auto-load data từ StoreRegistrationData
             LoadDataFromRegistration();
+        }
+
+        // Khi IsContractOpen đổi -> cập nhật ký hiệu nút
+        partial void OnIsContractOpenChanged(bool value)
+        {
+            ContractToggleText = value ? "−" : "+";
+        }
+
+        // Hàm toggle: đảo trạng thái mở/thu phần Hợp đồng
+        private void ToggleContract()
+        {
+            IsContractOpen = !IsContractOpen;
+            // ContractToggleText được cập nhật trong OnIsContractOpenChanged
         }
 
         private async Task OnNextClicked()
