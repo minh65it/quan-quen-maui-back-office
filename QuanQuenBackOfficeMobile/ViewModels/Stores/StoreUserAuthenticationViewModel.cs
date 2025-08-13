@@ -73,7 +73,6 @@ public partial class StoreUserAuthenticationViewModel : ObservableObject
         var response = await _storeUserService.VerifyCodeEmailAsync(Email, OtpCode);
         if (response.IsSuccess)
         {
-            await App.Current.MainPage.DisplayAlert("Thành công", "Xác thực thành công!", "OK");
             var contractService = App.Services.GetService<IContractService>();
             var viewModel = new StoreInformationContractViewModel(contractService);
             await Application.Current.MainPage.Navigation.PushAsync(new QuanQuenBackOfficeMobile.Views.Stores.StoreInformationContractPage(viewModel));
