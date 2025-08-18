@@ -73,25 +73,31 @@ namespace QuanQuenBackOfficeMobile.Services
                 formContent.Add(new StringContent(request.MainContract.BusinessLicenseNumber), "MainContract.BusinessLicenseNumber");
                 formContent.Add(new StringContent(request.MainContract.BusinessLicenseDate), "MainContract.BusinessLicenseDate");
                 formContent.Add(new StringContent(request.MainContract.BusinessLicensePlace), "MainContract.BusinessLicensePlace");
-                formContent.Add(new StringContent(request.MainContract.RepresentativeName), "MainContract.RepresentativeName");
-                formContent.Add(new StringContent(request.MainContract.RepresentativePosition), "MainContract.RepresentativePosition");
-                formContent.Add(new StringContent(request.MainContract.RepresentativeIdNumber), "MainContract.RepresentativeIdNumber");
-                formContent.Add(new StringContent(request.MainContract.RepresentativeIdDate), "MainContract.RepresentativeIdDate");
-                formContent.Add(new StringContent(request.MainContract.RepresentativeIdPlace), "MainContract.RepresentativeIdPlace");
-                formContent.Add(new StringContent(request.MainContract.RepresentativePermanentAddress), "MainContract.RepresentativePermanentAddress");
-                formContent.Add(new StringContent(request.MainContract.RepresentativeTemporaryAddress), "MainContract.RepresentativeTemporaryAddress");
                 formContent.Add(new StringContent(request.MainContract.StoreHeadOfficeAddress), "MainContract.StoreHeadOfficeAddress");
                 formContent.Add(new StringContent(request.MainContract.PhoneNumber), "MainContract.PhoneNumber");
+                
+                // Thông tin đại diện - sử dụng cấu trúc flat như backend expect
+                formContent.Add(new StringContent(request.MainContract.Representative.Name), "MainContract.RepresentativeName");
+                formContent.Add(new StringContent(request.MainContract.Representative.Position), "MainContract.RepresentativePosition");
+                formContent.Add(new StringContent(request.MainContract.Representative.IdNumber), "MainContract.RepresentativeIdNumber");
+                formContent.Add(new StringContent(request.MainContract.Representative.IdDate), "MainContract.RepresentativeIdDate");
+                formContent.Add(new StringContent(request.MainContract.Representative.IdPlace), "MainContract.RepresentativeIdPlace");
+                formContent.Add(new StringContent(request.MainContract.Representative.PermanentAddress), "MainContract.RepresentativePermanentAddress");
+                formContent.Add(new StringContent(request.MainContract.Representative.TemporaryAddress), "MainContract.RepresentativeTemporaryAddress");
+                
+                // Thông tin chủ hộ kinh doanh - sử dụng cấu trúc flat như backend expect
+                formContent.Add(new StringContent(request.MainContract.Owner.Name), "MainContract.OwnerName");
+                formContent.Add(new StringContent(request.MainContract.Owner.Gender), "MainContract.OwnerGender");
+                formContent.Add(new StringContent(request.MainContract.Owner.IdNumber), "MainContract.OwnerIdNumber");
+                formContent.Add(new StringContent(request.MainContract.Owner.IdDate), "MainContract.OwnerIdDate");
+                formContent.Add(new StringContent(request.MainContract.Owner.IdPlace), "MainContract.OwnerIdPlace");
+                formContent.Add(new StringContent(request.MainContract.Owner.PermanentAddress), "MainContract.OwnerPermanentAddress");
+                formContent.Add(new StringContent(request.MainContract.Owner.TemporaryAddress), "MainContract.OwnerTemporaryAddress");
+                
+                // Field riêng của MainContract
                 formContent.Add(new StringContent(request.MainContract.BankAccountNumber), "MainContract.BankAccountNumber");
                 formContent.Add(new StringContent(request.MainContract.BankAccountHolder), "MainContract.BankAccountHolder");
                 formContent.Add(new StringContent(request.MainContract.BankName), "MainContract.BankName");
-                formContent.Add(new StringContent(request.MainContract.OwnerName), "MainContract.OwnerName");
-                formContent.Add(new StringContent(request.MainContract.OwnerGender), "MainContract.OwnerGender");
-                formContent.Add(new StringContent(request.MainContract.OwnerIdNumber), "MainContract.OwnerIdNumber");
-                formContent.Add(new StringContent(request.MainContract.OwnerIdDate), "MainContract.OwnerIdDate");
-                formContent.Add(new StringContent(request.MainContract.OwnerIdPlace), "MainContract.OwnerIdPlace");
-                formContent.Add(new StringContent(request.MainContract.OwnerPermanentAddress), "MainContract.OwnerPermanentAddress");
-                formContent.Add(new StringContent(request.MainContract.OwnerTemporaryAddress), "MainContract.OwnerTemporaryAddress");
 
                 // Thêm AppendixContract fields - CHỈ 2 FIELDS NHƯ CURL EXAMPLE
                 formContent.Add(new StringContent(request.AppendixContract.AppendixSignDate), "AppendixContract.AppendixSignDate");
@@ -168,27 +174,37 @@ namespace QuanQuenBackOfficeMobile.Services
                     BusinessLicenseNumber = viewModel.BusinessLicenseNumber ?? "",
                     BusinessLicenseDate = viewModel.BusinessLicenseDate ?? "",
                     BusinessLicensePlace = viewModel.BusinessLicensePlace ?? "",
-                    RepresentativeName = viewModel.RepresentativeName ?? "",
-                    RepresentativePosition = viewModel.RepresentativePosition ?? "",
-                    RepresentativeIdNumber = viewModel.RepresentativeIdNumber ?? "",
-                    RepresentativeIdDate = viewModel.RepresentativeIdDate ?? "",
-                    RepresentativeIdPlace = viewModel.RepresentativeIdPlace ?? "",
-                    RepresentativePermanentAddress = viewModel.RepresentativePermanentAddress ?? "",
-                    RepresentativeTemporaryAddress = viewModel.RepresentativeTemporaryAddress ?? "",
                     StoreHeadOfficeAddress = viewModel.StoreHeadOfficeAddress ?? "",
                     PhoneNumber = viewModel.PhoneNumber ?? "",
+                    
+                    // Thông tin đại diện - sử dụng cấu trúc mới
+                    Representative = new PersonalInfoDto
+                    {
+                        Name = viewModel.RepresentativeName ?? "",
+                        Position = viewModel.RepresentativePosition ?? "",
+                        IdNumber = viewModel.RepresentativeIdNumber ?? "",
+                        IdDate = viewModel.RepresentativeIdDate ?? "",
+                        IdPlace = viewModel.RepresentativeIdPlace ?? "",
+                        PermanentAddress = viewModel.RepresentativePermanentAddress ?? "",
+                        TemporaryAddress = viewModel.RepresentativeTemporaryAddress ?? ""
+                    },
+                    
+                    // Thông tin chủ hộ kinh doanh - sử dụng cấu trúc mới
+                    Owner = new PersonalInfoDto
+                    {
+                        Name = viewModel.OwnerName ?? "",
+                        Gender = viewModel.OwnerGender ?? "",
+                        IdNumber = viewModel.OwnerIdNumber ?? "",
+                        IdDate = viewModel.OwnerIdDate ?? "",
+                        IdPlace = viewModel.OwnerIdPlace ?? "",
+                        PermanentAddress = viewModel.OwnerPermanentAddress ?? "",
+                        TemporaryAddress = viewModel.OwnerTemporaryAddress ?? ""
+                    },
+                    
+                    // Field riêng của MainContract
                     BankAccountNumber = viewModel.BankAccountNumber ?? "",
                     BankAccountHolder = viewModel.BankAccountHolder ?? "",
-                    BankName = viewModel.BankName ?? "",
-                    
-                    // Thông tin chủ hộ kinh doanh
-                    OwnerName = viewModel.OwnerName ?? "",
-                    OwnerGender = viewModel.OwnerGender ?? "",
-                    OwnerIdNumber = viewModel.OwnerIdNumber ?? "",
-                    OwnerIdDate = viewModel.OwnerIdDate ?? "",
-                    OwnerIdPlace = viewModel.OwnerIdPlace ?? "",
-                    OwnerPermanentAddress = viewModel.OwnerPermanentAddress ?? "",
-                    OwnerTemporaryAddress = viewModel.OwnerTemporaryAddress ?? ""
+                    BankName = viewModel.BankName ?? ""
                 },
                 AppendixContract = new AppendixContractDto
                 {
@@ -251,25 +267,31 @@ namespace QuanQuenBackOfficeMobile.Services
                 formContent.Add(new StringContent(request.MainContract.BusinessLicenseNumber), "MainContract.BusinessLicenseNumber");
                 formContent.Add(new StringContent(request.MainContract.BusinessLicenseDate), "MainContract.BusinessLicenseDate");
                 formContent.Add(new StringContent(request.MainContract.BusinessLicensePlace), "MainContract.BusinessLicensePlace");
-                formContent.Add(new StringContent(request.MainContract.RepresentativeName), "MainContract.RepresentativeName");
-                formContent.Add(new StringContent(request.MainContract.RepresentativePosition), "MainContract.RepresentativePosition");
-                formContent.Add(new StringContent(request.MainContract.RepresentativeIdNumber), "MainContract.RepresentativeIdNumber");
-                formContent.Add(new StringContent(request.MainContract.RepresentativeIdDate), "MainContract.RepresentativeIdDate");
-                formContent.Add(new StringContent(request.MainContract.RepresentativeIdPlace), "MainContract.RepresentativeIdPlace");
-                formContent.Add(new StringContent(request.MainContract.RepresentativePermanentAddress), "MainContract.RepresentativePermanentAddress");
-                formContent.Add(new StringContent(request.MainContract.RepresentativeTemporaryAddress), "MainContract.RepresentativeTemporaryAddress");
                 formContent.Add(new StringContent(request.MainContract.StoreHeadOfficeAddress), "MainContract.StoreHeadOfficeAddress");
                 formContent.Add(new StringContent(request.MainContract.PhoneNumber), "MainContract.PhoneNumber");
+                
+                // Thông tin đại diện - sử dụng cấu trúc flat như backend expect
+                formContent.Add(new StringContent(request.MainContract.Representative.Name), "MainContract.RepresentativeName");
+                formContent.Add(new StringContent(request.MainContract.Representative.Position), "MainContract.RepresentativePosition");
+                formContent.Add(new StringContent(request.MainContract.Representative.IdNumber), "MainContract.RepresentativeIdNumber");
+                formContent.Add(new StringContent(request.MainContract.Representative.IdDate), "MainContract.RepresentativeIdDate");
+                formContent.Add(new StringContent(request.MainContract.Representative.IdPlace), "MainContract.RepresentativeIdPlace");
+                formContent.Add(new StringContent(request.MainContract.Representative.PermanentAddress), "MainContract.RepresentativePermanentAddress");
+                formContent.Add(new StringContent(request.MainContract.Representative.TemporaryAddress), "MainContract.RepresentativeTemporaryAddress");
+                
+                // Thông tin chủ hộ kinh doanh - sử dụng cấu trúc flat như backend expect
+                formContent.Add(new StringContent(request.MainContract.Owner.Name), "MainContract.OwnerName");
+                formContent.Add(new StringContent(request.MainContract.Owner.Gender), "MainContract.OwnerGender");
+                formContent.Add(new StringContent(request.MainContract.Owner.IdNumber), "MainContract.OwnerIdNumber");
+                formContent.Add(new StringContent(request.MainContract.Owner.IdDate), "MainContract.OwnerIdDate");
+                formContent.Add(new StringContent(request.MainContract.Owner.IdPlace), "MainContract.OwnerIdPlace");
+                formContent.Add(new StringContent(request.MainContract.Owner.PermanentAddress), "MainContract.OwnerPermanentAddress");
+                formContent.Add(new StringContent(request.MainContract.Owner.TemporaryAddress), "MainContract.OwnerTemporaryAddress");
+                
+                // Field riêng của MainContract
                 formContent.Add(new StringContent(request.MainContract.BankAccountNumber), "MainContract.BankAccountNumber");
                 formContent.Add(new StringContent(request.MainContract.BankAccountHolder), "MainContract.BankAccountHolder");
                 formContent.Add(new StringContent(request.MainContract.BankName), "MainContract.BankName");
-                formContent.Add(new StringContent(request.MainContract.OwnerName), "MainContract.OwnerName");
-                formContent.Add(new StringContent(request.MainContract.OwnerGender), "MainContract.OwnerGender");
-                formContent.Add(new StringContent(request.MainContract.OwnerIdNumber), "MainContract.OwnerIdNumber");
-                formContent.Add(new StringContent(request.MainContract.OwnerIdDate), "MainContract.OwnerIdDate");
-                formContent.Add(new StringContent(request.MainContract.OwnerIdPlace), "MainContract.OwnerIdPlace");
-                formContent.Add(new StringContent(request.MainContract.OwnerPermanentAddress), "MainContract.OwnerPermanentAddress");
-                formContent.Add(new StringContent(request.MainContract.OwnerTemporaryAddress), "MainContract.OwnerTemporaryAddress");
 
                 // Add AppendixContract fields - CHỈ 2 FIELDS NHƯ CURL EXAMPLE
                 formContent.Add(new StringContent(request.AppendixContract.AppendixSignDate), "AppendixContract.AppendixSignDate");
@@ -334,6 +356,199 @@ namespace QuanQuenBackOfficeMobile.Services
                 {
                     IsSuccess = false,
                     Message = $"Lỗi khi gọi API PreviewContract với signatures: {ex.Message}"
+                };
+            }
+        }
+
+        // ========== AGREEMENT API METHODS ==========
+
+        public async Task<PreviewAgreementResponse> CallPreviewAgreementApiAsync(PreviewAgreementRequest request)
+        {
+            try
+            {
+                // Lấy URL từ configuration
+                var baseUrl = _configuration["API:Identity:BaseUrl"];
+                var path = _configuration["API:Identity:PreviewAgreement"];
+                var url = $"{baseUrl}{path}";
+                
+                System.Diagnostics.Debug.WriteLine($"[ContractService] Preview Agreement URL: {url}");
+                
+                // Lấy auth_token từ SecureStorage
+                var token = await SecureStorage.GetAsync("auth_token");
+                System.Diagnostics.Debug.WriteLine($"[ContractService] Token: {token}");
+                
+                if (string.IsNullOrEmpty(token))
+                {
+                    return new PreviewAgreementResponse
+                    {
+                        IsSuccess = false,
+                        Message = "Không tìm thấy auth_token. Vui lòng đăng nhập lại."
+                    };
+                }
+
+                // Thêm Bearer token vào header
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                // Tạo multipart/form-data content
+                using var formContent = new MultipartFormDataContent();
+                
+                // Thêm các trường cơ bản
+                formContent.Add(new StringContent(request.StoreId), "StoreId");
+                formContent.Add(new StringContent(request.UserId), "UserId");
+                formContent.Add(new StringContent(request.SignatureFile), "SignatureFile");
+                formContent.Add(new StringContent(request.StoreName), "StoreName");
+                formContent.Add(new StringContent(request.RepresentativeName), "RepresentativeName");
+                formContent.Add(new StringContent(request.RepresentativePosition), "RepresentativePosition");
+                formContent.Add(new StringContent(request.RepresentativeIdNumber), "RepresentativeIdNumber");
+                formContent.Add(new StringContent(request.StoreHeadOfficeAddress), "StoreHeadOfficeAddress");
+                formContent.Add(new StringContent(request.PhoneNumber), "PhoneNumber");
+
+                // Gọi API
+                var response = await _httpClient.PostAsync(url, formContent);
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseJson = await response.Content.ReadAsStringAsync();
+                    System.Diagnostics.Debug.WriteLine($"[ContractService] Agreement API Response: {responseJson}");
+                    
+                    // Parse JSON response
+                    using var jsonDocument = JsonDocument.Parse(responseJson);
+                    var root = jsonDocument.RootElement;
+                    
+                    return new PreviewAgreementResponse
+                    {
+                        IsSuccess = true,
+                        Message = root.TryGetProperty("message", out var messageElement) ? messageElement.GetString() ?? "" : "",
+                    };
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    return new PreviewAgreementResponse
+                    {
+                        IsSuccess = false,
+                        Message = $"API Error ({response.StatusCode}): {errorContent}"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new PreviewAgreementResponse
+                {
+                    IsSuccess = false,
+                    Message = $"Lỗi khi gọi API PreviewAgreement: {ex.Message}"
+                };
+            }
+        }
+
+        public async Task<PreviewAgreementRequest> ConvertToPreviewAgreementRequestAsync(AgreementInfoDto agreementInfo)
+        {
+            // Lấy StoreId và UserId từ StoreRegistrationData
+            var storeId = StoreRegistrationData.StoreId;
+            var userId = StoreRegistrationData.StoreUserId;
+            
+            if (string.IsNullOrEmpty(storeId) || string.IsNullOrEmpty(userId))
+            {
+                throw new Exception("Thiếu thông tin StoreId hoặc UserId. Vui lòng hoàn tất đăng ký trước.");
+            }
+            
+            return await Task.FromResult(new PreviewAgreementRequest
+            {
+                StoreId = storeId,
+                UserId = userId,
+                SignatureFile = string.Empty,
+                StoreName = agreementInfo.StoreName,
+                RepresentativeName = agreementInfo.RepresentativeName,
+                RepresentativePosition = agreementInfo.RepresentativePosition,
+                RepresentativeIdNumber = agreementInfo.RepresentativeIdNumber,
+                StoreHeadOfficeAddress = agreementInfo.StoreHeadOfficeAddress,
+                PhoneNumber = agreementInfo.PhoneNumber
+            });
+        }
+
+        public async Task<PreviewAgreementResponse> CallPreviewAgreementApiWithSignatureAsync(PreviewAgreementRequest request, byte[] signatureFile)
+        {
+            try
+            {
+                var baseUrl = _configuration["API:Identity:BaseUrl"];
+                var path = _configuration["API:Identity:PreviewAgreement"];
+                var url = $"{baseUrl}{path}";
+                
+                System.Diagnostics.Debug.WriteLine($"[ContractService] Preview Agreement with Signature URL: {url}");
+                
+                var token = await SecureStorage.GetAsync("auth_token");
+                System.Diagnostics.Debug.WriteLine($"[ContractService] Token: {token}");
+                
+                if (string.IsNullOrEmpty(token))
+                {
+                    return new PreviewAgreementResponse
+                    {
+                        IsSuccess = false,
+                        Message = "Không tìm thấy auth_token. Vui lòng đăng nhập lại."
+                    };
+                }
+
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                using var formContent = new MultipartFormDataContent();
+                
+                // Add basic fields
+                formContent.Add(new StringContent(request.StoreId), "StoreId");
+                formContent.Add(new StringContent(request.UserId), "UserId");
+                formContent.Add(new StringContent(request.StoreName), "StoreName");
+                formContent.Add(new StringContent(request.RepresentativeName), "RepresentativeName");
+                formContent.Add(new StringContent(request.RepresentativePosition), "RepresentativePosition");
+                formContent.Add(new StringContent(request.RepresentativeIdNumber), "RepresentativeIdNumber");
+                formContent.Add(new StringContent(request.StoreHeadOfficeAddress), "StoreHeadOfficeAddress");
+                formContent.Add(new StringContent(request.PhoneNumber), "PhoneNumber");
+
+                // Add signature file
+                if (signatureFile != null && signatureFile.Length > 0)
+                {
+                    var signatureImageContent = new ByteArrayContent(signatureFile);
+                    signatureImageContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+                    formContent.Add(signatureImageContent, "SignatureFile", "agreement_signature.jpg");
+                    System.Diagnostics.Debug.WriteLine($"[ContractService] Added agreement signature: {signatureFile.Length} bytes");
+                }
+                else
+                {
+                    formContent.Add(new StringContent(""), "SignatureFile");
+                }
+
+                var response = await _httpClient.PostAsync(url, formContent);
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseJson = await response.Content.ReadAsStringAsync();
+                    System.Diagnostics.Debug.WriteLine($"[ContractService] Agreement API Response with signature: {responseJson}");
+                    
+                    using var jsonDocument = System.Text.Json.JsonDocument.Parse(responseJson);
+                    var root = jsonDocument.RootElement;
+                    
+                    return new PreviewAgreementResponse
+                    {
+                        IsSuccess = root.TryGetProperty("success", out var successElement) ? successElement.GetBoolean() : false,
+                        Message = root.TryGetProperty("message", out var messageElement) ? messageElement.GetString() ?? "" : "",
+                        AgreementId = root.TryGetProperty("agreementId", out var agreementIdElement) ? agreementIdElement.GetString() ?? "" : "",
+                        AgreementNumber = root.TryGetProperty("agreementNumber", out var agreementNumberElement) ? agreementNumberElement.GetString() ?? "" : ""
+                    };
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    return new PreviewAgreementResponse
+                    {
+                        IsSuccess = false,
+                        Message = $"API Error ({response.StatusCode}): {errorContent}"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new PreviewAgreementResponse
+                {
+                    IsSuccess = false,
+                    Message = $"Lỗi khi gọi API PreviewAgreement với signature: {ex.Message}"
                 };
             }
         }

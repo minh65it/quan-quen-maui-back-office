@@ -126,6 +126,9 @@
 
 
 	<ItemGroup>
+	  <MauiXaml Update="Views\Stores\StoreAgreementInformationPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\Stores\StoreInformationContractPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

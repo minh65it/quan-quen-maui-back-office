@@ -58,12 +58,12 @@
         <ShellContent ContentTemplate="{DataTemplate views:AboutPage}" />
     </FlyoutItem>
     <FlyoutItem Title="Test">
-        <ShellContent ContentTemplate="{DataTemplate views:DrawingExamplePage}" />
+        <ShellContent ContentTemplate="{DataTemplate views:Stores.StoreAgreementInformationPage}" />    
     </FlyoutItem>
-     <!--<FlyoutItem Title="Test1">
-        <ShellContent ContentTemplate="{DataTemplate views:PhotoStoreUser}" />
+    <!--<FlyoutItem Title="Test1">
+        <ShellContent ContentTemplate="{DataTemplate views:Stores.AgreementSignaturePage}" />
     </FlyoutItem>
-   <FlyoutItem Title="Test2">
+    <FlyoutItem Title="Test2">
         <ShellContent ContentTemplate="{DataTemplate views:Stores.StoreLevelPage}" />
     </FlyoutItem>-->
 </Shell>

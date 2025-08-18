@@ -154,6 +154,8 @@ public partial class ContractStoreViewModel : ObservableObject
         BusinessLicenseNumber = sourceViewModel.BusinessLicenseNumber ?? string.Empty;
         BusinessLicenseDate = sourceViewModel.BusinessLicenseDate ?? string.Empty;
         BusinessLicensePlace = sourceViewModel.BusinessLicensePlace ?? string.Empty;
+        
+        // Thông tin đại diện - sử dụng cấu trúc mới
         RepresentativeName = sourceViewModel.RepresentativeName ?? string.Empty;
         RepresentativePosition = sourceViewModel.RepresentativePosition ?? string.Empty;
         RepresentativeIdNumber = sourceViewModel.RepresentativeIdNumber ?? string.Empty;
@@ -161,11 +163,14 @@ public partial class ContractStoreViewModel : ObservableObject
         RepresentativeIdPlace = sourceViewModel.RepresentativeIdPlace ?? string.Empty;
         RepresentativePermanentAddress = sourceViewModel.RepresentativePermanentAddress ?? string.Empty;
         RepresentativeTemporaryAddress = sourceViewModel.RepresentativeTemporaryAddress ?? string.Empty;
+        
         StoreHeadOfficeAddress = sourceViewModel.StoreHeadOfficeAddress ?? string.Empty;
         PhoneNumber = sourceViewModel.PhoneNumber ?? string.Empty;
         BankAccountNumber = sourceViewModel.BankAccountNumber ?? string.Empty;
         BankAccountHolder = sourceViewModel.BankAccountHolder ?? string.Empty;
         BankName = sourceViewModel.BankName ?? string.Empty;
+        
+        // Thông tin chủ hộ kinh doanh - sử dụng cấu trúc mới
         OwnerName = sourceViewModel.OwnerName ?? string.Empty;
         OwnerGender = sourceViewModel.OwnerGender ?? string.Empty;
         OwnerIdNumber = sourceViewModel.OwnerIdNumber ?? string.Empty;
@@ -173,6 +178,7 @@ public partial class ContractStoreViewModel : ObservableObject
         OwnerIdPlace = sourceViewModel.OwnerIdPlace ?? string.Empty;
         OwnerPermanentAddress = sourceViewModel.OwnerPermanentAddress ?? string.Empty;
         OwnerTemporaryAddress = sourceViewModel.OwnerTemporaryAddress ?? string.Empty;
+        
         ProviderRepresentativeIdNumber = sourceViewModel.ProviderRepresentativeIdNumber ?? string.Empty;
         ProviderRepresentativeIdDate = sourceViewModel.ProviderRepresentativeIdDate ?? string.Empty;
         ProviderRepresentativeIdPlace = sourceViewModel.ProviderRepresentativeIdPlace ?? string.Empty;
@@ -277,25 +283,37 @@ public partial class ContractStoreViewModel : ObservableObject
                 BusinessLicenseNumber = BusinessLicenseNumber,
                 BusinessLicenseDate = BusinessLicenseDate,
                 BusinessLicensePlace = BusinessLicensePlace,
-                RepresentativeName = StoreRegistrationData.RepresentativeName,
-                RepresentativePosition = RepresentativePosition,
-                RepresentativeIdNumber = RepresentativeIdNumber,
-                RepresentativeIdDate = RepresentativeIdDate,
-                RepresentativeIdPlace = RepresentativeIdPlace,
-                RepresentativePermanentAddress = RepresentativePermanentAddress,
-                RepresentativeTemporaryAddress = RepresentativeTemporaryAddress,
                 StoreHeadOfficeAddress = StoreHeadOfficeAddress,
                 PhoneNumber = PhoneNumber,
+                
+                // Thông tin đại diện - sử dụng cấu trúc mới
+                Representative = new PersonalInfoDto
+                {
+                    Name = StoreRegistrationData.RepresentativeName ?? "",
+                    Position = RepresentativePosition ?? "",
+                    IdNumber = RepresentativeIdNumber ?? "",
+                    IdDate = RepresentativeIdDate ?? "",
+                    IdPlace = RepresentativeIdPlace ?? "",
+                    PermanentAddress = RepresentativePermanentAddress ?? "",
+                    TemporaryAddress = RepresentativeTemporaryAddress ?? ""
+                },
+                
+                // Thông tin chủ hộ kinh doanh - sử dụng cấu trúc mới
+                Owner = new PersonalInfoDto
+                {
+                    Name = OwnerName ?? "",
+                    Gender = OwnerGender ?? "",
+                    IdNumber = OwnerIdNumber ?? "",
+                    IdDate = OwnerIdDate ?? "",
+                    IdPlace = OwnerIdPlace ?? "",
+                    PermanentAddress = OwnerPermanentAddress ?? "",
+                    TemporaryAddress = OwnerTemporaryAddress ?? ""
+                },
+                
+                // Field riêng của MainContract
                 BankAccountNumber = BankAccountNumber,
                 BankAccountHolder = BankAccountHolder,
-                BankName = BankName,
-                OwnerName = OwnerName,
-                OwnerGender = OwnerGender,
-                OwnerIdNumber = OwnerIdNumber,
-                OwnerIdDate = OwnerIdDate,
-                OwnerIdPlace = OwnerIdPlace,
-                OwnerPermanentAddress = OwnerPermanentAddress,
-                OwnerTemporaryAddress = OwnerTemporaryAddress
+                BankName = BankName
             },
             AppendixContract = new AppendixContractDto
             {
