@@ -175,6 +175,7 @@ namespace QuanQuenBackOfficeMobile.Models
         public static string WardId { get; set; } = string.Empty;
         public static string Password { get; set; } = string.Empty;
         public static string StoreId { get; set; } = string.Empty;
+        public static string StoreUserId { get; set; } = string.Empty;
         public static List<FileResult> LicenseImageFiles { get; set; } = new();
         public static List<string> LicenseImagePaths { get; set; } = new();
     }

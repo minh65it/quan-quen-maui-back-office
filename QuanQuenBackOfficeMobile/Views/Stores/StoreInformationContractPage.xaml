@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:Controls="clr-namespace:QuanQuenBackOfficeMobile.Controls"
+             xmlns:viewmodels="clr-namespace:QuanQuenBackOfficeMobile.ViewModels.Stores"
+             xmlns:converters="clr-namespace:QuanQuenBackOfficeMobile.Converters"
+             x:Class="QuanQuenBackOfficeMobile.Views.Stores.StoreInformationContractPage"
+             x:DataType="viewmodels:StoreInformationContractViewModel"
+             Title="Thông tin hợp đồng">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+            <converters:StringToBoolConverter x:Key="StringToBoolConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*">
+
+
+        <ScrollView x:Name="MainScrollView" Grid.Row="1">
+            <VerticalStackLayout Padding="20" Spacing="30">
+
+                <!-- Hướng dẫn sử dụng -->
+                <Frame CornerRadius="10" Padding="15" Margin="0,0,0,10">
+                    <StackLayout Spacing="5">
+                        <Label Text="📋 HƯỚNG DẪN NHẬP THÔNG TIN HỢP ĐỒNG" FontAttributes="Bold" FontSize="14" TextColor="#1976D2"/>
+                        <Label Text="• Các trường có dấu (*) là bắt buộc phải điền" FontSize="12" TextColor="#E53935" FontAttributes="Bold"/>
+                        <Label Text="• Điền thông tin cho cả Hợp đồng chính và Phụ lục" FontSize="12" TextColor="#424242"/>
+                        <Label Text="• Bên Cung Cấp Dịch Vụ: Thông tin đại diện công ty" FontSize="12" TextColor="#424242"/>
+                        <Label Text="• Bên Thuê Dịch Vụ: Thông tin cửa hàng đăng ký" FontSize="12" TextColor="#424242"/>
+                        <Label Text="• Số điện thoại phải là số Việt Nam hợp lệ (10 số, bắt đầu 03/05/07/08/09)" FontSize="12" TextColor="#424242"/>
+                        <Label Text="• Định dạng ngày tháng: dd/MM/yyyy (ví dụ: 25/12/2024)" FontSize="12" TextColor="#424242"/>
+                        <Label Text="• Ngày tháng phải hợp lệ và không được lớn hơn ngày hiện tại" FontSize="12" TextColor="#424242"/>
+                    </StackLayout>
+                </Frame>
+
+                <!-- ==================== HỢP ĐỒNG DỊCH VỤ THƯƠNG MẠI ĐIỆN TỬ ==================== -->
+                <!-- Header sticky cho Frame hợp đồng -->
+                <Grid Padding="20,10,20,10" BackgroundColor="White" Margin="0,10,0,0">
+                    <Grid ColumnDefinitions="*,Auto" Padding="0,0,0,8">
+                        <Label Text="HỢP ĐỒNG DỊCH VỤ THƯƠNG MẠI ĐIỆN TỬ"
+                               FontAttributes="Bold"
+                               FontSize="20"
+                               TextColor="#FF6F00"
+                               VerticalOptions="Center"/>
+                        <Button x:Name="BtnToggleContract"
+                                Grid.Column="1"
+                                WidthRequest="32"
+                                HeightRequest="32"
+                                CornerRadius="16"
+                                BackgroundColor="{StaticResource Primary}"
+                                Text="{Binding ContractToggleText}"
+                                Command="{Binding ToggleContractCommand}"
+                                Padding="0"
+                                HorizontalOptions="End"
+                                VerticalOptions="Center"/>
+                    </Grid>
+                </Grid>
+
+                <!-- Frame nội dung hợp đồng -->
+                <Frame CornerRadius="10" Padding="20" Margin="0,0,0,0">
+                    <VerticalStackLayout Spacing="20">
+
+                        <!-- Content wrapped to toggle visibility -->
+                        <ContentView x:Name="ContractContent" IsVisible="{Binding IsContractOpen}">
+                            <VerticalStackLayout Spacing="20">
+
+                                <!-- BÊN CUNG CẤP DỊCH VỤ -->
+                                <VerticalStackLayout Spacing="10">
+                                    <Label Text="BÊN CUNG CẤP DỊCH VỤ" FontAttributes="Bold" FontSize="16" TextColor="#E65100"/>
+                                    <StackLayout Spacing="8">
+                                        <Label Text="Số CCCD/CMND/Hộ chiếu đại diện *" FontSize="14" TextColor="Black"/>
+                                        <Entry Placeholder="Nhập số CCCD/CMND/Hộ chiếu" Text="{Binding ProviderRepresentativeIdNumber}" />
+
+                                        <Label Text="Cấp ngày *" FontSize="14" TextColor="Black"/>
+                                        <Entry Placeholder="dd/MM/yyyy" Text="{Binding ProviderRepresentativeIdDate}" />
+                                        <Label Text="{Binding ProviderRepresentativeIdDateError}"
+                                               FontSize="12"
+                                               TextColor="Red"
+                                               IsVisible="{Binding ProviderRepresentativeIdDateError, Converter={StaticResource StringToBoolConverter}}"
+                                               Margin="0,2,0,0"/>
+
+                                        <Label Text="Tại *" FontSize="14" TextColor="Black"/>
+                                        <Entry Placeholder="Nơi cấp" Text="{Binding ProviderRepresentativeIdPlace}" />
+                                    </StackLayout>
+                                </VerticalStackLayout>
+
+                                <!-- BÊN THUÊ DỊCH VỤ -->
+                                <VerticalStackLayout Spacing="15">
+                                    <Label Text="BÊN THUÊ DỊCH VỤ" FontAttributes="Bold" FontSize="16" TextColor="#E65100"/>
+
+                                    <!-- Đối với Tổ chức -->
+                                    <VerticalStackLayout Spacing="10">
+                                        <Label Text="Đối với Tổ chức" FontAttributes="Bold" FontSize="14" TextColor="#666"/>
+                                        <StackLayout Spacing="8">
+                                            <Label Text="Tên doanh nghiệp *" FontSize="14" TextColor="Black"/>
+                                            <Entry Placeholder="Nhập tên doanh nghiệp" Text="{Binding CompanyName}" />
+
+                                            <Label Text="Tên cửa hàng *" FontSize="14" TextColor="Black"/>
+                                            <Entry Placeholder="Nhập tên cửa hàng" Text="{Binding StoreName}" />
+
+                                            <Label Text="Số giấy chứng nhận đăng ký doanh nghiệp *" FontSize="14" TextColor="Black"/>
+                                            <Entry Placeholder="Nhập số GCN đăng ký DN" Text="{Binding BusinessLicenseNumber}" />
+
+                                            <Label Text="Ngày cấp GCN đăng ký doanh nghiệp *" FontSize="14" TextColor="Black"/>
+                                            <Entry Placeholder="dd/MM/yyyy" Text="{Binding BusinessLicenseDate}" />
+                                            <Label Text="{Binding BusinessLicenseDateError}"
+                                                   FontSize="12"
+                                                   TextColor="Red"
+                                                   IsVisible="{Binding BusinessLicenseDateError, Converter={StaticResource StringToBoolConverter}}"
+                                                   Margin="0,2,0,0"/>
+
+                                            <Label Text="Nơi cấp GCN đăng ký doanh nghiệp *" FontSize="14" TextColor="Black"/>
+                                            <Entry Placeholder="Nhập nơi cấp GCN" Text="{Binding BusinessLicensePlace}" />
+
+                                            <Label Text="Đại diện bởi (Họ tên) *" FontSize="14" TextColor="Black"/>
+                                            <Entry Placeholder="Nhập họ tên người đại diện" Text="{Binding RepresentativeName}" />
+
+                                            <Label Text="Chức vụ đại diện *" FontSize="14" TextColor="Black"/>
+                                            <Entry Placeholder="Nhập chức vụ" Text="{Binding RepresentativePosition}" />
+
+                                            <Label Text="Số CCCD/CMND/Hộ chiếu đại diện *" FontSize="14" TextColor="Black"/>
+                                            <Entry Placeholder="Nhập số CCCD/CMND/Hộ chiếu" Text="{Binding RepresentativeIdNumber}" />
+
+                                            <Label Text="Ngày cấp CCCD/CMND/Hộ chiếu đại diện *" FontSize="14" TextColor="Black"/>
+                                            <Entry Placeholder="dd/MM/yyyy" Text="{Binding RepresentativeIdDate}" />
+                                            <Label Text="{Binding RepresentativeIdDateError}"
+                                                   FontSize="12"
+                                                   TextColor="Red"
+                                                   IsVisible="{Binding RepresentativeIdDateError, Converter={StaticResource StringToBoolConverter}}"
+                                                   Margin="0,2,0,0"/>
+
+                                            <Label Text="Nơi cấp CCCD/CMND/Hộ chiếu đại diện *" FontSize="14" TextColor="Black"/>
+                                            <Entry Placeholder="Nhập nơi cấp" Text="{Binding RepresentativeIdPlace}" />
+
+                                            <Label Text="Địa chỉ thường trú đại diện *" FontSize="14" TextColor="Black"/>
+                                            <Entry Placeholder="Nhập địa chỉ thường trú" Text="{Binding RepresentativePermanentAddress}" />
+
+                                            <Label Text="Địa chỉ tạm trú đại diện" FontSize="14" TextColor="Black"/>
+                                            <Entry Placeholder="Nhập địa chỉ tạm trú" Text="{Binding RepresentativeTemporaryAddress}" />
+
+                                            <Label Text="Địa chỉ trụ sở chính của cửa hàng *" FontSize="14" TextColor="Black"/>
+                                            <Entry Placeholder="Nhập địa chỉ trụ sở" Text="{Binding StoreHeadOfficeAddress}" />
+
+                                            <Label Text="Số điện thoại liên hệ *" FontSize="14" TextColor="Black"/>
+                                            <Entry Placeholder="Nhập số điện thoại" Text="{Binding PhoneNumber}" Keyboard="Telephone" />
+                                            <Label Text="{Binding PhoneError}"
+                                                   FontSize="12"
+                                                   TextColor="Red"
+                                                   IsVisible="{Binding PhoneError, Converter={StaticResource StringToBoolConverter}}"
+                                                   Margin="0,2,0,0"/>
+
+                                            <Label Text="Số tài khoản ngân hàng" FontSize="14" TextColor="Black"/>
+                                            <Entry Placeholder="Nhập số tài khoản" Text="{Binding BankAccountNumber}" />
+
+                                            <Label Text="Chủ tài khoản ngân hàng" FontSize="14" TextColor="Black"/>
+                                            <Entry Placeholder="Nhập tên chủ tài khoản" Text="{Binding BankAccountHolder}" />
+
+                                            <Label Text="Tại ngân hàng" FontSize="14" TextColor="Black"/>
+                                            <Entry Placeholder="Nhập tên ngân hàng" Text="{Binding BankName}" />
+                                        </StackLayout>
+                                    </VerticalStackLayout>
+
+                                    <!-- Đối với Hộ kinh doanh -->
+                                    <VerticalStackLayout Spacing="10">
+                                        <Label Text="Đối với Hộ kinh doanh" FontAttributes="Bold" FontSize="14" TextColor="#666"/>
+                                        <StackLayout Spacing="8">
+                                            <Label Text="Tên cửa hàng *" FontSize="14" TextColor="Black"/>
+                                            <Entry Placeholder="Nhập tên cửa hàng" Text="{Binding StoreName}" />
+
+                                            <Label Text="Họ tên chủ hộ kinh doanh (Ông/Bà) *" FontSize="14" TextColor="Black"/>
+                                            <Entry Placeholder="Nhập họ tên chủ hộ" Text="{Binding OwnerName}" />
+
+                                            <Label Text="Giới tính *" FontSize="14" TextColor="Black"/>
+                                            <Controls:CustomDropdownPicker ItemsSource="{Binding GenderList}"
+                                                                           Title="Chọn giới tính"
+                                                                           SelectedItem="{Binding OwnerGender, Mode=TwoWay}"
+                                                                           HeightRequest="44"
+                                                                           FontSize="14"
+                                                                           TextColor="Black"
+                                                                           BackgroundColor="White" />
+
+                                            <Label Text="Số CCCD/CMND/Hộ chiếu chủ hộ *" FontSize="14" TextColor="Black"/>
+                                            <Entry Placeholder="Nhập số CCCD/CMND/Hộ chiếu" Text="{Binding OwnerIdNumber}" />
+
+                                            <Label Text="Ngày cấp CCCD/CMND/Hộ chiếu chủ hộ *" FontSize="14" TextColor="Black"/>
+                                            <Entry Placeholder="dd/MM/yyyy" Text="{Binding OwnerIdDate}" />
+                                            <Label Text="{Binding OwnerIdDateError}"
+                                                   FontSize="12"
+                                                   TextColor="Red"
+                                                   IsVisible="{Binding OwnerIdDateError, Converter={StaticResource StringToBoolConverter}}"
+                                                   Margin="0,2,0,0"/>
+
+                                            <Label Text="Nơi cấp CCCD/CMND/Hộ chiếu chủ hộ *" FontSize="14" TextColor="Black"/>
+                                            <Entry Placeholder="Nhập nơi cấp" Text="{Binding OwnerIdPlace}" />
+
+                                            <Label Text="Địa chỉ thường trú chủ hộ" FontSize="14" TextColor="Black"/>
+                                            <Entry Placeholder="Nhập địa chỉ thường trú" Text="{Binding OwnerPermanentAddress}" />
+
+                                            <Label Text="Địa chỉ tạm trú chủ hộ" FontSize="14" TextColor="Black"/>
+                                            <Entry Placeholder="Nhập địa chỉ tạm trú" Text="{Binding OwnerTemporaryAddress}" />
+
+                                            <Label Text="Địa chỉ trụ sở chính của cửa hàng *" FontSize="14" TextColor="Black"/>
+                                            <Entry Placeholder="Nhập địa chỉ trụ sở" Text="{Binding StoreHeadOfficeAddress}" />
+
+                                            <Label Text="Số điện thoại liên hệ *" FontSize="14" TextColor="Black"/>
+                                            <Entry Placeholder="Nhập số điện thoại" Text="{Binding PhoneNumber}" Keyboard="Telephone" />
+                                            <Label Text="{Binding PhoneError}"
+                                                   FontSize="12"
+                                                   TextColor="Red"
+                                                   IsVisible="{Binding PhoneError, Converter={StaticResource StringToBoolConverter}}"
+                                                   Margin="0,2,0,0"/>
+                                        </StackLayout>
+                                    </VerticalStackLayout>
+
+                                </VerticalStackLayout>
+
+                            </VerticalStackLayout>
+                        </ContentView>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- ==================== PHỤ LỤC HỢP ĐỒNG ==================== -->
+                <Frame CornerRadius="10" Padding="20" Margin="0,20,0,0">
+                    <VerticalStackLayout Spacing="20">
+                        <!-- Anchor for optional scroll -->
+                        <Label x:Name="AppendixHeader"
+                               Text="PHỤ LỤC HỢP ĐỒNG"
+                               FontAttributes="Bold"
+                               FontSize="20"
+                               TextColor="#2E7D32"
+                               HorizontalOptions="Center"/>
+
+                        <!-- BÊN CUNG CẤP DỊCH VỤ -->
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="BÊN CUNG CẤP DỊCH VỤ" FontAttributes="Bold" FontSize="16" TextColor="#1B5E20"/>
+                            <StackLayout Spacing="8">
+                                <Label Text="Số CCCD/CMND/Hộ chiếu đại diện *" FontSize="14" TextColor="Black"/>
+                                <Entry Placeholder="Nhập số CCCD/CMND/Hộ chiếu" Text="{Binding ProviderRepresentativeIdNumber}" />
+
+                                <Label Text="Cấp ngày *" FontSize="14" TextColor="Black"/>
+                                <Entry Placeholder="dd/MM/yyyy" Text="{Binding ProviderRepresentativeIdDate}" />
+                                <Label Text="{Binding ProviderRepresentativeIdDateError}"
+                                       FontSize="12"
+                                       TextColor="Red"
+                                       IsVisible="{Binding ProviderRepresentativeIdDateError, Converter={StaticResource StringToBoolConverter}}"
+                                       Margin="0,2,0,0"/>
+
+                                <Label Text="Tại *" FontSize="14" TextColor="Black"/>
+                                <Entry Placeholder="Nơi cấp" Text="{Binding ProviderRepresentativeIdPlace}" />
+                            </StackLayout>
+                        </VerticalStackLayout>
+
+                        <!-- BÊN THUÊ DỊCH VỤ -->
+                        <VerticalStackLayout Spacing="15">
+                            <Label Text="BÊN THUÊ DỊCH VỤ" FontAttributes="Bold" FontSize="16" TextColor="#1B5E20"/>
+
+                            <!-- Đối với Tổ chức (Phụ lục - ít field hơn) -->
+                            <VerticalStackLayout Spacing="10">
+                                <Label Text="Đối với Tổ chức" FontAttributes="Bold" FontSize="14" TextColor="#666"/>
+                                <StackLayout Spacing="8">
+                                    <Label Text="Tên doanh nghiệp *" FontSize="14" TextColor="Black"/>
+                                    <Entry Placeholder="Nhập tên doanh nghiệp" Text="{Binding CompanyName}" />
+
+                                    <Label Text="Tên cửa hàng *" FontSize="14" TextColor="Black"/>
+                                    <Entry Placeholder="Nhập tên cửa hàng" Text="{Binding StoreName}" />
+
+                                    <Label Text="Địa chỉ trụ sở chính doanh nghiệp *" FontSize="14" TextColor="Black"/>
+                                    <Entry Placeholder="Nhập địa chỉ trụ sở chính" Text="{Binding HeadquartersAddress}" />
+
+                                    <Label Text="Số giấy chứng nhận đăng ký doanh nghiệp *" FontSize="14" TextColor="Black"/>
+                                    <Entry Placeholder="Nhập số GCN đăng ký DN" Text="{Binding BusinessLicenseNumber}" />
+
+                                    <Label Text="Ngày cấp GCN đăng ký doanh nghiệp *" FontSize="14" TextColor="Black"/>
+                                    <Entry Placeholder="dd/MM/yyyy" Text="{Binding BusinessLicenseDate}" />
+                                    <Label Text="{Binding BusinessLicenseDateError}"
+                                           FontSize="12"
+                                           TextColor="Red"
+                                           IsVisible="{Binding BusinessLicenseDateError, Converter={StaticResource StringToBoolConverter}}"
+                                           Margin="0,2,0,0"/>
+
+                                    <Label Text="Nơi cấp GCN đăng ký doanh nghiệp *" FontSize="14" TextColor="Black"/>
+                                    <Entry Placeholder="Nhập nơi cấp GCN" Text="{Binding BusinessLicensePlace}" />
+
+                                    <Label Text="Địa chỉ thường trú *" FontSize="14" TextColor="Black"/>
+                                    <Entry Placeholder="Nhập địa chỉ thường trú" Text="{Binding RepresentativePermanentAddress}" />
+
+                                    <Label Text="Địa chỉ tạm trú" FontSize="14" TextColor="Black"/>
+                                    <Entry Placeholder="Nhập địa chỉ tạm trú" Text="{Binding RepresentativeTemporaryAddress}" />
+
+                                    <Label Text="Địa chỉ trụ sở chính của cửa hàng *" FontSize="14" TextColor="Black"/>
+                                    <Entry Placeholder="Nhập địa chỉ trụ sở" Text="{Binding StoreHeadOfficeAddress}" />
+
+                                    <Label Text="Số điện thoại liên hệ *" FontSize="14" TextColor="Black"/>
+                                    <Entry Placeholder="Nhập số điện thoại" Text="{Binding PhoneNumber}" Keyboard="Telephone" />
+                                    <Label Text="{Binding PhoneError}"
+                                           FontSize="12"
+                                           TextColor="Red"
+                                           IsVisible="{Binding PhoneError, Converter={StaticResource StringToBoolConverter}}"
+                                           Margin="0,2,0,0"/>
+                                </StackLayout>
+                            </VerticalStackLayout>
+
+                            <!-- Đối với Hộ kinh doanh (Phụ lục) -->
+                            <VerticalStackLayout Spacing="10">
+                                <Label Text="Đối với Hộ kinh doanh" FontAttributes="Bold" FontSize="14" TextColor="#666"/>
+                                <StackLayout Spacing="8">
+                                    <Label Text="Tên cửa hàng *" FontSize="14" TextColor="Black"/>
+                                    <Entry Placeholder="Nhập tên cửa hàng" Text="{Binding StoreName}" />
+
+                                    <Label Text="Ông/Bà *" FontSize="14" TextColor="Black"/>
+                                    <Entry Placeholder="Nhập họ tên chủ hộ" Text="{Binding OwnerName}" />
+
+                                    <Label Text="Giới tính *" FontSize="14" TextColor="Black"/>
+                                    <Controls:CustomDropdownPicker ItemsSource="{Binding GenderList}"
+                                                                   Title="Chọn giới tính"
+                                                                   SelectedItem="{Binding OwnerGender, Mode=TwoWay}"
+                                                                   HeightRequest="44"
+                                                                   FontSize="14"
+                                                                   TextColor="Black"
+                                                                   BackgroundColor="White" />
+
+                                    <Label Text="Số CCCD/CMND/Hộ chiếu *" FontSize="14" TextColor="Black"/>
+                                    <Entry Placeholder="Nhập số CCCD/CMND/Hộ chiếu" Text="{Binding OwnerIdNumber}" />
+
+                                    <Label Text="Ngày cấp *" FontSize="14" TextColor="Black"/>
+                                    <Entry Placeholder="dd/MM/yyyy" Text="{Binding OwnerIdDate}" />
+                                    <Label Text="{Binding OwnerIdDateError}"
+                                           FontSize="12"
+                                           TextColor="Red"
+                                           IsVisible="{Binding OwnerIdDateError, Converter={StaticResource StringToBoolConverter}}"
+                                           Margin="0,2,0,0"/>
+
+                                    <Label Text="Nơi cấp *" FontSize="14" TextColor="Black"/>
+                                    <Entry Placeholder="Nhập nơi cấp" Text="{Binding OwnerIdPlace}" />
+
+                                    <Label Text="Địa chỉ thường trú *" FontSize="14" TextColor="Black"/>
+                                    <Entry Placeholder="Nhập địa chỉ thường trú" Text="{Binding OwnerPermanentAddress}" />
+
+                                    <Label Text="Địa chỉ tạm trú" FontSize="14" TextColor="Black"/>
+                                    <Entry Placeholder="Nhập địa chỉ tạm trú" Text="{Binding OwnerTemporaryAddress}" />
+
+                                    <Label Text="Địa chỉ trụ sở chính của cửa hàng *" FontSize="14" TextColor="Black"/>
+                                    <Entry Placeholder="Nhập địa chỉ trụ sở" Text="{Binding StoreHeadOfficeAddress}" />
+
+                                    <Label Text="Số điện thoại liên hệ *" FontSize="14" TextColor="Black"/>
+                                    <Entry Placeholder="Nhập số điện thoại" Text="{Binding PhoneNumber}" Keyboard="Telephone" />
+                                    <Label Text="{Binding PhoneError}"
+                                           FontSize="12"
+                                           TextColor="Red"
+                                           IsVisible="{Binding PhoneError, Converter={StaticResource StringToBoolConverter}}"
+                                           Margin="0,2,0,0"/>
+                                </StackLayout>
+                            </VerticalStackLayout>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Validation Error -->
+                <Label Text="{Binding ValidationError}"
+                       FontSize="14"
+                       TextColor="Red"
+                       IsVisible="{Binding ValidationError, Converter={StaticResource StringToBoolConverter}}"
+                       Margin="0,10,0,0"
+                       HorizontalOptions="Center"/>
+
+                <!-- Buttons -->
+                <VerticalStackLayout Spacing="10" Margin="0,20,0,0">
+                    <Button Text="Xem trước"
+                            Command="{Binding PreviewCommand}"
+                            IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+                            HeightRequest="50"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            TextColor="White"
+                            CornerRadius="25"
+                            BackgroundColor="#2196F3"
+                            HorizontalOptions="FillAndExpand"/>
+                </VerticalStackLayout>
+
+                <!-- Loading indicator -->
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   IsVisible="{Binding IsBusy}"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center"/>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

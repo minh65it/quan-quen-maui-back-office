@@ -59,25 +59,39 @@
             </Border>
             <Label
                 Grid.Row="3"
-                Text="Thêm hình ảnh (Tối đa 8 ảnh)"
+                Text="Thêm hình ảnh (Tối đa 5 ảnh)"
                 FontSize="16"
                 FontAttributes="Bold"
                 TextColor="Black"
                 Margin="0,0,0,5" />
-            <CollectionView Grid.Row="4" ItemsSource="{Binding GalleryImages}"  SelectionMode="None" VerticalOptions="FillAndExpand"  HorizontalOptions="FillAndExpand" ItemSizingStrategy="MeasureAllItems">
+            <CollectionView Grid.Row="4"
+                ItemsSource="{Binding GalleryImages}"
+                SelectionMode="None"
+                VerticalOptions="Start"
+                HorizontalOptions="FillAndExpand">
                 <CollectionView.ItemsLayout>
-                    <GridItemsLayout Orientation="Vertical" Span="4" HorizontalItemSpacing="10" VerticalItemSpacing="10" />
+                    <GridItemsLayout Orientation="Vertical"
+                        Span="5"
+                        HorizontalItemSpacing="8"
+                        VerticalItemSpacing="8" />
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:ImageItem">
-                        <Border  Stroke="#E0E0E0" StrokeThickness="1" Background="White" Margin="5"  HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" HeightRequest="52">
+                        <Border Stroke="#E0E0E0"
+                                StrokeThickness="1"
+                                Background="White"
+                                Margin="4"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center"
+                                HeightRequest="70"
+                                WidthRequest="70">
                             <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="12"/>
+                                <RoundRectangle CornerRadius="10"/>
                             </Border.StrokeShape>
                             <Grid>
                                 <Image Source="{Binding Source}" Aspect="AspectFill" IsVisible="{Binding Source}" />
                                 <StackLayout IsVisible="{Binding Source, Converter={StaticResource NullToBoolConverter}}" VerticalOptions="Center" HorizontalOptions="Center">
-                                    <Image Source="add.png" HeightRequest="32" WidthRequest="32" />
+                                    <Image Source="add.png" HeightRequest="28" WidthRequest="28" />
                                 </StackLayout>
                                 <Grid.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding BindingContext.AddGalleryImageAtIndexCommand, Source={x:Reference Name=RootPage}}" CommandParameter="{Binding .}" />

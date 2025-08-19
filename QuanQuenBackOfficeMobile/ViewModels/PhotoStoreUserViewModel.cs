@@ -18,6 +18,9 @@ using QuanQuenBackOfficeMobile.Services.Interfaces;
 using QuanQuenBackOfficeMobile.ViewModels.Stores;
 using QuanQuenBackOfficeMobile.Views.Stores;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Platform;
+using Microsoft.Maui.Handlers;
 
 namespace QuanQuenBackOfficeMobile.ViewModels
 {
@@ -28,7 +31,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels
         [ObservableProperty]
         private ImageSource coverImageSource;
         [ObservableProperty]
-        private ObservableCollection<ImageItem> galleryImages = new(Enumerable.Range(0, 8).Select(_ => new ImageItem()).ToList());
+        private ObservableCollection<ImageItem> galleryImages = new(Enumerable.Range(0, 5).Select(_ => new ImageItem()).ToList());
         public bool CanAddMoreImages => GalleryImages.Count(img => img.Source == null) > 0;
         [ObservableProperty]
         private bool isLoading = false;
@@ -36,6 +39,11 @@ namespace QuanQuenBackOfficeMobile.ViewModels
         public PhotoStoreUserViewModel(IStoreMediaService storeMediaService)
         {
             _storeMediaService = storeMediaService;
+            GalleryImages = new ObservableCollection<ImageItem>();
+            for (int i = 0; i < 5; i++)
+            {
+                GalleryImages.Add(new ImageItem { Source = null });
+            }
         }
 
         [RelayCommand]
@@ -64,7 +72,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels
         public async Task AddGalleryImageAtIndexAsync(ImageItem tappedImage)
         {
             int index = GalleryImages.IndexOf(tappedImage);
-            if (index < 0 || index >= 8) return;
+            if (index < 0 || index >= 5) return;
             string action = await Shell.Current.DisplayActionSheet("Thêm ảnh", "Hủy", null, "Chụp ảnh mới", "Chọn từ thư viện");
             FileResult fileResult = null;
             if (action == "Chụp ảnh mới")
@@ -93,9 +101,9 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                 await Shell.Current.DisplayAlert("Lỗi", "Chưa có ảnh bìa!", "OK");
                 return;
             }
-            if (GalleryImages.All(img => img == null))
+            if (GalleryImages.All(img => img?.Source == null))
             {
-                await Shell.Current.DisplayAlert("Lỗi", "Chưa có ảnh bìa !", "OK");
+                await Shell.Current.DisplayAlert("Lỗi", "Chưa có ảnh gallery!", "OK");
                 return;
             }
             var token = await SecureStorage.GetAsync("auth_token");
@@ -132,8 +140,10 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                 if (result.IsSuccess)
                 {
                     await App.Current.MainPage.DisplayAlert("Thành công", "Thêm ảnh bìa nhà hàng thành công!", "OK");
-                    var videoPage = Application.Current.MainPage.Handler.MauiContext.Services.GetService<VideoStoreUserPage>();
-                    await Application.Current.MainPage.Navigation.PushAsync(videoPage);
+                    // Chuyển đến trang VideoStoreUserPage
+                    var serviceProvider = Application.Current.MainPage.Handler.MauiContext.Services;
+                    var videoStoreUserPage = serviceProvider.GetRequiredService<VideoStoreUserPage>();
+                    await Application.Current.MainPage.Navigation.PushAsync(videoStoreUserPage);
                 }
                 else
                 {

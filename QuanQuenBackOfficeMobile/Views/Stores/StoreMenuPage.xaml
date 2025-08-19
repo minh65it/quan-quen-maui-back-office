@@ -90,8 +90,7 @@
                                 <Image Source="{Binding Images}"
                                        Aspect="AspectFill"
                                        HorizontalOptions="Fill"
-                                       VerticalOptions="Fill"
-               />
+                                       VerticalOptions="Fill" />
                                 <Frame BackgroundColor="{x:Null}"
                                        BorderColor="{AppThemeBinding Light={StaticResource Orange70Color}, Dark={StaticResource OrangeColor}}"
                                        Padding="0"

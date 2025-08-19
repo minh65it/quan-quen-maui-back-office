@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:QuanQuenBackOfficeMobile.ViewModels.Stores"
+             xmlns:converters="clr-namespace:QuanQuenBackOfficeMobile.Converters"
+             x:Class="QuanQuenBackOfficeMobile.Views.Stores.AgreementPreviewPage"
+             x:DataType="viewmodels:AgreementPreviewViewModel"
+             Title="Xem Trước Thỏa Thuận">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- WebView để hiển thị PDF -->
+        <WebView Grid.Row="1" 
+                 x:Name="AgreementWebView"
+                 Source="{Binding PdfSource}"
+                 IsVisible="{Binding IsPdfLoaded}"/>
+
+        <!-- Loading indicator -->
+        <ActivityIndicator Grid.Row="1"
+                          IsRunning="{Binding IsBusy}"
+                          IsVisible="{Binding IsBusy}"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center"/>
+
+        <!-- Error message -->
+        <VerticalStackLayout Grid.Row="1" 
+                            IsVisible="{Binding HasError}"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            Spacing="10">
+            <Label Text="❌" 
+                   FontSize="48" 
+                   HorizontalOptions="Center"/>
+            <Label Text="{Binding ErrorMessage}" 
+                   FontSize="16" 
+                   TextColor="Red"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center"/>
+            <Button Text="Thử lại" 
+                    Command="{Binding RetryCommand}"
+                    BackgroundColor="#F58220"
+                    TextColor="White"
+                    FontSize="14"
+                    HeightRequest="40"
+                    WidthRequest="120"
+                    CornerRadius="20"
+                    HorizontalOptions="Center"/>
+        </VerticalStackLayout>
+
+        <!-- Sign Agreement Button - Overlay when PDF loaded -->
+        <Button Grid.Row="1"
+                x:Name="SignAgreementButton"
+                Text="✍️ Ký Thỏa Thuận"
+                IsVisible="{Binding IsPdfLoaded}"
+                BackgroundColor="#4CAF50"
+                TextColor="White"
+                FontSize="14"
+                FontAttributes="Bold"
+                HeightRequest="44"
+                WidthRequest="200"
+                CornerRadius="22"
+                HorizontalOptions="Center"
+                VerticalOptions="End"
+                Margin="20,0,20,25"
+                Clicked="OnSignAgreementClicked"/>
+    </Grid>
+</ContentPage>

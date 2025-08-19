@@ -100,13 +100,22 @@ public static class MauiProgram
         builder.Services.AddTransient<LoginViewModel>();
 		builder.Services.AddTransient<MainViewModel>();
 		builder.Services.AddTransient<CreateStoreUserPasswordViewModel>();
+		builder.Services.AddTransient<StoreInformationContractViewModel>();
+		builder.Services.AddTransient<ContractPreviewViewModel>();
+		builder.Services.AddTransient<ContractPreviewPage>();
+		builder.Services.AddTransient<ContractStoreViewModel>();
+		builder.Services.AddTransient<ContractStorePage>();
+		
+		// Register Services
+		builder.Services.AddTransient<IContractService, ContractService>();
+		
         // Register Views
         builder.Services.AddTransient<LoginPage>();
 		builder.Services.AddTransient<RegisterPage>();
 		builder.Services.AddTransient<MainPage>();
 		builder.Services.AddTransient<CreateStorePage>();
-
-		builder.Services.AddSingleton<SampleViewModel>();
+		builder.Services.AddTransient<StoreInformationContractPage>();
+        builder.Services.AddSingleton<SampleViewModel>();
 
 		builder.Services.AddSingleton<MediaElementViewModel>();
 		builder.Services.AddSingleton<MediaElementPage>();

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:QuanQuenBackOfficeMobile.ViewModels.Stores"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="QuanQuenBackOfficeMobile.Views.Stores.AgreementSignaturePage"
+             x:DataType="vm:AgreementSignatureViewModel"
+             BackgroundColor="White"
+             Title="Ký Thỏa Thuận">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="24">
+           <!-- Signature Area -->
+            <Frame CornerRadius="12" 
+                   Padding="20" 
+                   BackgroundColor="White" 
+                   HasShadow="True"
+                   BorderColor="#E0E0E0">
+                <VerticalStackLayout Spacing="16">
+                    <Button Command="{Binding ClearSignatureCommand}"
+                             Text="Xóa chữ ký"
+                             CornerRadius="18"
+                             BorderColor="#E74C3C"
+                             BorderWidth="1"
+                             BackgroundColor="White"
+                             TextColor="#E74C3C"
+                             FontSize="14"
+                             HeightRequest="36"
+                             Padding="16,8"
+                             HorizontalOptions="End"/>
+                    <Border Stroke="#D0D0D0" 
+                            StrokeThickness="1" 
+                            Background="#FAFAFA"
+                            StrokeShape="RoundRectangle 8">
+                        <toolkit:DrawingView
+                            x:Name="AgreementDrawingView"
+                            HeightRequest="200"
+                            Lines="{Binding SignatureLines, Mode=TwoWay}"
+                            IsMultiLineModeEnabled="True"
+                            BackgroundColor="Transparent"
+                            VerticalOptions="Fill"
+                            HorizontalOptions="FillAndExpand" />
+                        
+                    </Border>
+
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Save Button -->    
+            <Button
+                Clicked="SaveClicked"
+                Text="Hoàn Tất Ký Kết"
+                CornerRadius="24"
+                BorderColor="Transparent"
+                BorderWidth="1"
+                TextColor="White"
+                FontSize="16"
+                FontAttributes="Bold"
+                HeightRequest="48"
+                HorizontalOptions="FillAndExpand"
+                VerticalOptions="Center"
+                BackgroundColor="#4CAF50"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

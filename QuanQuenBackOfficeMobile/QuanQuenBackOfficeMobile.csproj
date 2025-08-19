@@ -14,7 +14,7 @@
 		<ApplicationTitle>QuanQuenBackOfficeMobile</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.companyname.QuanQuenBackOfficeMobile</ApplicationId>
+		<ApplicationId>com.quanquen.boapp</ApplicationId>
 
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
@@ -119,26 +119,24 @@
 	  <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
 	</ItemGroup>
 
+
 	<ItemGroup>
-	  <MauiXaml Update="Views\Stores\CreateStorePage.xaml">
+	  <MauiSplashScreen Include="Resources\Splash\logo_qq_new.png" Color="Transparent" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <MauiXaml Update="Views\Stores\StoreAgreementInformationPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\RegisterPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\Stores\CreateStoreUserPasswordPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\Stores\StorePage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\Stores\VideoStoreUserPage.xaml">
+	  <MauiXaml Update="Views\Stores\StoreInformationContractPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>
 
+
 	<ItemGroup>
-	  <MauiSplashScreen Include="Resources\Splash\logo_qq_new.png" Color="Transparent" />
+	  <Folder Include="Resources\Raw\pdfjs\" />
 	</ItemGroup>
 
 

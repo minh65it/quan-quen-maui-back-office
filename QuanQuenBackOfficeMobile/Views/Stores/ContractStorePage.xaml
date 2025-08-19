@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:QuanQuenBackOfficeMobile.ViewModels.Stores"
+             x:Class="QuanQuenBackOfficeMobile.Views.Stores.ContractStorePage"
+             x:DataType="vm:ContractStoreViewModel"
+             BackgroundColor="White"
+             Title="">
+    
+    <Grid RowDefinitions="Auto,*,Auto">
+        
+       
+        <!-- Loading indicator -->
+        <ActivityIndicator Grid.Row="1"
+                         IsVisible="{Binding IsBusy}" 
+                         IsRunning="{Binding IsBusy}"
+                         Color="#4CAF50"
+                         HeightRequest="50"
+                         VerticalOptions="Center"
+                         HorizontalOptions="Center"/>
+
+        <!-- Error message -->
+        <Frame Grid.Row="1"
+               IsVisible="{Binding HasError}" 
+               BackgroundColor="#FFEBEE" 
+               BorderColor="#F44336" 
+               CornerRadius="8" 
+               Padding="16"
+               Margin="20"
+               VerticalOptions="Center">
+            <Label Text="{Binding ErrorMessage}" 
+                   TextColor="#C62828" 
+                   FontSize="14"
+                   HorizontalOptions="Center"/>
+        </Frame>
+
+        <!-- WebView để hiển thị hợp đồng cuối cùng từ URL -->
+        <WebView Grid.Row="1"
+                 IsVisible="{Binding IsHtmlLoaded}"
+                 Source="{Binding HtmlWebViewSource}"
+                 VerticalOptions="FillAndExpand"
+                 HorizontalOptions="FillAndExpand"/>
+
+        <!-- Button Tiếp theo -->
+        <Button Grid.Row="2"
+                IsVisible="{Binding IsHtmlLoaded}"
+                x:Name="NextButton"
+                Text="📸 Upload Ảnh Cửa Hàng"
+                CornerRadius="25"
+                BorderColor="Transparent"
+                BorderWidth="1"
+                TextColor="White"
+                FontSize="16"
+                FontAttributes="Bold"
+                HeightRequest="50"
+                Margin="20,15,20,15"
+                HorizontalOptions="FillAndExpand"
+                VerticalOptions="End"
+                Clicked="OnNextClicked">
+            <Button.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#4CAF50" Offset="0.0" />
+                    <GradientStop Color="#2E7D32" Offset="1.0" />
+                </LinearGradientBrush>
+            </Button.Background>
+        </Button>
+
+    </Grid>
+</ContentPage>
