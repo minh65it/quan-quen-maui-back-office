@@ -1,6 +1,7 @@
 using QuanQuenBackOfficeMobile.ViewModels.Stores;
 using QuanQuenBackOfficeMobile.Models;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace QuanQuenBackOfficeMobile.Views.Stores
 {
@@ -14,11 +15,12 @@ namespace QuanQuenBackOfficeMobile.Views.Stores
             
             // Get services from DI container
             var contractService = App.Services.GetService<IContractService>();
+            var configuration = App.Services.GetService<IConfiguration>();
             
-            if (contractService != null)
+            if (contractService != null && configuration != null)
             {
                 // Create and set ViewModel
-                _viewModel = new AgreementPageViewModel(contractService, agreementInfo);
+                _viewModel = new AgreementPageViewModel(contractService, agreementInfo, configuration);
                 BindingContext = _viewModel;
                 
                 // Load PDF với chữ ký từ URL

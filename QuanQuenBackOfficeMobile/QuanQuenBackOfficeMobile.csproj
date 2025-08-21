@@ -155,9 +155,4 @@
 	  <MtouchDebug>True</MtouchDebug>
 	  <CodesignEntitlements>Platforms\iOS\Entitlements.plist</CodesignEntitlements>
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-ios'">
-		<CodesignKey></CodesignKey>
-		<CodesignProvision></CodesignProvision>
-		<CodesignRequireProvisioningProfile>false</CodesignRequireProvisioningProfile>
-	</PropertyGroup>
 </Project>

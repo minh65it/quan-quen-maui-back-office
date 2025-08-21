@@ -6,6 +6,7 @@ using QuanQuenBackOfficeMobile.Services.Interfaces;
 using QuanQuenBackOfficeMobile.Models;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Storage;
+using Microsoft.Extensions.Configuration;
 
 namespace QuanQuenBackOfficeMobile.ViewModels.Stores
 {
@@ -13,6 +14,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
     {
         private readonly IContractService _contractService;
         private readonly AgreementInfoDto _agreementInfo;
+        private readonly IConfiguration _configuration;
 
         [ObservableProperty]
         private bool isBusy = false;
@@ -34,10 +36,11 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
 
         public IAsyncRelayCommand RetryCommand { get; }
 
-        public AgreementPageViewModel(IContractService contractService, AgreementInfoDto agreementInfo)
+        public AgreementPageViewModel(IContractService contractService, AgreementInfoDto agreementInfo, IConfiguration configuration)
         {
             _contractService = contractService;
             _agreementInfo = agreementInfo;
+            _configuration = configuration;
             
             RetryCommand = new AsyncRelayCommand(RetryAsync);
         }
@@ -140,8 +143,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
                 return pdfUrl;
             }
 
-            // Nếu là relative path thì gắn Asset.ImageUrl
-            var assetBaseUrl = "https://quanquenapi-dev.azurewebsites.net/asset";
+            var assetBaseUrl = _configuration?["API:Asset:ImageUrl"] ?? string.Empty;
             return $"{assetBaseUrl}/{pdfUrl.TrimStart('/')}";
         }
 
@@ -162,219 +164,148 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
             return $@"<!DOCTYPE html>
 <html>
 <head>
-    <meta charset='utf-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1'>
-    <title>{title}</title>
-    <style>
-        body {{
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            overflow-x: hidden;
-        }}
-
-        .success-message {{
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            color: #155724;
-            padding: 10px;
-            margin: 5px;
-            border-radius: 4px;
-            font-size: 14px;
-        }}
-        .loading {{
-            text-align: center;
-            padding: 20px;
-            margin-top: 20px;
-        }}
-        .spinner {{
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #4CAF50;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 2s linear infinite;
-            margin: 0 auto 20px;
-        }}
-        @keyframes spin {{
-            0% {{ transform: rotate(0deg); }}
-            100% {{ transform: rotate(360deg); }}
-        }}
-        .progress-bar {{
-            width: 80%;
-            height: 4px;
-            background-color: #ddd;
-            border-radius: 2px;
-            margin: 20px auto;
-            overflow: hidden;
-        }}
-        .progress-fill {{
-            height: 100%;
-            background-color: #4CAF50;
-            width: 0%;
-            transition: width 0.3s ease;
-            border-radius: 2px;
-        }}
-        .error {{
-            color: red;
-            text-align: center;
-            padding: 20px;
-            display: none;
-            margin-top: 20px;
-        }}
-        #pdfPagesContainer {{
-            margin-top: 20px;
-            padding: 10px;
-        }}
-        .page-wrapper {{
-            margin-bottom: 20px;
-            text-align: center;
-            background: white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border-radius: 8px;
-            padding: 10px;
-        }}
-        .page-label {{
-            background: #4CAF50;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            margin-bottom: 10px;
-            display: inline-block;
-        }}
-        .page-canvas {{
-            max-width: 100%;
-            height: auto;
-            border-radius: 4px;
-        }}
-        .scroll-top-btn {{
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            font-size: 20px;
-            cursor: pointer;
-            display: none;
-            z-index: 1000;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }}
-    </style>
+  <meta charset='utf-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1'>
+  <title>{title}</title>
+  <style>
+    body {{
+      margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f5f5f5; overflow-x: hidden;
+    }}
+    .loading {{ text-align:center; padding:20px; margin-top:20px; }}
+    .spinner {{ border:4px solid #f3f3f3; border-top:4px solid #4CAF50; border-radius:50%; width:40px; height:40px; animation:spin 2s linear infinite; margin:0 auto 20px; }}
+    @keyframes spin {{ 0% {{transform:rotate(0deg);}} 100% {{transform:rotate(360deg);}} }}
+    .progress-bar {{ width:80%; height:4px; background:#ddd; border-radius:2px; margin:20px auto; overflow:hidden; }}
+    .progress-fill {{ height:100%; background:#4CAF50; width:0%; transition:width .3s ease; border-radius:2px; }}
+    .error {{ color:red; text-align:center; padding:20px; display:none; margin-top:20px; }}
+    #pdfPagesContainer {{ margin-top:20px; padding:10px; }}
+    .page-wrapper {{ margin-bottom:20px; text-align:center; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.1); border-radius:8px; padding:10px; }}
+    .page-label {{ background:#4CAF50; color:#fff; padding:5px 10px; border-radius:4px; font-size:12px; margin-bottom:10px; display:inline-block; }}
+    .page-canvas {{ max-width:100%; height:auto; border-radius:4px; }}
+    .scroll-top-btn {{ position:fixed; bottom:20px; right:20px; background:#4CAF50; color:#fff; border:none; border-radius:50%; width:50px; height:50px; font-size:20px; cursor:pointer; display:none; z-index:1000; box-shadow:0 2px 8px rgba(0,0,0,.2); }}
+  </style>
 </head>
 <body>
-
-
-    <div id='pdfContainer'>
-        <div id='loading' class='loading'>
-            <div class='spinner'></div>
-            <p>Đang tải bản thỏa thuận...</p>
-            <div class='progress-bar'>
-                <div id='progressFill' class='progress-fill'></div>
-            </div>
-        </div>
-        <div id='error' class='error'>
-            <h3>❌ Không thể tải bản thỏa thuận</h3>
-        </div>
-        <div id='pdfPagesContainer' style='display: none;'></div>
+  <div id='pdfContainer'>
+    <div id='loading' class='loading'>
+      <div class='spinner'></div>
+      <p>Đang tải bản thỏa thuận...</p>
+      <div class='progress-bar'><div id='progressFill' class='progress-fill'></div></div>
     </div>
+    <div id='error' class='error'>
+      <h3>❌ Không thể tải bản thỏa thuận</h3>
+      <div id='errMsg' style='white-space:pre-wrap'></div>
+    </div>
+    <div id='pdfPagesContainer' style='display:none;'></div>
+  </div>
+  <button id='scrollTopBtn' class='scroll-top-btn' onclick='scrollToTop()'>↑</button>
 
-    <button id='scrollTopBtn' class='scroll-top-btn' onclick='scrollToTop()'>↑</button>
+  <!-- dùng PDF.js CDN -->
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'></script>
+  <script>
+    // worker cùng version
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js'></script>
-    <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js';
+    const loadingDiv = document.getElementById('loading');
+    const errorDiv = document.getElementById('error');
+    const errMsg = document.getElementById('errMsg');
+    const pagesContainer = document.getElementById('pdfPagesContainer');
+    const progressFill = document.getElementById('progressFill');
 
-        const loadingDiv = document.getElementById('loading');
-        const errorDiv = document.getElementById('error');
-        const pagesContainer = document.getElementById('pdfPagesContainer');
-        const progressFill = document.getElementById('progressFill');
+    function sanitizeBase64(b64) {{
+      try {{
+        // Nếu là data URL => cắt phần đầu
+        if (b64.startsWith('data:')) {{
+          const idx = b64.indexOf(',');
+          if (idx > -1) b64 = b64.slice(idx + 1);
+        }}
+        // bỏ whitespace/newline
+        b64 = b64.replace(/\\s+/g, '');
+        // URL-safe -> chuẩn
+        b64 = b64.replace(/-/g, '+').replace(/_/g, '/');
+        // padding
+        const mod4 = b64.length % 4;
+        if (mod4) b64 += '='.repeat(4 - mod4);
+        return b64;
+      }} catch (e) {{
+        return b64; // fallback
+      }}
+    }}
 
-        async function loadPDF() {{
-            try {{
-                progressFill.style.width = '20%';
+    async function loadPDF() {{
+      try {{
+        progressFill.style.width = '20%';
 
-                const base64Data = '{base64Data}';
-                console.log('PDF base64 length:', base64Data.length);
+        // KHÔNG dùng atob. Dùng fetch data: + arrayBuffer
+        const raw = '{base64Data}';
+        const b64 = sanitizeBase64(raw);
+        const dataUrl = 'data:application/pdf;base64,' + b64;
 
-                const binaryString = atob(base64Data);
-                const bytes = new Uint8Array(binaryString.length);
-                for (let i = 0; i < binaryString.length; i++) {{
-                    bytes[i] = binaryString.charCodeAt(i);
-                }}
+        // iOS/Android WebView đều hỗ trợ fetch data: → ArrayBuffer
+        const resp = await fetch(dataUrl);
+        if (!resp.ok) throw new Error('Fetch data URL thất bại: ' + resp.status);
+        const bytes = new Uint8Array(await resp.arrayBuffer());
 
-                progressFill.style.width = '40%';
+        progressFill.style.width = '40%';
 
-                const pdf = await pdfjsLib.getDocument({{ data: bytes }}).promise;
-                console.log('PDF loaded successfully, pages:', pdf.numPages);
+        const pdf = await pdfjsLib.getDocument({{ data: bytes }}).promise;
 
-                progressFill.style.width = '60%';
+        progressFill.style.width = '60%';
 
-                for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {{
-                    const page = await pdf.getPage(pageNum);
-                    const viewport = page.getViewport({{ scale: 1.2 }});
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {{
+          const page = await pdf.getPage(pageNum);
+          const viewport = page.getViewport({{ scale: 1.2 }});
 
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    canvas.width = viewport.width;
-                    canvas.height = viewport.height;
-                    canvas.className = 'page-canvas';
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          canvas.className = 'page-canvas';
 
-                    const pageLabel = document.createElement('div');
-                    pageLabel.className = 'page-label';
-                    pageLabel.textContent = `Trang ${{pageNum}}/${{pdf.numPages}}`;
+          const pageLabel = document.createElement('div');
+          pageLabel.className = 'page-label';
+          pageLabel.textContent = `Trang ${{pageNum}}/${{pdf.numPages}}`;
 
-                    const pageWrapper = document.createElement('div');
-                    pageWrapper.className = 'page-wrapper';
-                    pageWrapper.appendChild(pageLabel);
-                    pageWrapper.appendChild(canvas);
+          const pageWrapper = document.createElement('div');
+          pageWrapper.className = 'page-wrapper';
+          pageWrapper.appendChild(pageLabel);
+          pageWrapper.appendChild(canvas);
 
-                    pagesContainer.appendChild(pageWrapper);
+          pagesContainer.appendChild(pageWrapper);
 
-                    await page.render({{ canvasContext: ctx, viewport: viewport }}).promise;
-                    
-                    const progress = 60 + (pageNum / pdf.numPages) * 30;
-                    progressFill.style.width = progress + '%';
-                }}
+          await page.render({{ canvasContext: ctx, viewport }}).promise;
 
-                progressFill.style.width = '100%';
-
-                setTimeout(() => {{
-                    loadingDiv.style.display = 'none';
-                    pagesContainer.style.display = 'block';
-                    setupScrollFeatures();
-                }}, 500);
-
-            }} catch (error) {{
-                console.error('Error loading PDF:', error);
-                loadingDiv.style.display = 'none';
-                errorDiv.style.display = 'block';
-            }}
+          const progress = 60 + (pageNum / pdf.numPages) * 30;
+          progressFill.style.width = progress + '%';
         }}
 
-        function scrollToTop() {{
-            window.scrollTo({{ top: 0, behavior: 'smooth' }});
-        }}
+        progressFill.style.width = '100%';
+        setTimeout(() => {{
+          loadingDiv.style.display = 'none';
+          pagesContainer.style.display = 'block';
+          setupScrollFeatures();
+        }}, 300);
 
-        function setupScrollFeatures() {{
-            const scrollTopBtn = document.getElementById('scrollTopBtn');
-            window.addEventListener('scroll', function() {{
-                if (window.pageYOffset > 300) {{
-                    scrollTopBtn.style.display = 'block';
-                }} else {{
-                    scrollTopBtn.style.display = 'none';
-                }}
-            }});
-        }}
+      }} catch (error) {{
+        loadingDiv.style.display = 'none';
+        errorDiv.style.display = 'block';
+        errMsg.textContent = String(error && error.message ? error.message : error);
+        console.error('Error loading PDF:', error);
+      }}
+    }}
 
-        // Start loading PDF
-        loadPDF();
-    </script>
+    function scrollToTop() {{
+      window.scrollTo({{ top: 0, behavior: 'smooth' }});
+    }}
+
+    function setupScrollFeatures() {{
+      const btn = document.getElementById('scrollTopBtn');
+      window.addEventListener('scroll', function() {{
+        btn.style.display = (window.pageYOffset > 300) ? 'block' : 'none';
+      }});
+    }}
+
+    loadPDF();
+  </script>
 </body>
 </html>";
         }
