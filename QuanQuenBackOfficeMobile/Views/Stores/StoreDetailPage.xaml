@@ -40,7 +40,17 @@
                     <Label Text="Địa chỉ:" 
                            FontAttributes="Bold" 
                            TextColor="{StaticResource Primary}"/>
-                    <Label Text="{Binding StoreDetail.FullAdrress, Converter={StaticResource NullOrEmptyToNAConverter}}" />
+                    <Label Text="{Binding StoreDetail.address, Converter={StaticResource NullOrEmptyToNAConverter}}" />
+                    
+                    <!-- Button xem trên bản đồ -->
+                    <Button Text="🗺️ Xem trên bản đồ" 
+                            Clicked="ViewOnMap_Clicked"
+                            BackgroundColor="#007AFF"
+                            TextColor="White"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            CornerRadius="8"
+                            HeightRequest="50" />
                 </VerticalStackLayout>
             </Frame>
 

@@ -369,5 +369,98 @@ namespace QuanQuenBackOfficeMobile.Services
                 return new ApiResponse { IsSuccess = false, Message = $"Create store type to store failed: {ex.Message}" };
             }
         }
+
+        public async Task<bool> UpdateStoreLocationAsync(string storeId, double latitude, double longitude, string address, string ward = null, string district = null, string city = null)
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine($"[StoreService] UpdateStoreLocationAsync started for store: {storeId}");
+                System.Diagnostics.Debug.WriteLine($"[StoreService] Request parameters - Lat: {latitude}, Lng: {longitude}, Address: {address}, Ward: {ward}, District: {district}, City: {city}");
+
+                var token = await SecureStorage.GetAsync("auth_token");
+                if (string.IsNullOrEmpty(token))
+                {
+                    System.Diagnostics.Debug.WriteLine("[StoreService] No auth token found");
+                    return false;
+                }
+                System.Diagnostics.Debug.WriteLine($"[StoreService] Auth token found: {token.Substring(0, Math.Min(20, token.Length))}...");
+
+                var baseUrl = _configuration["API:Store:BaseUrl"];
+                var path = _configuration["API:Store:UpdateStore"];
+                var url = $"{baseUrl}{path}";
+                
+                System.Diagnostics.Debug.WriteLine($"[StoreService] API URL: {url}");
+
+                using var form = new MultipartFormDataContent();
+                
+                // Thêm các field cần thiết
+                form.Add(new StringContent(storeId), "StoreId");
+                form.Add(new StringContent(address ?? string.Empty), "Address");
+                form.Add(new StringContent(ward ?? string.Empty), "Ward");
+                form.Add(new StringContent(district ?? string.Empty), "District");
+                form.Add(new StringContent(city ?? string.Empty), "City");
+                form.Add(new StringContent(latitude.ToString("F6")), "Latitude");
+                form.Add(new StringContent(longitude.ToString("F6")), "Longitude");
+
+                System.Diagnostics.Debug.WriteLine($"[StoreService] Form data prepared - StoreId: {storeId}, Address: {address}, Ward: {ward}, District: {district}, City: {city}, Lat: {latitude:F6}, Lng: {longitude:F6}");
+
+                using var request = new HttpRequestMessage(HttpMethod.Put, url)
+                {
+                    Content = form
+                };
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.SendAsync(request);
+                
+                System.Diagnostics.Debug.WriteLine($"[StoreService] Response received - Status: {response.StatusCode}, IsSuccess: {response.IsSuccessStatusCode}");
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    System.Diagnostics.Debug.WriteLine($"[StoreService] Response content: {responseContent}");
+                    
+                    // Parse response theo format thực tế của API
+                    try
+                    {
+                        using var jsonDoc = JsonDocument.Parse(responseContent);
+                        var root = jsonDoc.RootElement;
+                        bool isSuccess = false;
+                        string message = "";
+                        if (root.TryGetProperty("success", out var successProp))
+                        {
+                            isSuccess = successProp.GetBoolean();
+                        }
+                        else if (root.TryGetProperty("isSuccess", out var isSuccessProp))
+                        {
+                            isSuccess = isSuccessProp.GetBoolean();
+                        }
+                        if (root.TryGetProperty("message", out var messageProp))
+                        {
+                            message = messageProp.GetString() ?? "";
+                        }
+                        System.Diagnostics.Debug.WriteLine($"[StoreService] Final result - isSuccess: {isSuccess}, message: {message}");
+                        return isSuccess;
+                    }
+                    catch (JsonException jsonEx)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[StoreService] JSON parsing error: {jsonEx.Message}");
+                        var containsSuccess = responseContent.Contains("\"success\":true") || responseContent.Contains("\"isSuccess\":true");
+                        return containsSuccess;
+                    }
+                }
+
+                var errorContent = await response.Content.ReadAsStringAsync();
+                System.Diagnostics.Debug.WriteLine($"[StoreService] UpdateStoreLocationAsync failed with status: {response.StatusCode}");
+                System.Diagnostics.Debug.WriteLine($"[StoreService] Error response content: {errorContent}");
+                
+                return false;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[StoreService] UpdateStoreLocationAsync error: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"[StoreService] Exception type: {ex.GetType().Name}");
+                return false;
+            }
+        }
     }
 } 

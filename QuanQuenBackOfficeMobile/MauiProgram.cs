@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using QuanQuenBackOfficeMobile.Services;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
 using QuanQuenBackOfficeMobile.ViewModels.Stores;
 using QuanQuenBackOfficeMobile.Views.Stores;
@@ -108,6 +109,7 @@ public static class MauiProgram
 		
 		// Register Services
 		builder.Services.AddTransient<IContractService, ContractService>();
+		builder.Services.AddTransient<IGeocodingService, GeocodingService>();
 		
         // Register Views
         builder.Services.AddTransient<LoginPage>();
@@ -155,6 +157,8 @@ public static class MauiProgram
 		builder.Services.AddTransient<StorePage>();
 		builder.Services.AddTransient<StoreDetailViewModel>();
 		builder.Services.AddTransient<StoreDetailPage>();
+		builder.Services.AddTransient<StoreMapViewModel>();
+		builder.Services.AddTransient<StoreMapPage>();
 
 		builder.Services.AddSingleton<ITokenService, TokenService>();
 
