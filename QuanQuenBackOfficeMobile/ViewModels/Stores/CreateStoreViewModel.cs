@@ -85,6 +85,10 @@ public partial class CreateStoreViewModel : ObservableObject
         PickLicenseImagesCommand = new AsyncRelayCommand(PickLicenseImagesAsync, () => CanAddMoreLicenseImages);
         CaptureLicenseImageCommand = new AsyncRelayCommand(CaptureLicenseImageAsync, () => CanAddMoreLicenseImages);
         RemoveLicenseImageCommand = new RelayCommand<ImageSource>(RemoveLicenseImage);
+        
+        // Debug log để kiểm tra trạng thái ban đầu
+        System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] Constructor - LicenseImages count: {LicenseImages.Count}");
+        System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] Constructor - StoreRegistrationData.LicenseImagePaths count: {StoreRegistrationData.LicenseImagePaths.Count}");
     }
 
     partial void OnSelectedProvinceChanged(ProvinceDto value)
@@ -348,6 +352,22 @@ public partial class CreateStoreViewModel : ObservableObject
             StoreRegistrationData.DistrictId = SelectedDistrict.territoryId;
             StoreRegistrationData.WardId = SelectedWard.stateId;
             StoreRegistrationData.LicenseImagePaths = LicenseImages.Select(img => img.LocalPath).ToList();
+            
+            // Debug log để kiểm tra dữ liệu ảnh
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] Số lượng ảnh đã chọn: {LicenseImages.Count}");
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] LicenseImagePaths count: {StoreRegistrationData.LicenseImagePaths.Count}");
+            foreach (var path in StoreRegistrationData.LicenseImagePaths)
+            {
+                System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] LicenseImagePath: {path}");
+                System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] File exists: {File.Exists(path)}");
+            }
+            
+            // Debug log để kiểm tra dữ liệu cuối cùng trước khi chuyển trang
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][OnNextClicked] Dữ liệu cuối cùng:");
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][OnNextClicked] StoreName: {StoreRegistrationData.StoreName}");
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][OnNextClicked] Email: {StoreRegistrationData.Email}");
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][OnNextClicked] LicenseImagePaths count: {StoreRegistrationData.LicenseImagePaths.Count}");
+            
             await App.Current.MainPage.Navigation.PushAsync(new CreateStoreUserPasswordPage(Email));
         }
         catch (Exception ex)
@@ -399,6 +419,7 @@ public partial class CreateStoreViewModel : ObservableObject
                 var imgSource = ImageSource.FromFile(copiedPath);
                 LicenseImages.Add(new MyImageModel { Images = imgSource, LocalPath = copiedPath });
                 System.Diagnostics.Debug.WriteLine($"[LOG] Đã thêm vào LicenseImages (FromFile): {copiedPath}");
+                System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] PickLicenseImagesAsync - LicenseImages count sau khi thêm: {LicenseImages.Count}");
                 OnPropertyChanged(nameof(CanAddMoreLicenseImages));
                 OnPropertyChanged(nameof(LicenseButtonBackgroundColor));
                 OnPropertyChanged(nameof(LicenseButtonTextColor));
@@ -442,6 +463,7 @@ public partial class CreateStoreViewModel : ObservableObject
                 var imgSource = ImageSource.FromFile(copiedPath);
                 LicenseImages.Add(new MyImageModel { Images = imgSource, LocalPath = copiedPath });
                 System.Diagnostics.Debug.WriteLine($"[LOG] Đã thêm vào LicenseImages (FromFile): {copiedPath}");
+                System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] CaptureLicenseImageAsync - LicenseImages count sau khi thêm: {LicenseImages.Count}");
                 OnPropertyChanged(nameof(CanAddMoreLicenseImages));
                 OnPropertyChanged(nameof(LicenseButtonBackgroundColor));
                 OnPropertyChanged(nameof(LicenseButtonTextColor));
@@ -462,16 +484,32 @@ public partial class CreateStoreViewModel : ObservableObject
 
     private void RemoveLicenseImage(ImageSource img)
     {
+        System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] RemoveLicenseImage - Bắt đầu xóa ảnh");
+        System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] RemoveLicenseImage - LicenseImages count trước khi xóa: {LicenseImages.Count}");
+        
         int idx = LicenseImages.IndexOf(LicenseImages.FirstOrDefault(i => i.Images == img));
+        System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] RemoveLicenseImage - Index cần xóa: {idx}");
+        
         if (idx >= 0)
         {
+            var removedImage = LicenseImages[idx];
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] RemoveLicenseImage - Xóa ảnh: {removedImage.LocalPath}");
+            
             LicenseImages.RemoveAt(idx);
             if (LicenseImageFiles.Count > idx)
                 LicenseImageFiles.RemoveAt(idx);
+                
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] RemoveLicenseImage - LicenseImages count sau khi xóa: {LicenseImages.Count}");
+            
             OnPropertyChanged(nameof(CanAddMoreLicenseImages));
             OnPropertyChanged(nameof(LicenseButtonBackgroundColor));
             OnPropertyChanged(nameof(LicenseButtonTextColor));
         }
+        else
+        {
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] RemoveLicenseImage - Không tìm thấy ảnh để xóa");
+        }
+        
         PickLicenseImagesCommand.NotifyCanExecuteChanged();
         CaptureLicenseImageCommand.NotifyCanExecuteChanged();
     }

@@ -6,6 +6,7 @@ using QuanQuenBackOfficeMobile.Services.Interfaces;
 using QuanQuenBackOfficeMobile.Models;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Storage;
+using Microsoft.Maui.Devices.Sensors;
 using Microsoft.Extensions.Configuration;
 
 namespace QuanQuenBackOfficeMobile.ViewModels.Stores
@@ -15,6 +16,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
         private readonly IContractService _contractService;
         private readonly AgreementInfoDto _agreementInfo;
         private readonly IConfiguration _configuration;
+        private readonly IQRCodeService _qrCodeService;
 
         [ObservableProperty]
         private bool isBusy = false;
@@ -34,13 +36,26 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
         [ObservableProperty]
         private HtmlWebViewSource pdfSource = new HtmlWebViewSource();
 
+        [ObservableProperty]
+        private bool isQrCodeVisible = false;
+
+        [ObservableProperty]
+        private string qrCodeImage = string.Empty;
+
+        [ObservableProperty]
+        private bool isQrCodeLoading = false;
+
+        [ObservableProperty]
+        private string qrCodeErrorMessage = string.Empty;
+
         public IAsyncRelayCommand RetryCommand { get; }
 
-        public AgreementPageViewModel(IContractService contractService, AgreementInfoDto agreementInfo, IConfiguration configuration)
+        public AgreementPageViewModel(IContractService contractService, AgreementInfoDto agreementInfo, IConfiguration configuration, IQRCodeService qrCodeService)
         {
             _contractService = contractService;
             _agreementInfo = agreementInfo;
             _configuration = configuration;
+            _qrCodeService = qrCodeService;
             
             RetryCommand = new AsyncRelayCommand(RetryAsync);
         }
@@ -64,6 +79,9 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
                     
                     // Download PDF từ URL và hiển thị bằng PDF.js
                     await DisplaySignedAgreementAsync(fullUrl);
+                    
+                    // Sau khi PDF load thành công, tự động tạo QR Code
+                    await GenerateStoreQRCodeAsync();
                 }
                 else
                 {
@@ -154,6 +172,154 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
         {
             // Có thể implement retry logic ở đây
             await Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Tạo QR Code cho store (tự động gọi sau khi PDF load thành công)
+        /// Sử dụng geocoding service để lấy tọa độ thực tế từ địa chỉ cửa hàng
+        /// </summary>
+        private async Task GenerateStoreQRCodeAsync()
+        {
+            try
+            {
+                IsQrCodeLoading = true;
+                IsQrCodeVisible = false;
+                QrCodeErrorMessage = string.Empty;
+
+                // Lấy thông tin agent từ storage
+                var agentName = await SecureStorage.GetAsync("userName") ?? "Unknown Agent";
+                var agentId = await SecureStorage.GetAsync("userId") ?? "Unknown ID";
+
+                // Tạo dữ liệu QR Code từ agreement info
+                // Sử dụng geocoding service để lấy tọa độ thực tế từ địa chỉ cửa hàng
+                var storeAddress = _agreementInfo?.StoreHeadOfficeAddress ?? "Địa chỉ chưa cập nhật";
+                
+                // Lấy tọa độ từ địa chỉ cửa hàng bằng MAUI Essentials Geocoding
+                (double Latitude, double Longitude)? coordinates = null;
+                try
+                {
+                    var locations = await Geocoding.GetLocationsAsync(storeAddress);
+                    var location = locations?.FirstOrDefault();
+                    if (location != null)
+                    {
+                        coordinates = (location.Latitude, location.Longitude);
+                    }
+                }
+                catch (Exception geoEx)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[AgreementPageViewModel] Essentials Geocoding failed: {geoEx.Message}");
+                }
+                
+                var qrCodeData = new QRCodeData
+                {
+                    DiaChi = storeAddress,
+                    ToaDo = new Coordinates
+                    {
+                        // Sử dụng tọa độ thực tế nếu có, nếu không thì dùng tọa độ mặc định TP.HCM
+                        Latitude = coordinates?.Latitude ?? 10.762622,   // Tọa độ thực tế hoặc mặc định TP.HCM
+                        Longitude = coordinates?.Longitude ?? 106.660172  // Tọa độ thực tế hoặc mặc định TP.HCM
+                    },
+                    TenNguoiDaiDien = _agreementInfo?.RepresentativeName ?? "Tên chưa cập nhật",
+                    AgentInfo = new AgentInfo
+                    {
+                        Ten = agentName,
+                        Id = agentId
+                    },
+                    Timestamp = DateTime.UtcNow
+                };
+                
+                // Log thông tin tọa độ để debug
+                if (coordinates.HasValue)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[AgreementPageViewModel] Geocoding SUCCESS: Address='{storeAddress}' -> Lat={coordinates.Value.Latitude:F6}, Lng={coordinates.Value.Longitude:F6}");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"[AgreementPageViewModel] Geocoding FAILED: Address='{storeAddress}' -> Using default coordinates: Lat=10.762622, Lng=106.660172");
+                }
+
+                // Gọi service tạo QR Code
+                var qrCodeResponse = await _qrCodeService.GenerateStoreQRCodeAsync(qrCodeData, qrCodeData.AgentInfo);
+
+                if (qrCodeResponse.Success)
+                {
+                    // Thay vì sử dụng URL trực tiếp, download image và lưu local
+                    try
+                    {
+                        var localImagePath = await DownloadAndSaveQRCodeImage(qrCodeResponse.QRCodeImage);
+                        QrCodeImage = localImagePath;
+                        IsQrCodeVisible = true;
+                        System.Diagnostics.Debug.WriteLine($"[AgreementPageViewModel] QR Code generated successfully. Image URL: {qrCodeResponse.QRCodeImage}");
+                        System.Diagnostics.Debug.WriteLine($"[AgreementPageViewModel] Local image path: {localImagePath}");
+                    }
+                    catch (Exception downloadEx)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[AgreementPageViewModel] Failed to download QR image: {downloadEx.Message}");
+                        // Fallback: sử dụng URL trực tiếp
+                        QrCodeImage = qrCodeResponse.QRCodeImage;
+                        IsQrCodeVisible = true;
+                    }
+                }
+                else
+                {
+                    QrCodeErrorMessage = qrCodeResponse.Message;
+                    System.Diagnostics.Debug.WriteLine($"[AgreementPageViewModel] QR Code generation failed: {qrCodeResponse.Message}");
+                }
+            }
+            catch (Exception ex)
+            {
+                QrCodeErrorMessage = $"Lỗi tạo QR Code: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine($"[AgreementPageViewModel] Error generating QR Code: {ex.Message}");
+                // Không throw exception vì đây là tính năng phụ, không ảnh hưởng đến việc hiển thị PDF
+            }
+            finally
+            {
+                IsQrCodeLoading = false;
+            }
+        }
+
+        /// <summary>
+        /// Download và lưu QR Code image vào local storage
+        /// </summary>
+        private async Task<string> DownloadAndSaveQRCodeImage(string imageUrl)
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine($"[AgreementPageViewModel] Downloading QR image from: {imageUrl}");
+                
+                var token = await SecureStorage.GetAsync("auth_token");
+                if (string.IsNullOrEmpty(token))
+                {
+                    throw new Exception("Không tìm thấy auth_token");
+                }
+
+                var httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                
+                var response = await httpClient.GetAsync(imageUrl);
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception($"Không thể tải QR image: {response.StatusCode}");
+                }
+
+                var imageBytes = await response.Content.ReadAsByteArrayAsync();
+                System.Diagnostics.Debug.WriteLine($"[AgreementPageViewModel] QR image downloaded: {imageBytes.Length} bytes");
+
+                // Tạo tên file unique
+                var fileName = $"qr_code_{DateTime.UtcNow:yyyyMMdd_HHmmss}.png";
+                var localPath = Path.Combine(FileSystem.AppDataDirectory, fileName);
+                
+                // Lưu file
+                await File.WriteAllBytesAsync(localPath, imageBytes);
+                System.Diagnostics.Debug.WriteLine($"[AgreementPageViewModel] QR image saved to: {localPath}");
+                
+                return localPath;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[AgreementPageViewModel] Error downloading QR image: {ex.Message}");
+                throw;
+            }
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
+using QuanQuenBackOfficeMobile.Models;
 using System.Text.Json;
 using System.Text;
 using Microsoft.Maui.Storage;
@@ -123,6 +124,8 @@ namespace QuanQuenBackOfficeMobile.Services
                     result.IsSuccess = true;
                 }
 
+                // Store creation completed successfully
+
                 return result ?? new ApiResponse { IsSuccess = false, Message = "Failed to deserialize response" };
             }
             catch (Exception ex)
@@ -153,6 +156,8 @@ namespace QuanQuenBackOfficeMobile.Services
             var json = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<StoreDetailModel>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
+
+
 
         public async Task<ApiResponse> UpdateStore(string storeId, Status status)
         {

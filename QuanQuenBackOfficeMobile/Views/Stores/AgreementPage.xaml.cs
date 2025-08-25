@@ -16,11 +16,12 @@ namespace QuanQuenBackOfficeMobile.Views.Stores
             // Get services from DI container
             var contractService = App.Services.GetService<IContractService>();
             var configuration = App.Services.GetService<IConfiguration>();
+            var qrCodeService = App.Services.GetService<IQRCodeService>();
             
-            if (contractService != null && configuration != null)
+            if (contractService != null && configuration != null && qrCodeService != null)
             {
                 // Create and set ViewModel
-                _viewModel = new AgreementPageViewModel(contractService, agreementInfo, configuration);
+                _viewModel = new AgreementPageViewModel(contractService, agreementInfo, configuration, qrCodeService);
                 BindingContext = _viewModel;
                 
                 // Load PDF với chữ ký từ URL

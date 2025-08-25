@@ -21,6 +21,7 @@ public static class MauiProgram
 			.UseSkiaSharp()
 #if ANDROID || IOS
 			.UseMauiMaps()
+			
 #endif
 			.UseMauiCommunityToolkitMediaElement()
 			.UseMauiCommunityToolkit()
@@ -42,7 +43,6 @@ public static class MauiProgram
         // Development environment - load appsettings.Development.json
         var resourceName = "QuanQuenBackOfficeMobile.appsettings.Development.json";
 #else
-        // Production environment - load appsettings.json
         var resourceName = "QuanQuenBackOfficeMobile.appsettings.json";
 #endif
 
@@ -91,6 +91,18 @@ public static class MauiProgram
             var configService = sp.GetRequiredService<IConfigurationService>();
             var baseUrl = configService.GetApiUrl("Store");
             client.BaseAddress = new Uri(baseUrl);
+            client.Timeout = TimeSpan.FromSeconds(30);
+            client.Timeout = TimeSpan.FromMinutes(5); 
+        });
+
+        builder.Services.AddHttpClient<IQRCodeService, QRCodeService>((sp, client) =>
+        {
+            var configuration = sp.GetRequiredService<IConfiguration>();
+            var baseUrl = configuration["QRCode:BaseUrl"];
+            if (!string.IsNullOrEmpty(baseUrl))
+            {
+                client.BaseAddress = new Uri(baseUrl);
+            }
             client.Timeout = TimeSpan.FromSeconds(30);
             client.Timeout = TimeSpan.FromMinutes(5); 
         });
@@ -183,6 +195,7 @@ public static class MauiProgram
     builder.ConfigureMauiHandlers(handlers =>
     {
         handlers.AddHandler(typeof(CustomDropdownPicker), typeof(CustomDropdownPickerHandler));
+        handlers.AddHandler(typeof(CustomMap), typeof(CustomMapHandler));
     });
 #endif
 		return builder.Build();
