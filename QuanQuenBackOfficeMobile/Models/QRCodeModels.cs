@@ -13,37 +13,37 @@ namespace QuanQuenBackOfficeMobile.Models
 
     public class QRCodeData
     {
-        [JsonPropertyName("diaChi")]
+        [JsonPropertyName("Địa Chỉ")]
         public string DiaChi { get; set; } = string.Empty;
 
-        [JsonPropertyName("toaDo")]
+        [JsonPropertyName("Tọa Độ")]
         public Coordinates ToaDo { get; set; } = new();
 
-        [JsonPropertyName("tenNguoiDaiDien")]
+        [JsonPropertyName("Tên Đại Diện Nhà Hàng")]
         public string TenNguoiDaiDien { get; set; } = string.Empty;
 
-        [JsonPropertyName("agentInfo")]
+        [JsonPropertyName("Thông Tin Sale")]
         public AgentInfo AgentInfo { get; set; } = new();
 
-        [JsonPropertyName("timestamp")]
+        [JsonPropertyName("Thời Gian")]
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
     }
 
     public class Coordinates
     {
-        [JsonPropertyName("latitude")]
+        [JsonPropertyName("vĩ độ")]
         public double Latitude { get; set; }
 
-        [JsonPropertyName("longitude")]
+        [JsonPropertyName("kinh độ")]
         public double Longitude { get; set; }
     }
 
     public class AgentInfo
     {
-        [JsonPropertyName("ten")]
+        [JsonPropertyName("Tên")]
         public string Ten { get; set; } = string.Empty;
 
-        [JsonPropertyName("id")]
+        [JsonPropertyName("Id")]
         public string Id { get; set; } = string.Empty;
     }
 
@@ -56,6 +56,6 @@ namespace QuanQuenBackOfficeMobile.Models
         public string Message { get; set; } = string.Empty;
 
         [JsonPropertyName("qrCodeImage")]
-        public string QRCodeImage { get; set; } = string.Empty; // URL của image hoặc base64 string
+        public string QRCodeImage { get; set; } = string.Empty; 
     }
 }

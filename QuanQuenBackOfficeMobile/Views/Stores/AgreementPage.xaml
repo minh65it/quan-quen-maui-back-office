@@ -72,7 +72,6 @@
                     HorizontalOptions="FillAndExpand"
                     Clicked="OnContinueClicked"/>
 
-            <!-- QR Code Card -->
             <Frame Grid.Column="1"
                    IsVisible="{Binding IsPdfLoaded}"
                    Padding="10"
@@ -84,28 +83,22 @@
                    BackgroundColor="White">
 
                 <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
-                    <Label Text="🏪 QR Code"
-                           FontSize="14"
-                           FontAttributes="Bold"
-                           TextColor="#333"
-                           HorizontalOptions="Center"/>
-
                     <ActivityIndicator IsRunning="{Binding IsQrCodeLoading}"
                                        IsVisible="{Binding IsQrCodeLoading}"
                                        Color="#2196F3"/>
 
-                                         <Image Source="{Binding QrCodeImage}"
-                            IsVisible="{Binding IsQrCodeVisible}"
-                            HeightRequest="130"
-                            WidthRequest="130"
-                            Aspect="AspectFit"
-                            HorizontalOptions="Center"/>
+                    <Image Source="{Binding QrCodeImage}"
+                           IsVisible="{Binding IsQrCodeVisible}"
+                           HeightRequest="130"
+                           WidthRequest="150"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center"/>
 
-                     <Label Text="{Binding QrCodeErrorMessage}"
-                            IsVisible="{Binding QrCodeErrorMessage, Converter={StaticResource StringToBoolConverter}}"
-                            FontSize="10"
-                            TextColor="Red"
-                            HorizontalTextAlignment="Center"/>
+                    <Label Text="{Binding QrCodeErrorMessage}"
+                           IsVisible="{Binding QrCodeErrorMessage, Converter={StaticResource StringToBoolConverter}}"
+                           FontSize="10"
+                           TextColor="Red"
+                           HorizontalTextAlignment="Center"/>
                 </VerticalStackLayout>
             </Frame>
         </Grid>
