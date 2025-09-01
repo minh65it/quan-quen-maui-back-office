@@ -47,22 +47,30 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
         {
             try
             {
+                System.Diagnostics.Debug.WriteLine($"[AgreementPreviewViewModel] Received PDF base64 data length: {pdfBase64Data?.Length ?? 0}");
+                System.Diagnostics.Debug.WriteLine($"[AgreementPreviewViewModel] PDF base64 preview: {pdfBase64Data?.Substring(0, Math.Min(100, pdfBase64Data?.Length ?? 0))}...");
+                
                 if (!string.IsNullOrEmpty(pdfBase64Data))
                 {               
 
                     // Tạo PDF.js HTML content từ base64 data
                     var pdfHtmlContent = CreatePdfJsHtml(pdfBase64Data);
                     
+                    System.Diagnostics.Debug.WriteLine($"[AgreementPreviewViewModel] Generated HTML content length: {pdfHtmlContent.Length}");
+                    
                     // Set PDF source
                     PdfSource.Html = pdfHtmlContent;
                     IsPdfLoaded = true;
                     HasError = false;
+                    
+                    System.Diagnostics.Debug.WriteLine("[AgreementPreviewViewModel] PDF content set successfully");
                 }
                 else
                 {
                     HasError = true;
                     ErrorMessage = "Không thể tải PDF từ API - Data trống";
                     IsPdfLoaded = false;
+                    System.Diagnostics.Debug.WriteLine("[AgreementPreviewViewModel] Empty PDF base64 data");
                 }
             }
             catch (Exception ex)
@@ -70,6 +78,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
                 HasError = true;
                 ErrorMessage = $"Lỗi hiển thị PDF: {ex.Message}";
                 IsPdfLoaded = false;
+                System.Diagnostics.Debug.WriteLine($"[AgreementPreviewViewModel] Error setting PDF content: {ex.Message}");
             }
         }
 
@@ -186,10 +195,19 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
 
   <button id='scrollTopBtn' class='scroll-top-btn' onclick='scrollToTop()'>↑</button>
 
-  <script src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'></script>
   <script>
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
+    console.log('🚀 Starting PDF.js viewer for Agreement Preview...');
+    
+    // Sử dụng PDF.js từ CDN để tránh vấn đề path trong MAUI WebView
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    script.onload = function() {{
+        // Cấu hình PDF.js worker từ CDN
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        loadPDF();
+    }};
+    document.head.appendChild(script);
+    
     const loadingDiv = document.getElementById('loading');
     const errorDiv = document.getElementById('error');
     const errMsg = document.getElementById('errMsg');
@@ -215,6 +233,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
 
     async function loadPDF() {{
       try {{
+        console.log('📄 Converting base64 to PDF for Agreement Preview...');
         progressFill.style.width = '15%';
 
         // base64 từ C#
@@ -222,16 +241,20 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
         const b64 = sanitizeBase64(raw);
         if (!b64) throw new Error('Base64 rỗng hoặc không hợp lệ');
 
+        console.log('📄 Base64 length:', b64.length);
+
         // KHÔNG dùng atob. Dùng fetch(data:) → arrayBuffer để tránh lỗi Release
         const dataUrl = 'data:application/pdf;base64,' + b64;
         const resp = await fetch(dataUrl);
         if (!resp.ok) throw new Error('Fetch data URL thất bại: ' + resp.status);
         const bytes = new Uint8Array(await resp.arrayBuffer());
 
+        console.log('📄 PDF bytes:', bytes.length);
         progressFill.style.width = '35%';
 
         const pdf = await pdfjsLib.getDocument({{ data: bytes }}).promise;
 
+        console.log('📄 PDF loaded, pages:', pdf.numPages);
         progressFill.style.width = '55%';
 
         for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {{
@@ -289,8 +312,6 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
       }});
       container.style.scrollBehavior = 'smooth';
     }}
-
-    loadPDF();
   </script>
 </body>
 </html>";

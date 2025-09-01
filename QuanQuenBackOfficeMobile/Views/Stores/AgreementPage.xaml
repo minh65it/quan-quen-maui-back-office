@@ -19,7 +19,9 @@
         <WebView Grid.Row="0"
                  x:Name="AgreementWebView"
                  Source="{Binding PdfSource}"
-                 IsVisible="{Binding IsPdfLoaded}" />
+                 IsVisible="{Binding IsPdfLoaded}"
+                 HorizontalOptions="FillAndExpand"
+                 VerticalOptions="FillAndExpand" />
 
         <!-- Loading / Error overlay -->
         <AbsoluteLayout Grid.Row="0">
@@ -53,54 +55,19 @@
             </VerticalStackLayout>
         </AbsoluteLayout>
 
-        <!-- Footer chứa Nút và QR -->
-        <Grid Grid.Row="1"
-              ColumnDefinitions="*,Auto"
-              Padding="15"
-              BackgroundColor="WhiteSmoke">
+        <!-- Footer chỉ chứa Nút Tiếp tục -->
+        <Button Grid.Row="1"
+                Text="📸 Tiếp Tục - Thêm Ảnh Cửa Hàng"
+                IsVisible="{Binding IsPdfLoaded}"
+                BackgroundColor="#4CAF50"
+                TextColor="White"
+                FontSize="16"
+                FontAttributes="Bold"
+                HeightRequest="48"
+                CornerRadius="24"
+                HorizontalOptions="FillAndExpand"
+                Margin="15"
+                Clicked="OnContinueClicked"/>
 
-            <!-- Nút Tiếp tục -->
-            <Button Grid.Column="0"
-                    Text="📸 Tiếp Tục - Thêm Ảnh Cửa Hàng"
-                    IsVisible="{Binding IsPdfLoaded}"
-                    BackgroundColor="#4CAF50"
-                    TextColor="White"
-                    FontSize="16"
-                    FontAttributes="Bold"
-                    HeightRequest="48"
-                    CornerRadius="24"
-                    HorizontalOptions="FillAndExpand"
-                    Clicked="OnContinueClicked"/>
-
-            <Frame Grid.Column="1"
-                   IsVisible="{Binding IsPdfLoaded}"
-                   Padding="10"
-                   Margin="10,0,0,0"
-                   WidthRequest="160"
-                   HeightRequest="160"
-                   HasShadow="True"
-                   CornerRadius="12"
-                   BackgroundColor="White">
-
-                <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
-                    <ActivityIndicator IsRunning="{Binding IsQrCodeLoading}"
-                                       IsVisible="{Binding IsQrCodeLoading}"
-                                       Color="#2196F3"/>
-
-                    <Image Source="{Binding QrCodeImage}"
-                           IsVisible="{Binding IsQrCodeVisible}"
-                           HeightRequest="130"
-                           WidthRequest="150"
-                           Aspect="AspectFit"
-                           HorizontalOptions="Center"/>
-
-                    <Label Text="{Binding QrCodeErrorMessage}"
-                           IsVisible="{Binding QrCodeErrorMessage, Converter={StaticResource StringToBoolConverter}}"
-                           FontSize="10"
-                           TextColor="Red"
-                           HorizontalTextAlignment="Center"/>
-                </VerticalStackLayout>
-            </Frame>
-        </Grid>
     </Grid>
 </ContentPage>

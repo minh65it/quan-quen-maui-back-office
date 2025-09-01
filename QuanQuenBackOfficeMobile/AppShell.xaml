@@ -21,25 +21,21 @@
     <ShellContent
         Title="Sample MediaElement"
         ContentTemplate="{DataTemplate views:MediaElementPage}"
-        Icon="iconmediaelement.png"
         Route="MediaElementPage"
         Shell.NavBarIsVisible="true" />
     <ShellContent
         Title="Sample WebView"
         ContentTemplate="{DataTemplate views:WebViewPage}"
-        Icon="iconwebview.png"
         Route="WebViewPage"
         Shell.NavBarIsVisible="true" />
     <ShellContent
         Title="About"
         ContentTemplate="{DataTemplate views:AboutPage}"
-        Icon="iconblank.png"
         Route="AboutPage"
         Shell.NavBarIsVisible="true" />
     <ShellContent
         Title="Sample Localization"
         ContentTemplate="{DataTemplate views:LocalizationPage}"
-        Icon="iconlocalization.png"
         Route="LocalizationPage"
         Shell.NavBarIsVisible="true" />
     <ShellContent
@@ -51,25 +47,21 @@
     <ShellContent
         Title="Settings"
         ContentTemplate="{DataTemplate views:SettingsPage}"
-        Icon="iconlistdetail.png"
         Route="SettingsPage"
         Shell.NavBarIsVisible="true" />
     <ShellContent
         Title="Example Font AwesomeUsage"
         ContentTemplate="{DataTemplate views:ExampleFontAwesomeUsagePage}"
-        Icon="iconfontawesome.png"
         Route="ExampleFontAwesomeUsagePage"
         Shell.NavBarIsVisible="true" />
     <ShellContent
         Title="Example Material Font Usage"
         ContentTemplate="{DataTemplate views:ExampleMaterialFontUsagePage}"
-        Icon="iconmaterial.png"
         Route="ExampleMaterialFontUsagePage"
         Shell.NavBarIsVisible="true" />
     <ShellContent
         Title="Lottie"
         ContentTemplate="{DataTemplate views:LottiePage}"
-        Icon="iconlottie.png"
         Route="LottiePage"
         Shell.NavBarIsVisible="true" />
 </Shell>

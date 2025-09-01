@@ -466,7 +466,7 @@ namespace QuanQuenBackOfficeMobile.Services
             });
         }
 
-        public async Task<PreviewAgreementResponse> CallPreviewAgreementApiWithSignatureAsync(PreviewAgreementRequest request, byte[] signatureFile)
+        public async Task<PreviewAgreementResponse> CallPreviewAgreementApiWithSignatureAsync(PreviewAgreementRequest request, byte[] signatureFile, byte[]? qrCodeFile = null)
         {
             try
             {
@@ -514,6 +514,29 @@ namespace QuanQuenBackOfficeMobile.Services
                 {
                     formContent.Add(new StringContent(""), "SignatureFile");
                 }
+
+                // Add QR code file
+                if (qrCodeFile != null && qrCodeFile.Length > 0)
+                {
+                    var qrCodeImageContent = new ByteArrayContent(qrCodeFile);
+                    qrCodeImageContent.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+                    
+                    // Sử dụng field name đúng theo curl example
+                    formContent.Add(qrCodeImageContent, "SignatureQrFile", "agreement_qr_code.png");
+                    System.Diagnostics.Debug.WriteLine($"[ContractService] Added QR code file: {qrCodeFile.Length} bytes with field 'SignatureQrFile'");
+                }
+                else
+                {
+                    formContent.Add(new StringContent(""), "SignatureQrFile");
+                }
+
+                // Debug: Log tất cả fields được gửi
+                System.Diagnostics.Debug.WriteLine($"[ContractService] Sending form data:");
+                System.Diagnostics.Debug.WriteLine($"[ContractService] - StoreId: {request.StoreId}");
+                System.Diagnostics.Debug.WriteLine($"[ContractService] - UserId: {request.UserId}");
+                System.Diagnostics.Debug.WriteLine($"[ContractService] - StoreName: {request.StoreName}");
+                System.Diagnostics.Debug.WriteLine($"[ContractService] - SignatureFile: {(signatureFile?.Length ?? 0)} bytes");
+                System.Diagnostics.Debug.WriteLine($"[ContractService] - QRCodeFile: {(qrCodeFile?.Length ?? 0)} bytes");
 
                 var response = await _httpClient.PostAsync(url, formContent);
                 

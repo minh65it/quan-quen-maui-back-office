@@ -25,7 +25,6 @@ public static class MauiProgram
 #endif
 			.UseMauiCommunityToolkitMediaElement()
 			.UseMauiCommunityToolkit()
-			.UseMauiCommunityToolkitCamera()
 			.ConfigureFonts(fonts =>
 			{
 				fonts.AddFont("MaterialIcons-Regular.ttf", "MaterialSymbol");
@@ -61,7 +60,6 @@ public static class MauiProgram
                    var configService = sp.GetRequiredService<IConfigurationService>();
                    var baseUrl = configService.GetApiUrl("Identity");
                    client.BaseAddress = new Uri(baseUrl);
-                   client.Timeout = TimeSpan.FromSeconds(30);
 				   client.Timeout = TimeSpan.FromMinutes(5);
 
                });
@@ -71,7 +69,6 @@ public static class MauiProgram
             var configService = sp.GetRequiredService<IConfigurationService>();
             var baseUrl = configService.GetApiUrl("Store");
             client.BaseAddress = new Uri(baseUrl);
-            client.Timeout = TimeSpan.FromSeconds(30);
             client.Timeout = TimeSpan.FromMinutes(5); 
 
         });
@@ -81,7 +78,6 @@ public static class MauiProgram
             var configService = sp.GetRequiredService<IConfigurationService>();
             var baseUrl = configService.GetApiUrl("Identity");
             client.BaseAddress = new Uri(baseUrl);
-            client.Timeout = TimeSpan.FromSeconds(30);
             client.Timeout = TimeSpan.FromMinutes(5); 
 
         });
@@ -91,7 +87,6 @@ public static class MauiProgram
             var configService = sp.GetRequiredService<IConfigurationService>();
             var baseUrl = configService.GetApiUrl("Store");
             client.BaseAddress = new Uri(baseUrl);
-            client.Timeout = TimeSpan.FromSeconds(30);
             client.Timeout = TimeSpan.FromMinutes(5); 
         });
 
@@ -103,7 +98,6 @@ public static class MauiProgram
             {
                 client.BaseAddress = new Uri(baseUrl);
             }
-            client.Timeout = TimeSpan.FromSeconds(30);
             client.Timeout = TimeSpan.FromMinutes(5); 
         });
 
