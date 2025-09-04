@@ -116,6 +116,7 @@ public class StoreMediaService : IStoreMediaService
 
             foreach (var bytes in imageBytesList)
             {
+                // Sử dụng tên file đơn giản để tránh lỗi Azure Storage
                 var fileName = $"{Guid.NewGuid()}.jpg";
                 Debug.WriteLine($"[StoreMediaService] UploadStoreImagesAsync - Adding image: {fileName}, Size: {bytes.Length} bytes");
                 content.Add(new ByteArrayContent(bytes), "FileMedia", fileName);

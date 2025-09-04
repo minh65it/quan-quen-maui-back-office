@@ -221,7 +221,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                 return;
             }
             
-            var nameMedia = "Ảnh nhà hàng";
+            var nameMedia = "Ảnh bìa";
             var categoryMediaId = await _storeMediaService.GetThumbnailCategoryMediaIdAsync(nameMedia);
             if (string.IsNullOrEmpty(categoryMediaId))
             {
@@ -285,42 +285,6 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                 }
             }
             return null;
-        }
-
-        private byte[] ReadFully(Stream input)
-        {
-            using var ms = new MemoryStream();
-            input.CopyTo(ms);
-            return ms.ToArray();
-        }
-
-        private async Task<bool> CheckAndRequestCameraPermissionAsync()
-        {
-            System.Diagnostics.Debug.WriteLine("[PhotoStoreUserViewModel] CheckAndRequestCameraPermissionAsync - Bắt đầu kiểm tra quyền camera");
-            
-            try
-            {
-                // Sử dụng Permissions từ Microsoft.Maui.ApplicationModel
-                var status = await Permissions.RequestAsync<Permissions.Camera>();
-                System.Diagnostics.Debug.WriteLine($"[PhotoStoreUserViewModel] CheckAndRequestCameraPermissionAsync - Camera permission status: {status}");
-                
-                if (status == PermissionStatus.Granted)
-                {
-                    System.Diagnostics.Debug.WriteLine("[PhotoStoreUserViewModel] CheckAndRequestCameraPermissionAsync - Đã có quyền camera");
-                    return true;
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("[PhotoStoreUserViewModel] CheckAndRequestCameraPermissionAsync - Không có quyền camera");
-                    await Shell.Current.DisplayAlert("Lỗi", "Ứng dụng cần quyền camera để chụp ảnh", "OK");
-                    return false;
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"[PhotoStoreUserViewModel] CheckAndRequestCameraPermissionAsync - Exception: {ex.Message}");
-                return false;
-            }
         }
 
         [RelayCommand]

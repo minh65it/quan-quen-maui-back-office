@@ -158,6 +158,18 @@ namespace QuanQuenBackOfficeMobile.Models
         public string Message { get; set; }
     }
 
+    public class CreateStoreResponse
+    {
+        [JsonPropertyName("success")]
+        public bool IsSuccess { get; set; }
+
+        [JsonPropertyName("message")]
+        public string Message { get; set; }
+
+        [JsonPropertyName("data")]
+        public string Data { get; set; } = string.Empty;
+    }
+
     // Static class to store registration data between pages
     public static class StoreRegistrationData
     {
@@ -176,6 +188,7 @@ namespace QuanQuenBackOfficeMobile.Models
         public static string Password { get; set; } = string.Empty;
         public static string StoreId { get; set; } = string.Empty;
         public static string StoreUserId { get; set; } = string.Empty;
+        public static string UserToken { get; set; } = string.Empty; // Token từ RegisterUser endpoint
         public static List<FileResult> LicenseImageFiles { get; set; } = new();
         public static List<string> LicenseImagePaths { get; set; } = new();
     }

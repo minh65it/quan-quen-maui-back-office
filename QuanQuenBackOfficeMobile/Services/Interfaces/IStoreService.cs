@@ -7,7 +7,7 @@ namespace QuanQuenBackOfficeMobile.Services.Interfaces;
 public interface IStoreService
 {
     Task<StoreApiResponse> GetAllStoresAsync(int page = 1, int pageSize = 20, string searchText = null);
-    Task<ApiResponse> CreateStoreAsync(StoreCreateRequest request);
+    Task<CreateStoreResponse> CreateStoreAsync(StoreCreateRequest request, string token = null);
     Task<StoreDetailModel> GetStoreDetailAsync(string storeId);
     Task<ApiResponse> UpdateStore(string storeId, Status status);
     Task<List<FilterStoreModel>> GetUtilitiesAsync();

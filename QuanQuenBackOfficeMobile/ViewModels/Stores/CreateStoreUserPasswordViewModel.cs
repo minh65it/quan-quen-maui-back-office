@@ -181,24 +181,22 @@ public partial class CreateStoreUserPasswordViewModel : ObservableObject
                 return;
             }
 
-            // 2. Lấy storeId từ response
-            if (string.IsNullOrEmpty(response.StoreId))
+            // Lấy token từ response của RegisterUser
+            var userToken = response.StoreId; // StoreId field chứa token từ data
+            if (string.IsNullOrEmpty(userToken))
             {
-                PasswordError = "StoreId bắt buộc có";
+                PasswordError = "Token bắt buộc có";
                 return;
             }
             
-            // Lưu StoreUserId (response.StoreId là UserId thực tế)
-            var storeUserId = response.StoreId;
-            StoreRegistrationData.StoreUserId = storeUserId;
-            
-            // Convert UserId thành StoreId (U -> S)
-            var storeId = response.StoreId.StartsWith("U") ? ("S" + response.StoreId.Substring(1)) : response.StoreId;
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Token từ RegisterUser: {userToken}");
 
-            // 3. Gọi API tạo cửa hàng với file giấy phép kinh doanh
+            // Lưu token vào StoreRegistrationData để sử dụng sau này
+            StoreRegistrationData.UserToken = userToken;
+
+            // 2. Gọi API tạo cửa hàng với token từ RegisterUser và không cần StoreId
             var storeRequest = new StoreCreateRequest
             {
-                StoreId = storeId,
                 StoreName = StoreRegistrationData.StoreName,
                 StorePhone = StoreRegistrationData.PhoneNumber,
                 StoreEmail = StoreRegistrationData.Email,
@@ -213,14 +211,22 @@ public partial class CreateStoreUserPasswordViewModel : ObservableObject
                 BusinessType = StoreRegistrationData.BusinessType
             };
 
-           
-
-            var storeResponse = await _storeService.CreateStoreAsync(storeRequest);
+            var storeResponse = await _storeService.CreateStoreAsync(storeRequest, userToken);
             if (storeResponse == null || !storeResponse.IsSuccess)
             {
                 PasswordError = storeResponse?.Message ?? "Tạo cửa hàng thất bại";
                 return;
             }
+
+            // Lấy StoreId từ response của CreateStore
+            var storeId = storeResponse.Data;
+            if (string.IsNullOrEmpty(storeId))
+            {
+                PasswordError = "StoreId bắt buộc có từ response CreateStore";
+                return;
+            }
+            
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] StoreId từ CreateStore: {storeId}");
 
             // Lấy danh sách file ảnh từ StoreRegistrationData
             List<string> licenseImagePaths = StoreRegistrationData.LicenseImagePaths ?? new List<string>();
@@ -312,7 +318,7 @@ public partial class CreateStoreUserPasswordViewModel : ObservableObject
             // --- Chỉ khi cả hai API đều thành công mới chuyển trang ---
             if (response.IsSuccess && storeResponse.IsSuccess)
             {
-                // Lưu StoreId thực tế để dùng cho upload media
+                // Lưu StoreId từ response của CreateStore endpoint để sử dụng cho các API khác
                 StoreRegistrationData.StoreId = storeId;
                 // 4. Thành công cả hai, chuyển sang trang xác thực OTP
                 await Application.Current.MainPage.Navigation.PushAsync(new QuanQuenBackOfficeMobile.Views.Stores.StoreUserAuthentication(Email));

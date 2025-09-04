@@ -256,8 +256,8 @@ public partial class ContractStoreViewModel : ObservableObject
 
     private async Task<PreviewContractRequest> ConvertToPreviewContractRequestAsync()
     {
-        var storeId = StoreRegistrationData.StoreId ; // Get from registration data
-        var userId = StoreRegistrationData.StoreUserId ; // Get from registration data
+        var storeId = StoreRegistrationData.StoreId; // StoreId từ response của CreateStore endpoint
+        var userId = StoreRegistrationData.UserToken; // Token từ response của RegisterUser endpoint
         
         if (string.IsNullOrEmpty(storeId) || string.IsNullOrEmpty(userId))
         {

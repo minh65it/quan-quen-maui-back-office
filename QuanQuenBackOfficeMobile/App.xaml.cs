@@ -6,6 +6,7 @@ using Microsoft.Maui;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.PlatformConfiguration;
 using Microsoft.Maui.Hosting;
+using Microsoft.Maui.ApplicationModel;
 #if ANDROID
 using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
@@ -23,23 +24,32 @@ public partial class App : Application
 		InitializeComponent();
 		Application.Current.UserAppTheme = AppTheme.Light;
         MainPage = new ContentPage { Content = new ActivityIndicator { IsRunning = true, VerticalOptions = LayoutOptions.Center, HorizontalOptions = LayoutOptions.Center } };
-		CheckTokenAndNavigate();
+		Dispatcher.Dispatch(async () => await CheckTokenAndNavigateAsync());
 	}
 
-	private async void CheckTokenAndNavigate()
+	private async Task CheckTokenAndNavigateAsync()
 	{
+		try
+		{
+			await Task.Yield();
         var sp = IPlatformApplication.Current.Services;
-		Services = sp;
-		var tokenService = sp.GetService<ITokenService>();
-		if (tokenService != null && await tokenService.IsTokenValidAsync())
-		{
-			var mainViewModel = sp.GetService<MainViewModel>();
-			MainPage = new MainPage(mainViewModel);
+			Services = sp;
+			var tokenService = sp.GetService<ITokenService>();
+			if (tokenService != null && await tokenService.IsTokenValidAsync().ConfigureAwait(false))
+			{
+				var mainViewModel = sp.GetService<MainViewModel>();
+				MainThread.BeginInvokeOnMainThread(() => MainPage = new MainPage(mainViewModel));
+			}
+			else
+			{
+				var loginViewModel = sp.GetService<LoginViewModel>();
+				MainThread.BeginInvokeOnMainThread(() => MainPage = new LoginPage(loginViewModel));
+			}
 		}
-		else
+		catch
 		{
-			var loginViewModel = sp.GetService<LoginViewModel>();
-			MainPage = new LoginPage(loginViewModel);
+			var loginViewModel = IPlatformApplication.Current.Services.GetService<LoginViewModel>();
+			MainThread.BeginInvokeOnMainThread(() => MainPage = new LoginPage(loginViewModel));
 		}
 	}
 }

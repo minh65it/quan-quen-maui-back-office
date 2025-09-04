@@ -81,7 +81,7 @@ namespace QuanQuenBackOfficeMobile.Services
             }
         }
 
-        public async Task<ApiResponse> CreateStoreAsync(StoreCreateRequest request)
+        public async Task<CreateStoreResponse> CreateStoreAsync(StoreCreateRequest request, string token = null)
         {
             try
             {
@@ -91,7 +91,6 @@ namespace QuanQuenBackOfficeMobile.Services
 
                 using var form = new MultipartFormDataContent();
 
-                form.Add(new StringContent(request.StoreId ?? ""), "StoreId");
                 form.Add(new StringContent(request.StoreName ?? ""), "StoreName");
                 form.Add(new StringContent(request.StorePhone ?? ""), "StorePhone");
                 form.Add(new StringContent(request.StoreEmail ?? ""), "StoreEmail");
@@ -105,15 +104,16 @@ namespace QuanQuenBackOfficeMobile.Services
                 form.Add(new StringContent(request.ProvinceId ?? ""), "ProvinceId");
                 form.Add(new StringContent(request.BusinessType ?? ""), "BusinessType");
 
-                var token = await SecureStorage.GetAsync("auth_token");
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                // Sử dụng token được truyền vào hoặc lấy từ SecureStorage
+                var authToken = token ?? await SecureStorage.GetAsync("auth_token");
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authToken);
 
                 var response = await _httpClient.PostAsync(url, form);
                 response.EnsureSuccessStatusCode();
 
                 var content = await response.Content.ReadAsStringAsync();
                 System.Diagnostics.Debug.WriteLine($"[StoreService] Response thành công: {content}");
-                var result = JsonSerializer.Deserialize<ApiResponse>(content, new JsonSerializerOptions
+                var result = JsonSerializer.Deserialize<CreateStoreResponse>(content, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
                 });
@@ -124,13 +124,11 @@ namespace QuanQuenBackOfficeMobile.Services
                     result.IsSuccess = true;
                 }
 
-                // Store creation completed successfully
-
-                return result ?? new ApiResponse { IsSuccess = false, Message = "Failed to deserialize response" };
+                return result ?? new CreateStoreResponse { IsSuccess = false, Message = "Failed to deserialize response" };
             }
             catch (Exception ex)
             {
-                return new ApiResponse
+                return new CreateStoreResponse
                 {
                     IsSuccess = false,
                     Message = $"Failed to create store: {ex.Message}"
