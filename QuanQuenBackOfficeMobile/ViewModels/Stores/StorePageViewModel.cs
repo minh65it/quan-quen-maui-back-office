@@ -16,6 +16,8 @@ namespace QuanQuenBackOfficeMobile.ViewModels
         private readonly IStoreService _storeService;
         private const int DefaultPageSize = 20;
 
+        private readonly IAiChatbotService _aiChatbotService;
+
         [ObservableProperty]
         private string searchText;
 
@@ -50,13 +52,80 @@ namespace QuanQuenBackOfficeMobile.ViewModels
         public IRelayCommand<StoreModel> DeleteCommand { get; }
         public IAsyncRelayCommand CreateStoreCommand { get; }
 
-        public StorePageViewModel(IStoreService storeService)
+        [ObservableProperty]
+        private bool isChatbotVisible;
+
+        [ObservableProperty]
+        private ObservableCollection<ChatMessage> chatMessages = new();
+
+        [ObservableProperty]
+        private string chatbotInput = string.Empty;
+
+        public IRelayCommand ToggleChatbotCommand { get; }
+        public IAsyncRelayCommand SendChatbotCommand { get; }
+
+        public StorePageViewModel(IStoreService storeService, IAiChatbotService aiChatbotService)
         {
             _storeService = storeService;
+            _aiChatbotService = aiChatbotService;
             SearchCommand = new AsyncRelayCommand(OnSearchAsync);
             ViewDetailCommand = new RelayCommand<StoreModel>(OnViewDetail);
             DeleteCommand = new RelayCommand<StoreModel>(OnDelete);
             CreateStoreCommand = new AsyncRelayCommand(OnCreateStore);
+
+            ToggleChatbotCommand = new RelayCommand(() => IsChatbotVisible = !IsChatbotVisible);
+            SendChatbotCommand = new AsyncRelayCommand(SendChatbotAsync, CanSendChatbot);
+        }
+
+        private bool CanSendChatbot()
+        {
+            return !string.IsNullOrWhiteSpace(ChatbotInput);
+        }
+
+        partial void OnChatbotInputChanged(string value)
+        {
+            SendChatbotCommand.NotifyCanExecuteChanged();
+        }
+
+        private async Task SendChatbotAsync()
+        {
+            try
+            {
+                var msg = ChatbotInput?.Trim() ?? string.Empty;
+                if (string.IsNullOrEmpty(msg)) return;
+
+                // Thêm tin nhắn của user
+                var userMessage = new ChatMessage
+                {
+                    Content = msg,
+                    IsFromUser = true,
+                    Timestamp = DateTime.Now
+                };
+                ChatMessages.Add(userMessage);
+
+                // Xóa input
+                ChatbotInput = string.Empty;
+
+                // Gọi API và thêm phản hồi của bot
+                var response = await _aiChatbotService.GetResponseAsync(msg);
+                var botMessage = new ChatMessage
+                {
+                    Content = response,
+                    IsFromUser = false,
+                    Timestamp = DateTime.Now
+                };
+                ChatMessages.Add(botMessage);
+            }
+            catch (Exception ex)
+            {
+                var errorMessage = new ChatMessage
+                {
+                    Content = $"Lỗi: {ex.Message}",
+                    IsFromUser = false,
+                    Timestamp = DateTime.Now
+                };
+                ChatMessages.Add(errorMessage);
+            }
         }
 
         private bool _isLoaded = false;

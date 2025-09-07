@@ -101,6 +101,14 @@ public static class MauiProgram
             client.Timeout = TimeSpan.FromMinutes(5); 
         });
 
+        builder.Services.AddHttpClient<IAiChatbotService, AiChatbotService>((sp, client) =>
+        {
+            var configService = sp.GetRequiredService<IConfigurationService>();
+            var baseUrl = configService.GetApiUrl("AiChatbot");
+            client.BaseAddress = new Uri(baseUrl);
+            client.Timeout = TimeSpan.FromMinutes(5);
+        });
+
       
 
         // Register ViewModels
@@ -176,6 +184,10 @@ public static class MauiProgram
 		builder.Services.AddTransient<PhotoStoreUser>();
 		builder.Services.AddTransient<VideoStoreUserViewModel>();
 		builder.Services.AddTransient<VideoStoreUserPage>();
+
+		// AI Chatbot
+		builder.Services.AddTransient<AiChatbotViewModel>();
+		builder.Services.AddTransient<AiChatbotPage>();
 
 		// Register Converters
 		builder.Services.AddSingleton<Converters.AvatarUrlConverter>();

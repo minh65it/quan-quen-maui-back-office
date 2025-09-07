@@ -13,6 +13,7 @@
         <ResourceDictionary>
             <converters:NullOrEmptyToNAConverter x:Key="NullOrEmptyToNAConverter" />
             <converters:AvatarUrlConverter x:Key="AvatarUrlConverter" />
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
     <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="8" RowSpacing="8">
@@ -144,12 +145,82 @@
             </CollectionView>
 
             <!-- Loading Overlay -->
-            <Grid IsVisible="{Binding IsLoading}" 
+            <Grid IsVisible="{Binding IsLoading}"
                   BackgroundColor="{AppThemeBinding Light={StaticResource Black50Color}, Dark={StaticResource Black20Color}}">
-                <ActivityIndicator IsRunning="True" 
-                                 HorizontalOptions="Center" 
-                                 VerticalOptions="Center" 
-                                 Color="White"/>
+                <ActivityIndicator IsRunning="True"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center"
+                                   Color="White"/>
+            </Grid>
+
+            <!-- AI Chatbot Floating Button - Simple Version -->
+            <Button x:Name="ChatbotButton" Text="💬" WidthRequest="56" HeightRequest="56" CornerRadius="28"
+                    BackgroundColor="{StaticResource Orange70Color}" TextColor="White"
+                    Command="{Binding ToggleChatbotCommand}"
+                    HorizontalOptions="End" VerticalOptions="End" Margin="16">
+            </Button>
+
+            <!-- AI Chatbot Overlay -->
+            <Grid IsVisible="{Binding IsChatbotVisible}" BackgroundColor="#80000000">
+                <Frame CornerRadius="16" Padding="0" HasShadow="True" BackgroundColor="White"
+                       HorizontalOptions="End" VerticalOptions="End" Margin="16" WidthRequest="320" HeightRequest="400">
+                    <Grid RowDefinitions="Auto,*,Auto">
+                        <!-- Header -->
+                        <Grid Grid.Row="0" Padding="12" BackgroundColor="{StaticResource Orange70Color}">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Text="AI Chatbot" FontAttributes="Bold" FontSize="16" TextColor="White" Grid.Column="0"/>
+                                <Button Text="✕" Grid.Column="1" Command="{Binding ToggleChatbotCommand}" 
+                                        BackgroundColor="Transparent" TextColor="White" FontSize="18"/>
+                            </Grid>
+                        </Grid>
+                        
+                        <!-- Chat Messages -->
+                        <ScrollView Grid.Row="1" Padding="8">
+                            <CollectionView ItemsSource="{Binding ChatMessages}" VerticalOptions="Start">
+                                <CollectionView.ItemsLayout>
+                                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="8"/>
+                                </CollectionView.ItemsLayout>
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="models:ChatMessage">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            
+                                            <!-- User Message (Right) -->
+                                            <Frame Grid.Column="1" Padding="12,8" CornerRadius="16" 
+                                                   BackgroundColor="{StaticResource Orange70Color}"
+                                                   HorizontalOptions="End" 
+                                                   IsVisible="{Binding IsFromUser}">
+                                                <Label Text="{Binding Content}" TextColor="White" 
+                                                       LineBreakMode="WordWrap" FontSize="14"/>
+                                            </Frame>
+                                            
+                                            <!-- Bot Message (Left) -->
+                                            <Frame Grid.Column="0" Padding="12,8" CornerRadius="16" 
+                                                   BackgroundColor="#F0F0F0"
+                                                   HorizontalOptions="Start" 
+                                                   IsVisible="{Binding IsFromUser, Converter={StaticResource InverseBoolConverter}}">
+                                                <Label Text="{Binding Content}" TextColor="Black" 
+                                                       LineBreakMode="WordWrap" FontSize="14"/>
+                                            </Frame>
+                                        </Grid>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </ScrollView>
+                        
+                        <!-- Input Area -->
+                        <Grid Grid.Row="2" Padding="8" ColumnDefinitions="*,Auto">
+                            <Entry Placeholder="Nhập tin nhắn..." Text="{Binding ChatbotInput}" 
+                                   Grid.Column="0" Margin="0,0,8,0" ReturnCommand="{Binding SendChatbotCommand}"/>
+                            <Button Text="Gửi" Grid.Column="1" Command="{Binding SendChatbotCommand}"
+                                    BackgroundColor="{StaticResource Orange70Color}" TextColor="White"
+                                    CornerRadius="8" Padding="16,8"/>
+                        </Grid>
+                    </Grid>
+                </Frame>
             </Grid>
         </Grid>
     </Grid>

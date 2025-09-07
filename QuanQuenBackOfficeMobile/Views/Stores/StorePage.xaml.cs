@@ -4,6 +4,7 @@ using QuanQuenBackOfficeMobile.ViewModels;
 using QuanQuenBackOfficeMobile.ViewModels.Stores;
 using QuanQuenBackOfficeMobile.Views.Stores;
 using Microsoft.Maui.Controls;
+using Microsoft.Maui.Layouts;
 
 public partial class StorePage : ContentPage
 {
