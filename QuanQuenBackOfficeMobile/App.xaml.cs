@@ -25,33 +25,24 @@ public partial class App : Application
 		Application.Current.UserAppTheme = AppTheme.Light;
         MainPage = new ContentPage { Content = new ActivityIndicator { IsRunning = true, VerticalOptions = LayoutOptions.Center, HorizontalOptions = LayoutOptions.Center } };
 		
-		// Chạy startup operations trên background thread để không block UI
-		_ = Task.Run(async () => await CheckTokenAndNavigateAsync());
-	}
+		Dispatcher.Dispatch(async () => CheckTokenAndNavigateAsync());
+    }
 
 	private async Task CheckTokenAndNavigateAsync()
 	{
-		try
+		var sp = IPlatformApplication.Current.Services;
+		Services = sp;
+        var tokenService = sp.GetService<ITokenService>();
+        if (tokenService != null && await tokenService.IsTokenValidAsync())
 		{
-			await Task.Yield();
-        var sp = IPlatformApplication.Current.Services;
-			Services = sp;
-			var tokenService = sp.GetService<ITokenService>();
-			if (tokenService != null && await tokenService.IsTokenValidAsync().ConfigureAwait(false))
-			{
-				var mainViewModel = sp.GetService<MainViewModel>();
-				MainThread.BeginInvokeOnMainThread(() => MainPage = new MainPage(mainViewModel));
-			}
-			else
-			{
-				var loginViewModel = sp.GetService<LoginViewModel>();
-				MainThread.BeginInvokeOnMainThread(() => MainPage = new LoginPage(loginViewModel));
-			}
-		}
-		catch
+			var mainViewmodel = sp.GetService<MainViewModel>();
+			MainPage = new MainPage(mainViewmodel!);
+        }
+		else
 		{
-			var loginViewModel = IPlatformApplication.Current.Services.GetService<LoginViewModel>();
-			MainThread.BeginInvokeOnMainThread(() => MainPage = new LoginPage(loginViewModel));
-		}
+			var loginViewModel = sp.GetService<LoginViewModel>();
+			MainPage = new LoginPage(loginViewModel);
+        }
+           
 	}
 }
