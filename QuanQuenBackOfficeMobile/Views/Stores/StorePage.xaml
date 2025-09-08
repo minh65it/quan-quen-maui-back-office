@@ -160,64 +160,85 @@
                     HorizontalOptions="End" VerticalOptions="End" Margin="16">
             </Button>
 
-            <!-- AI Chatbot Overlay -->
+            <!-- AI Chatbot Overlay (khung chat + icon bot) -->
             <Grid IsVisible="{Binding IsChatbotVisible}" BackgroundColor="#80000000">
-                <Frame CornerRadius="16" Padding="0" HasShadow="True" BackgroundColor="White"
-                       HorizontalOptions="End" VerticalOptions="End" Margin="16" WidthRequest="320" HeightRequest="400">
-                    <Grid RowDefinitions="Auto,*,Auto">
-                        <!-- Header -->
-                        <Grid Grid.Row="0" Padding="12" BackgroundColor="{StaticResource Orange70Color}">
-                            <Grid ColumnDefinitions="*,Auto">
-                                <Label  FontAttributes="Bold" FontSize="16" TextColor="White" Grid.Column="0"/>
-                                <Button Text="✕" Grid.Column="1" Command="{Binding ToggleChatbotCommand}" 
-                                        BackgroundColor="Transparent" TextColor="White" FontSize="18"/>
+                <Frame CornerRadius="20" Padding="0" HasShadow="True"
+           HorizontalOptions="End" VerticalOptions="End"
+           Margin="16" WidthRequest="340" HeightRequest="480">
+
+                    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="0">
+
+                        <!-- Header (Trắng) -->
+                        <Grid Grid.Row="0" Padding="14" BackgroundColor="White">
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                                <Image Source="logo_qq_new.png" HeightRequest="28" WidthRequest="28"/>
+                                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                    <Label Text="Qui Qui AI" FontAttributes="Bold" FontSize="16" TextColor="Black"/>
+                                    <Label Text="Đang hoạt động" FontSize="12" TextColor="#888888"/>
+                                </VerticalStackLayout>
+                                <Button Grid.Column="2" Text="✕" Command="{Binding ToggleChatbotCommand}"
+                            BackgroundColor="Transparent" TextColor="Black" FontSize="18"/>
                             </Grid>
                         </Grid>
-                        
-                        <!-- Chat Messages -->
-                        <ScrollView Grid.Row="1" Padding="8">
-                            <CollectionView ItemsSource="{Binding ChatMessages}" VerticalOptions="Start">
-                                <CollectionView.ItemsLayout>
-                                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="8"/>
-                                </CollectionView.ItemsLayout>
-                                <CollectionView.ItemTemplate>
-                                    <DataTemplate x:DataType="models:ChatMessage">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
-                                            
-                                            <!-- User Message (Right) -->
-                                            <Frame Grid.Column="1" Padding="12,8" CornerRadius="16" 
-                                                   BackgroundColor="{StaticResource Orange70Color}"
-                                                   HorizontalOptions="End" 
-                                                   IsVisible="{Binding IsFromUser}">
-                                                <Label Text="{Binding Content}" TextColor="White" 
-                                                       LineBreakMode="WordWrap" FontSize="14"/>
-                                            </Frame>
-                                            
-                                            <!-- Bot Message (Left) -->
-                                            <Frame Grid.Column="0" Padding="12,8" CornerRadius="16" 
-                                                   BackgroundColor="#F0F0F0"
-                                                   HorizontalOptions="Start" 
-                                                   IsVisible="{Binding IsFromUser, Converter={StaticResource InverseBoolConverter}}">
-                                                <Label Text="{Binding Content}" TextColor="Black" 
-                                                       LineBreakMode="WordWrap" FontSize="14"/>
-                                            </Frame>
-                                        </Grid>
-                                    </DataTemplate>
-                                </CollectionView.ItemTemplate>
-                            </CollectionView>
-                        </ScrollView>
-                        
-                        <!-- Input Area -->
-                        <Grid Grid.Row="2" Padding="8" ColumnDefinitions="*,Auto">
-                            <Entry Placeholder="Nhập tin nhắn..." Text="{Binding ChatbotInput}" 
-                                   Grid.Column="0" Margin="0,0,8,0" ReturnCommand="{Binding SendChatbotCommand}"/>
-                            <Button Text="Gửi" Grid.Column="1" Command="{Binding SendChatbotCommand}"
-                                    BackgroundColor="{StaticResource Orange70Color}" TextColor="White"
-                                    CornerRadius="8" Padding="16,8"/>
+
+                        <!-- Messages (Body với Gradient) -->
+                        <Grid Grid.Row="1">
+                            <Grid.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                    <GradientStop Color="#FFE9B0" Offset="0.0"/>
+                                    <!-- vàng nhạt -->
+                                    <GradientStop Color="#FFA733" Offset="1.0"/>
+                                    <!-- cam -->
+                                </LinearGradientBrush>
+                            </Grid.Background>
+
+                            <ScrollView>
+                                <VerticalStackLayout Spacing="10" Padding="12">
+                                    <CollectionView ItemsSource="{Binding ChatMessages}" VerticalOptions="Start">
+                                        <CollectionView.ItemsLayout>
+                                            <LinearItemsLayout Orientation="Vertical" ItemSpacing="8"/>
+                                        </CollectionView.ItemsLayout>
+                                        <CollectionView.ItemTemplate>
+                                            <DataTemplate x:DataType="models:ChatMessage">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!-- User Message -->
+                                                    <Frame Grid.Column="1" Padding="10,6" CornerRadius="16"
+                                               BackgroundColor="{StaticResource Orange70Color}"
+                                               HorizontalOptions="End"
+                                               IsVisible="{Binding IsFromUser}">
+                                                        <Label Text="{Binding Content}" TextColor="White"
+                                                   LineBreakMode="WordWrap" FontSize="14"/>
+                                                    </Frame>
+
+                                                    <!-- Bot Message -->
+                                                    <Frame Grid.Column="0" Padding="10,6" CornerRadius="16"
+                                               BackgroundColor="#F0F0F0"
+                                               HorizontalOptions="Start"
+                                               IsVisible="{Binding IsFromUser, Converter={StaticResource InverseBoolConverter}}">
+                                                        <Label Text="{Binding Content}" TextColor="Black"
+                                                   LineBreakMode="WordWrap" FontSize="14"/>
+                                                    </Frame>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </CollectionView.ItemTemplate>
+                                    </CollectionView>
+                                </VerticalStackLayout>
+                            </ScrollView>
+                        </Grid>
+
+                        <!-- Input Area (Footer trắng) -->
+                        <Grid Grid.Row="2" Padding="10" ColumnDefinitions="*,Auto" BackgroundColor="White">
+                            <Entry Placeholder="Message Qui Qui" Text="{Binding ChatbotInput}"
+                       Grid.Column="0" Margin="0,0,8,0"
+                       ReturnCommand="{Binding SendChatbotCommand}"/>
+                            <Button Text="➤" Grid.Column="1" Command="{Binding SendChatbotCommand}"
+                        BackgroundColor="{StaticResource Orange70Color}"
+                        TextColor="White" CornerRadius="18" Padding="16,8"/>
                         </Grid>
                     </Grid>
                 </Frame>

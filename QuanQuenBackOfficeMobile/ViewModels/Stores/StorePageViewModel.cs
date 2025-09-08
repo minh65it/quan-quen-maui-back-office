@@ -128,6 +128,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels
             }
         }
 
+
         private bool _isLoaded = false;
         public async void OnAppearing()
         {
