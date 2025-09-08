@@ -197,6 +197,11 @@ namespace QuanQuenBackOfficeMobile.ViewModels
             
             try
             {
+                // Tối ưu bộ nhớ trước khi mở camera
+                _performanceService?.OptimizeMemoryUsage();
+                await Task.Yield();
+                await Task.Delay(150);
+
                 if (!CanAddMoreImages)
                 {
                     System.Diagnostics.Debug.WriteLine("[LOG] Không thể thêm ảnh mới, đã đủ 6 ảnh.");

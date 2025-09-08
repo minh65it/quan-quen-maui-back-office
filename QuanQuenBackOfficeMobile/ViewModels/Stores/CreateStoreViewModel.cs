@@ -486,6 +486,13 @@ public partial class CreateStoreViewModel : ObservableObject
         
         try
         {
+            // Nhường UI và tối ưu bộ nhớ trước khi mở camera
+            await MainThread.InvokeOnMainThreadAsync(() =>
+            {
+                // nhỏ delay để tránh jank khi transition
+            });
+            await Task.Yield();
+            await Task.Delay(120);
             if (!CanAddMoreLicenseImages)
             {
                 System.Diagnostics.Debug.WriteLine("[LOG] Không thể thêm ảnh mới, đã đủ 4 ảnh.");

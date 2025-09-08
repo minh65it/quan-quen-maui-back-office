@@ -21,6 +21,23 @@ public partial class StoreMapPage : ContentPage
         BindingContext = viewModel;
     }
 
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        try
+        {
+            // Gỡ đăng ký sự kiện để tránh memory leak
+            storeMap.MapClicked -= OnMapClicked;
+
+            // Dọn các pin và giải phóng bớt tài nguyên UI
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                storeMap.Pins.Clear();
+            });
+        }
+        catch { }
+    }
+
     protected override async void OnAppearing()
     {
         base.OnAppearing();

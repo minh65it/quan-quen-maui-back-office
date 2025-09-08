@@ -12,6 +12,27 @@ public partial class ContractPreviewPage : ContentPage
         this.BindingContext = viewModel;
     }
 
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        try
+        {
+            // Dọn WebView để giải phóng tài nguyên render/JS
+            if (ContractWebView != null)
+            {
+                ContractWebView.Source = null;
+                ContractWebView.Handler?.DisconnectHandler();
+            }
+        }
+        catch { }
+        finally
+        {
+            // Chủ động GC nhẹ khi rời trang nặng
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+        }
+    }
+
     // Constructor với contract data để có thể navigate tới signing page
     public ContractPreviewPage(ContractPreviewViewModel viewModel, StoreInformationContractViewModel contractData)
     {
