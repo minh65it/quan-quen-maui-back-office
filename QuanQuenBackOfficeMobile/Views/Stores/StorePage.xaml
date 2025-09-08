@@ -168,7 +168,7 @@
                         <!-- Header -->
                         <Grid Grid.Row="0" Padding="12" BackgroundColor="{StaticResource Orange70Color}">
                             <Grid ColumnDefinitions="*,Auto">
-                                <Label Text="AI Chatbot" FontAttributes="Bold" FontSize="16" TextColor="White" Grid.Column="0"/>
+                                <Label  FontAttributes="Bold" FontSize="16" TextColor="White" Grid.Column="0"/>
                                 <Button Text="✕" Grid.Column="1" Command="{Binding ToggleChatbotCommand}" 
                                         BackgroundColor="Transparent" TextColor="White" FontSize="18"/>
                             </Grid>
