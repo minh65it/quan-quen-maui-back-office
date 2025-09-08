@@ -9,7 +9,9 @@ namespace QuanQuenBackOfficeMobile.Views
         {
             InitializeComponent();
             var storeMediaService = App.Services.GetService<IStoreMediaService>();
-            BindingContext = new PhotoStoreUserViewModel(storeMediaService);
+            var cameraService = App.Services.GetService<Services.ICameraService>();
+            var performanceService = App.Services.GetService<Services.IPerformanceOptimizationService>();
+            BindingContext = new PhotoStoreUserViewModel(storeMediaService, cameraService, performanceService);
         }
     }
 }

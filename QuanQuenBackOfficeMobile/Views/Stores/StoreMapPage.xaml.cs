@@ -30,7 +30,22 @@ public partial class StoreMapPage : ContentPage
         // Thêm event handler cho tap trên map
         storeMap.MapClicked += OnMapClicked;
 
-        await InitializeMapAsync();
+        // Chạy map initialization trên background thread để không block UI
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await InitializeMapAsync();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[StoreMapPage] Map initialization error: {ex.Message}");
+                await MainThread.InvokeOnMainThreadAsync(async () =>
+                {
+                    await DisplayAlert("Lỗi", "Không thể khởi tạo bản đồ: " + ex.Message, "OK");
+                });
+            }
+        });
     }
 
     private async Task InitializeMapAsync()
@@ -68,24 +83,28 @@ public partial class StoreMapPage : ContentPage
 
                 System.Diagnostics.Debug.WriteLine($"[StoreMapPage] Adding store pin at Lat: {latitude.Value}, Lng: {longitude.Value}");
 
-                // Xóa tất cả pin cũ
-                storeMap.Pins.Clear();
-
-                // Thêm pin cho nhà hàng (vị trí hiện tại)
-                var storePin = new Pin
+                // Update UI trên main thread
+                await MainThread.InvokeOnMainThreadAsync(() =>
                 {
-                    Label = detail.StoreName ?? "Nhà hàng",
-                    Address = detail.FullAdrress,
-                    Type = PinType.Place,
-                    Location = location
-                };
-                storeMap.Pins.Add(storePin);
+                    // Xóa tất cả pin cũ
+                    storeMap.Pins.Clear();
 
-                // Di chuyển camera đến vị trí nhà hàng
-                var mapSpan = MapSpan.FromCenterAndRadius(location, Distance.FromKilometers(0.5));
-                storeMap.MoveToRegion(mapSpan);
+                    // Thêm pin cho nhà hàng (vị trí hiện tại)
+                    var storePin = new Pin
+                    {
+                        Label = detail.StoreName ?? "Nhà hàng",
+                        Address = detail.FullAdrress,
+                        Type = PinType.Place,
+                        Location = location
+                    };
+                    storeMap.Pins.Add(storePin);
 
-                System.Diagnostics.Debug.WriteLine("[StoreMapPage] Store pin added and camera moved");
+                    // Di chuyển camera đến vị trí nhà hàng
+                    var mapSpan = MapSpan.FromCenterAndRadius(location, Distance.FromKilometers(0.5));
+                    storeMap.MoveToRegion(mapSpan);
+
+                    System.Diagnostics.Debug.WriteLine("[StoreMapPage] Store pin added and camera moved");
+                });
             }
         }
         catch (Exception ex)

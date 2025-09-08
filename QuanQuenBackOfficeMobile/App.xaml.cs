@@ -24,7 +24,9 @@ public partial class App : Application
 		InitializeComponent();
 		Application.Current.UserAppTheme = AppTheme.Light;
         MainPage = new ContentPage { Content = new ActivityIndicator { IsRunning = true, VerticalOptions = LayoutOptions.Center, HorizontalOptions = LayoutOptions.Center } };
-		Dispatcher.Dispatch(async () => await CheckTokenAndNavigateAsync());
+		
+		// Chạy startup operations trên background thread để không block UI
+		_ = Task.Run(async () => await CheckTokenAndNavigateAsync());
 	}
 
 	private async Task CheckTokenAndNavigateAsync()
