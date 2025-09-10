@@ -125,16 +125,6 @@
 
 
 	<ItemGroup>
-	  <MauiXaml Update="Views\Stores\StoreAgreementInformationPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\Stores\StoreInformationContractPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	</ItemGroup>
-
-
-	<ItemGroup>
 	  <Folder Include="Resources\Raw\pdfjs\" />
 	</ItemGroup>
 
@@ -154,5 +144,9 @@
 	  <MtouchDebug>False</MtouchDebug>
 	  <MtouchLink>SdkOnly</MtouchLink>
 	  <CodesignEntitlements>Platforms\iOS\Entitlements.plist</CodesignEntitlements>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 </Project>

@@ -16,7 +16,6 @@ namespace QuanQuenBackOfficeMobile.ViewModels;
 public partial class CreateStoreViewModel : ObservableObject
 {
     private readonly GeographicApiService _geoService;
-    private readonly Services.ICameraService _cameraService;
     public ObservableCollection<ProvinceDto> ProvinceList { get; } = new();
     public ObservableCollection<DistrictDto> DistrictList { get; } = new();
     public ObservableCollection<WardDto> WardList { get; } = new();
@@ -76,10 +75,9 @@ public partial class CreateStoreViewModel : ObservableObject
 
     private List<UploadImages> images = new();
 
-    public CreateStoreViewModel(GeographicApiService geoService, Services.ICameraService cameraService)
+    public CreateStoreViewModel(GeographicApiService geoService)
     {
         _geoService = geoService;
-        _cameraService = cameraService;
         LoadProvincesAsync();
         BusinessTypeList.Add("Tư Nhân");
         BusinessTypeList.Add("Công Ty");
@@ -405,8 +403,19 @@ public partial class CreateStoreViewModel : ObservableObject
                 return;
             }
 
-            // Sử dụng CameraService với timeout 30 giây
-            var result = await _cameraService.PickPhotoWithTimeoutAsync(TimeSpan.FromSeconds(30));
+            // Quyền thư viện ảnh và chọn ảnh trực tiếp
+            var photosPermission = await Permissions.CheckStatusAsync<Permissions.Photos>();
+            if (photosPermission != PermissionStatus.Granted)
+            {
+                photosPermission = await Permissions.RequestAsync<Permissions.Photos>();
+                if (photosPermission != PermissionStatus.Granted)
+                {
+                    await App.Current.MainPage.DisplayAlert("Lỗi", "Ứng dụng cần quyền truy cập thư viện ảnh!", "OK");
+                    return;
+                }
+            }
+
+            var result = await MediaPicker.Default.PickPhotoAsync(new MediaPickerOptions { Title = "Chọn ảnh giấy phép" });
             
             if (result != null)
             {
@@ -461,11 +470,6 @@ public partial class CreateStoreViewModel : ObservableObject
                 System.Diagnostics.Debug.WriteLine("[LOG] Không chọn được ảnh từ thư viện!");
             }
         }
-        catch (TimeoutException ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"[LOG][TIMEOUT] Pick photo timeout: {ex.Message}");
-            await App.Current.MainPage.DisplayAlert("Thông báo", "Chọn ảnh quá lâu đã được tự động hủy. Vui lòng thử lại.", "OK");
-        }
         catch (UnauthorizedAccessException ex)
         {
             System.Diagnostics.Debug.WriteLine($"[LOG][PERMISSION] Permission denied: {ex.Message}");
@@ -486,13 +490,6 @@ public partial class CreateStoreViewModel : ObservableObject
         
         try
         {
-            // Nhường UI và tối ưu bộ nhớ trước khi mở camera
-            await MainThread.InvokeOnMainThreadAsync(() =>
-            {
-                // nhỏ delay để tránh jank khi transition
-            });
-            await Task.Yield();
-            await Task.Delay(120);
             if (!CanAddMoreLicenseImages)
             {
                 System.Diagnostics.Debug.WriteLine("[LOG] Không thể thêm ảnh mới, đã đủ 4 ảnh.");
@@ -506,7 +503,7 @@ public partial class CreateStoreViewModel : ObservableObject
                 return;
             }
 
-            // Kiểm tra quyền camera
+            // Kiểm tra quyền camera và chụp ảnh trực tiếp
             var cameraStatus = await Permissions.CheckStatusAsync<Permissions.Camera>();
             if (cameraStatus != PermissionStatus.Granted)
             {
@@ -518,8 +515,7 @@ public partial class CreateStoreViewModel : ObservableObject
                 }
             }
 
-            // Sử dụng CameraService với timeout 60 giây
-            var file = await _cameraService.CapturePhotoWithTimeoutAsync(TimeSpan.FromSeconds(60));
+            var file = await MediaPicker.Default.CapturePhotoAsync();
             if (file != null)
             {
                 System.Diagnostics.Debug.WriteLine($"[LOG] Đã chụp ảnh: {file.FullPath}");
@@ -561,11 +557,6 @@ public partial class CreateStoreViewModel : ObservableObject
             {
                 System.Diagnostics.Debug.WriteLine("[LOG] Không lấy được file ảnh từ camera!");
             }
-        }
-        catch (TimeoutException ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"[LOG][TIMEOUT] Camera session timeout: {ex.Message}");
-            await App.Current.MainPage.DisplayAlert("Thông báo", "Camera session quá lâu đã được tự động hủy để tránh crash. Vui lòng thử lại.", "OK");
         }
         catch (UnauthorizedAccessException ex)
         {

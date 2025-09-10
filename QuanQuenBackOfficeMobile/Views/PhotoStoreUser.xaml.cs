@@ -9,9 +9,7 @@ namespace QuanQuenBackOfficeMobile.Views
         {
             InitializeComponent();
             var storeMediaService = App.Services.GetService<IStoreMediaService>();
-            var cameraService = App.Services.GetService<Services.ICameraService>();
-            var performanceService = App.Services.GetService<Services.IPerformanceOptimizationService>();
-            BindingContext = new PhotoStoreUserViewModel(storeMediaService, cameraService, performanceService);
+            BindingContext = new PhotoStoreUserViewModel(storeMediaService);
         }
 
         protected override void OnAppearing()

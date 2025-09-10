@@ -27,8 +27,6 @@ namespace QuanQuenBackOfficeMobile.ViewModels
     public partial class PhotoStoreUserViewModel : ObservableObject
     {
         private readonly IStoreMediaService _storeMediaService;
-        private readonly Services.ICameraService _cameraService;
-        private readonly Services.IPerformanceOptimizationService _performanceService;
         
         public ObservableCollection<MyImageModel> StoreImages { get; } = new();
         public List<FileResult> StoreImageFiles { get; } = new();
@@ -44,11 +42,9 @@ namespace QuanQuenBackOfficeMobile.ViewModels
 
         public IRelayCommand<ImageSource> RemoveImageCommand { get; }
 
-        public PhotoStoreUserViewModel(IStoreMediaService storeMediaService, Services.ICameraService cameraService, Services.IPerformanceOptimizationService performanceService)
+        public PhotoStoreUserViewModel(IStoreMediaService storeMediaService)
         {
             _storeMediaService = storeMediaService;
-            _cameraService = cameraService;
-            _performanceService = performanceService;
             PickImageCommand = new AsyncRelayCommand(PickImagesAsync, () => CanAddMoreImages);
             CaptureImageCommand = new AsyncRelayCommand(CaptureImageAsync, () => CanAddMoreImages);
             RemoveImageCommand = new RelayCommand<ImageSource>(RemoveImage);
@@ -70,38 +66,31 @@ namespace QuanQuenBackOfficeMobile.ViewModels
 
         private async Task<string> CopyFileToAppDirectoryAsync(FileResult file)
         {
-            return await _performanceService.RunOnBackgroundThreadAsync(async () =>
+            try
             {
-                try
+                var appDir = FileSystem.AppDataDirectory;
+                var fileName = Path.GetFileName(file.FullPath);
+                var destPath = Path.Combine(appDir, $"{Guid.NewGuid()}_{fileName}");
+                
+                using (var sourceStream = await file.OpenReadAsync())
+                using (var destStream = File.OpenWrite(destPath))
                 {
-                    var appDir = FileSystem.AppDataDirectory;
-                    var fileName = Path.GetFileName(file.FullPath);
-                    var destPath = Path.Combine(appDir, $"{Guid.NewGuid()}_{fileName}");
-                    
-                    // Sử dụng buffer nhỏ hơn để giảm memory pressure
-                    using (var sourceStream = await file.OpenReadAsync())
-                    using (var destStream = File.OpenWrite(destPath))
+                    var buffer = new byte[4096];
+                    int bytesRead;
+                    while ((bytesRead = await sourceStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
                     {
-                        var buffer = new byte[4096]; // 4KB buffer thay vì 8KB
-                        int bytesRead;
-                        while ((bytesRead = await sourceStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
-                        {
-                            await destStream.WriteAsync(buffer, 0, bytesRead);
-                        }
+                        await destStream.WriteAsync(buffer, 0, bytesRead);
                     }
-                    
-                    // Optimize image nếu cần
-                    var optimizedPath = await _cameraService.OptimizeImageAsync(destPath);
-                    
-                    System.Diagnostics.Debug.WriteLine($"[LOG] Đã copy file sang: {optimizedPath}");
-                    return optimizedPath;
                 }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"[LOG][ERROR] Lỗi khi copy file: {ex.Message}");
-                    throw;
-                }
-            }, "CopyFileToAppDirectory");
+
+                System.Diagnostics.Debug.WriteLine($"[LOG] Đã copy file sang: {destPath}");
+                return destPath;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[LOG][ERROR] Lỗi khi copy file: {ex.Message}");
+                throw;
+            }
         }
 
         private async Task PickImagesAsync()
@@ -116,8 +105,19 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                     return;
                 }
 
-                // Sử dụng CameraService với timeout 30 giây
-                var result = await _cameraService.PickPhotoWithTimeoutAsync(TimeSpan.FromSeconds(30));
+                // Chọn ảnh trực tiếp qua MediaPicker
+                var photosPermission = await Permissions.CheckStatusAsync<Permissions.Photos>();
+                if (photosPermission != PermissionStatus.Granted)
+                {
+                    photosPermission = await Permissions.RequestAsync<Permissions.Photos>();
+                    if (photosPermission != PermissionStatus.Granted)
+                    {
+                        await App.Current.MainPage.DisplayAlert("Lỗi", "Ứng dụng cần quyền truy cập thư viện ảnh!", "OK");
+                        return;
+                    }
+                }
+
+                var result = await MediaPicker.Default.PickPhotoAsync(new MediaPickerOptions { Title = "Chọn ảnh" });
                 
                 if (result != null)
                 {
@@ -172,11 +172,6 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                     System.Diagnostics.Debug.WriteLine("[LOG] Không chọn được ảnh từ thư viện!");
                 }
             }
-            catch (TimeoutException ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"[LOG][TIMEOUT] Pick photo timeout: {ex.Message}");
-                await App.Current.MainPage.DisplayAlert("Thông báo", "Chọn ảnh quá lâu đã được tự động hủy. Vui lòng thử lại.", "OK");
-            }
             catch (UnauthorizedAccessException ex)
             {
                 System.Diagnostics.Debug.WriteLine($"[LOG][PERMISSION] Permission denied: {ex.Message}");
@@ -197,10 +192,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels
             
             try
             {
-                // Tối ưu bộ nhớ trước khi mở camera
-                _performanceService?.OptimizeMemoryUsage();
-                await Task.Yield();
-                await Task.Delay(150);
+                // Bỏ tối ưu hóa qua service để đơn giản hóa
 
                 if (!CanAddMoreImages)
                 {
@@ -208,8 +200,19 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                     return;
                 }
 
-                // Sử dụng CameraService với timeout 60 giây
-                var file = await _cameraService.CapturePhotoWithTimeoutAsync(TimeSpan.FromSeconds(60));
+                // Kiểm tra quyền camera
+                var cameraStatus = await Permissions.CheckStatusAsync<Permissions.Camera>();
+                if (cameraStatus != PermissionStatus.Granted)
+                {
+                    cameraStatus = await Permissions.RequestAsync<Permissions.Camera>();
+                    if (cameraStatus != PermissionStatus.Granted)
+                    {
+                        await App.Current.MainPage.DisplayAlert("Lỗi", "Ứng dụng cần quyền truy cập camera để chụp ảnh!", "OK");
+                        return;
+                    }
+                }
+
+                var file = await MediaPicker.Default.CapturePhotoAsync();
                 
                 if (file != null)
                 {
@@ -253,11 +256,6 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                 {
                     System.Diagnostics.Debug.WriteLine("[LOG] Không lấy được file ảnh từ camera!");
                 }
-            }
-            catch (TimeoutException ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"[LOG][TIMEOUT] Camera session timeout: {ex.Message}");
-                await App.Current.MainPage.DisplayAlert("Thông báo", "Camera session quá lâu đã được tự động hủy để tránh crash. Vui lòng thử lại.", "OK");
             }
             catch (UnauthorizedAccessException ex)
             {

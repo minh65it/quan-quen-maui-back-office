@@ -185,11 +185,6 @@ public static class MauiProgram
 		builder.Services.AddTransient<VideoStoreUserViewModel>();
 		builder.Services.AddTransient<VideoStoreUserPage>();
 
-		// Register Camera Service
-		builder.Services.AddSingleton<Services.ICameraService, Services.CameraService>();
-
-		// Register Performance Optimization Service
-		builder.Services.AddSingleton<Services.IPerformanceOptimizationService, Services.PerformanceOptimizationService>();
 
 		// Register Converters
 		builder.Services.AddSingleton<Converters.AvatarUrlConverter>();

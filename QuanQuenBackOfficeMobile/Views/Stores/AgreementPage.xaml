@@ -19,41 +19,40 @@
         <WebView Grid.Row="0"
                  x:Name="AgreementWebView"
                  Source="{Binding PdfSource}"
-                 IsVisible="{Binding IsPdfLoaded}"
-                 HorizontalOptions="FillAndExpand"
-                 VerticalOptions="FillAndExpand" />
+                 IsVisible="{Binding IsPdfLoaded}" />
 
-        <!-- Loading / Error overlay -->
-        <AbsoluteLayout Grid.Row="0">
-            <ActivityIndicator IsRunning="{Binding IsBusy}"
-                               IsVisible="{Binding IsBusy}"
-                               HorizontalOptions="Center"
-                               VerticalOptions="Center"
-                               Color="#2196F3" />
+        <!-- Loading indicator -->
+        <ActivityIndicator Grid.Row="0"
+                          IsRunning="{Binding IsBusy}"
+                          IsVisible="{Binding IsBusy}"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center"
+                          Color="#2196F3" />
 
-            <VerticalStackLayout IsVisible="{Binding HasError}"
-                                 AbsoluteLayout.LayoutFlags="All"
-                                 AbsoluteLayout.LayoutBounds="0.5,0.5,AutoSize,AutoSize"
-                                 HorizontalOptions="Center"
-                                 VerticalOptions="Center"
-                                 Spacing="10">
-                <Label Text="❌" FontSize="48" HorizontalOptions="Center"/>
-                <Label Text="{Binding ErrorMessage}" 
-                       FontSize="16" 
-                       TextColor="Red"
-                       HorizontalOptions="Center"
-                       HorizontalTextAlignment="Center"/>
-                <Button Text="Thử lại" 
-                        Command="{Binding RetryCommand}"
-                        BackgroundColor="#4CAF50"
-                        TextColor="White"
-                        FontSize="14"
-                        HeightRequest="40"
-                        WidthRequest="120"
-                        CornerRadius="20"
-                        HorizontalOptions="Center"/>
-            </VerticalStackLayout>
-        </AbsoluteLayout>
+        <!-- Error message -->
+        <VerticalStackLayout Grid.Row="0" 
+                            IsVisible="{Binding HasError}"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            Spacing="10">
+            <Label Text="❌" 
+                   FontSize="48" 
+                   HorizontalOptions="Center"/>
+            <Label Text="{Binding ErrorMessage}" 
+                   FontSize="16" 
+                   TextColor="Red"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center"/>
+            <Button Text="Thử lại" 
+                    Command="{Binding RetryCommand}"
+                    BackgroundColor="#4CAF50"
+                    TextColor="White"
+                    FontSize="14"
+                    HeightRequest="40"
+                    WidthRequest="120"
+                    CornerRadius="20"
+                    HorizontalOptions="Center"/>
+        </VerticalStackLayout>
 
         <!-- Footer chỉ chứa Nút Tiếp tục -->
         <Button Grid.Row="1"
