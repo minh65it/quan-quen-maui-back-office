@@ -7,6 +7,7 @@
 		<Nullable>enable</Nullable>
 		<UseMaui>true</UseMaui>
 		<MauiVersion>9.0.21</MauiVersion>
+		<IsPublishable>false</IsPublishable>
 		<SkipValidateMauiImplicitPackageReferences>true</SkipValidateMauiImplicitPackageReferences>
 	</PropertyGroup>
 
@@ -19,7 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Update="Microsoft.Maui.Controls" Version="9.0.22" />
+	  <PackageReference Update="Microsoft.Maui.Controls" Version="9.0.21" />
 	</ItemGroup>
 
 </Project>
