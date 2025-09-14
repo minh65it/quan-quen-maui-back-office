@@ -194,6 +194,11 @@ public partial class CreateStoreUserPasswordViewModel : ObservableObject
             // Lưu token vào StoreRegistrationData để sử dụng sau này
             StoreRegistrationData.UserToken = userToken;
 
+            // Lấy email trước, nếu null thì dùng userId
+            var email = await SecureStorage.GetAsync("email");
+            var userId = await SecureStorage.GetAsync("userId");
+            var storePIC = !string.IsNullOrEmpty(email) ? email : userId ?? "Unknown";
+
             // 2. Gọi API tạo cửa hàng với token từ RegisterUser và không cần StoreId
             var storeRequest = new StoreCreateRequest
             {
@@ -208,7 +213,8 @@ public partial class CreateStoreUserPasswordViewModel : ObservableObject
                 Address = StoreRegistrationData.Address,
                 RepresentativeName = StoreRegistrationData.RepresentativeName,
                 ProvinceId = StoreRegistrationData.ProvinceId,
-                BusinessType = StoreRegistrationData.BusinessType
+                BusinessType = StoreRegistrationData.BusinessType,
+                CreatedBy = storePIC
             };
 
             var storeResponse = await _storeService.CreateStoreAsync(storeRequest, userToken);

@@ -144,12 +144,16 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                     {
                         await SecureStorage.SetAsync("auth_token", response.Token);
                         await SecureStorage.SetAsync("userName", response.VsiriusUserDto.UserName);
+                        await SecureStorage.SetAsync("email", response.VsiriusUserDto.Email);
+                        await SecureStorage.SetAsync("userId", response.VsiriusUserDto.UserName); // Tạm thời dùng userName làm userId
                     }
                     catch (Exception ex)
                     {
 #if DEBUG
                         Preferences.Set("auth_token", response.Token);
                         Preferences.Set("userName", response.VsiriusUserDto.UserName);
+                        Preferences.Set("email", response.VsiriusUserDto.Email);
+                        Preferences.Set("userId", response.VsiriusUserDto.UserName);
 #endif
                     }
                     var mainViewModel = IPlatformApplication.Current.Services.GetService<MainViewModel>();
