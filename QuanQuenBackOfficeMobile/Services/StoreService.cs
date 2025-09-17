@@ -330,6 +330,115 @@ namespace QuanQuenBackOfficeMobile.Services
                 return storeTypeList;
         }
 
+        public async Task<ApiResponse> GenerateFoodFromImageAsync(string storeId, List<string> imagePaths)
+        {
+            try
+            {
+                var token = await SecureStorage.GetAsync("auth_token");
+                if (string.IsNullOrEmpty(token))
+                    throw new UnauthorizedAccessException("No authentication token found");
+
+                var baseUrl = _configuration["API:Store:BaseUrl"];
+                var path = _configuration["API:Store:GenerateFoodFromImage"];
+                var url = $"{baseUrl}{path}";
+
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                // API mẫu yêu cầu 1 file mỗi request với field name 'File' và có 'StoreId', 'Url'
+                // Nếu có nhiều ảnh, gửi tuần tự từng ảnh và tổng hợp kết quả
+                bool allSuccess = true;
+                string lastMessage = string.Empty;
+
+                foreach (var imagePath in imagePaths)
+                {
+                    if (!System.IO.File.Exists(imagePath))
+                    {
+                        allSuccess = false;
+                        lastMessage = $"File not found: {imagePath}";
+                        continue;
+                    }
+
+                    using var form = new MultipartFormDataContent();
+                    form.Add(new StringContent(storeId), "StoreId");
+                    form.Add(new StringContent(string.Empty), "Url");
+
+                    var fileBytes = await System.IO.File.ReadAllBytesAsync(imagePath);
+                    var byteArrayContent = new ByteArrayContent(fileBytes);
+
+                    var ext = System.IO.Path.GetExtension(imagePath).ToLowerInvariant();
+                    var mediaType = ext switch
+                    {
+                        ".png" => "image/png",
+                        ".jpg" => "image/jpeg",
+                        ".jpeg" => "image/jpeg",
+                        ".webp" => "image/webp",
+                        _ => "application/octet-stream"
+                    };
+                    byteArrayContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(mediaType);
+                    form.Add(byteArrayContent, "File", System.IO.Path.GetFileName(imagePath));
+
+                    System.Diagnostics.Debug.WriteLine($"[GenerateFoodFromImage] POST {url}");
+                    System.Diagnostics.Debug.WriteLine($"[GenerateFoodFromImage] StoreId={storeId}, File={System.IO.Path.GetFileName(imagePath)}, ContentType={mediaType}");
+                    var response = await _httpClient.PostAsync(url, form);
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    System.Diagnostics.Debug.WriteLine($"[GenerateFoodFromImage] Status={(int)response.StatusCode} {response.StatusCode}");
+                    System.Diagnostics.Debug.WriteLine($"[GenerateFoodFromImage] RawResponse={responseContent}");
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        allSuccess = false;
+                        lastMessage = responseContent;
+                        continue;
+                    }
+
+                    try
+                    {
+                        using var doc = System.Text.Json.JsonDocument.Parse(responseContent);
+                        var root = doc.RootElement;
+                        bool success = false;
+                        string? message = null;
+                        if (root.TryGetProperty("success", out var successProp)) success = successProp.GetBoolean();
+                        if (root.TryGetProperty("message", out var messageProp)) message = messageProp.GetString();
+                        System.Diagnostics.Debug.WriteLine($"[GenerateFoodFromImage] Parsed success={success}, message={message}");
+                        if (!success)
+                        {
+                            allSuccess = false;
+                            lastMessage = message ?? "Unknown error";
+                        }
+                        else
+                        {
+                            lastMessage = message ?? "Tạo món ăn thành công";
+                        }
+                    }
+                    catch
+                    {
+                        // Fallback deserialize sang ApiResponse nếu có đúng schema
+                        var parsed = System.Text.Json.JsonSerializer.Deserialize<ApiResponse>(responseContent, new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        System.Diagnostics.Debug.WriteLine($"[GenerateFoodFromImage] Fallback parsed: isSuccess={parsed?.IsSuccess}, message={parsed?.Message}");
+                        if (parsed == null || (!parsed.IsSuccess))
+                        {
+                            allSuccess = false;
+                            lastMessage = parsed?.Message ?? "Deserialize error";
+                        }
+                        else
+                        {
+                            lastMessage = parsed.Message ?? "Tạo món ăn thành công";
+                        }
+                    }
+                }
+
+                return new ApiResponse
+                {
+                    IsSuccess = allSuccess,
+                    Message = string.IsNullOrWhiteSpace(lastMessage) ? (allSuccess ? "Tạo món ăn thành công" : "Có ảnh thất bại") : lastMessage
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse { IsSuccess = false, Message = ex.Message };
+            }
+        }
+
         public async Task<ApiResponse> CreateStoreTypeToStoreAsync(List<string> storeTypeIds, string storeId)
         {
             try

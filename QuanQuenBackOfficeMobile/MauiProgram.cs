@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Camera.MAUI;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using QuanQuenBackOfficeMobile.Services;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
@@ -7,6 +8,7 @@ using QuanQuenBackOfficeMobile.Views.Stores;
 using System.Reflection;
 #if IOS && ANDROID
 using QuanQuenBackOfficeMobile.Controls;
+using Camera.MAUI;
 #endif
 
 namespace QuanQuenBackOfficeMobile;
@@ -23,7 +25,8 @@ public static class MauiProgram
 			.UseMauiMaps()
 			
 #endif
-			.UseMauiCommunityToolkitMediaElement()
+			.UseMauiCameraView()
+            .UseMauiCommunityToolkitMediaElement()
 			.UseMauiCommunityToolkit()
 			.ConfigureFonts(fonts =>
 			{
@@ -100,6 +103,8 @@ public static class MauiProgram
             }
             client.Timeout = TimeSpan.FromMinutes(5); 
         });
+
+        // Register QR Code Scanning Service
 
         builder.Services.AddHttpClient<IAiChatbotService, AiChatbotService>((sp, client) =>
         {
@@ -185,6 +190,9 @@ public static class MauiProgram
 		builder.Services.AddTransient<VideoStoreUserViewModel>();
 		builder.Services.AddTransient<VideoStoreUserPage>();
 
+		// Register Scanning QR ViewModel and Page
+		builder.Services.AddTransient<ScanningQRPage>();
+
 
 		// Register Converters
 		builder.Services.AddSingleton<Converters.AvatarUrlConverter>();
@@ -199,6 +207,7 @@ public static class MauiProgram
     {
         handlers.AddHandler(typeof(CustomDropdownPicker), typeof(CustomDropdownPickerHandler));
         handlers.AddHandler(typeof(CustomMap), typeof(CustomMapHandler));
+        handlers.AddHandler(typeof(Camera.MAUI.CameraView), typeof(Camera.MAUI.CameraViewHandler));
     });
 #endif
 		return builder.Build();

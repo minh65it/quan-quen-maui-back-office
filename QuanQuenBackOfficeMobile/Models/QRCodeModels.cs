@@ -2,15 +2,6 @@ using System.Text.Json.Serialization;
 
 namespace QuanQuenBackOfficeMobile.Models
 {
-    public class QRCodeRequest
-    {
-        [JsonPropertyName("qrText")]
-        public string QRText { get; set; } = string.Empty;
-
-        [JsonPropertyName("text")]
-        public string Text { get; set; } = string.Empty;
-    }
-
     public class QRCodeData
     {
         [JsonPropertyName("Địa Chỉ")]
@@ -57,5 +48,32 @@ namespace QuanQuenBackOfficeMobile.Models
 
         [JsonPropertyName("qrCodeImage")]
         public string QRCodeImage { get; set; } = string.Empty; 
+    }
+
+    public class UpdateQRCodeRequest
+    {
+        [JsonPropertyName("identityId")]
+        public string? IdentityId { get; set; }
+
+        [JsonPropertyName("qrCodeType")]
+        public string? QRCodeType { get; set; }
+
+        [JsonPropertyName("qRcode")]
+        public string? QRCode { get; set; }
+
+        [JsonPropertyName("qrFormat")]
+        public int QRFormat { get; set; }
+
+        [JsonPropertyName("jsonContent")]
+        public JsonContentData? JsonContent { get; set; }
+    }
+
+    public class JsonContentData
+    {
+        [JsonPropertyName("objectId")]
+        public string[]? ObjectId { get; set; }
+
+        [JsonPropertyName("userId")]
+        public string[]? UserId { get; set; }
     }
 }

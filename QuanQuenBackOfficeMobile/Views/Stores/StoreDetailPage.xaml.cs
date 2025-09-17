@@ -52,4 +52,44 @@ public partial class StoreDetailPage : ContentPage
             await DisplayAlert("Lỗi", $"Không thể mở bản đồ: {ex.Message}", "OK");
         }
     }
+
+    private async void ScanQRCode_Clicked(object sender, EventArgs e)
+    {
+        try
+        {
+            if (_viewModel.StoreDetail?.StoreId == null)
+            {
+                await DisplayAlert("Lỗi", "Không tìm thấy thông tin nhà hàng", "OK");
+                return;
+            }
+
+            // Navigate đến ScanningQRPage với StoreId
+            var scanningPage = new ScanningQRPage(_viewModel.StoreDetail.StoreId);
+            await Navigation.PushAsync(scanningPage);
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Lỗi", $"Không thể mở camera scan QR: {ex.Message}", "OK");
+        }
+    }
+
+    private async void AddMenuImages_Clicked(object sender, EventArgs e)
+    {
+        try
+        {
+            if (_viewModel.StoreDetail?.StoreId == null)
+            {
+                await DisplayAlert("Lỗi", "Không tìm thấy thông tin nhà hàng", "OK");
+                return;
+            }
+
+            // Navigate đến StoreMenuPage để thêm ảnh menu món ăn
+            var storeMenuPage = new StoreMenuPage(_viewModel.StoreDetail.StoreId);
+            await Navigation.PushAsync(storeMenuPage);
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Lỗi", $"Không thể mở trang thêm ảnh menu: {ex.Message}", "OK");
+        }
+    }
 } 

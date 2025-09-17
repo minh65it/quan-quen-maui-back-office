@@ -11,7 +11,6 @@ using Microsoft.Maui.Storage;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Maui.Graphics;
-using Microsoft.Maui.Media;
 
 namespace QuanQuenBackOfficeMobile.ViewModels.Stores;
 
@@ -29,80 +28,39 @@ public partial class StoreMenuViewModel : ObservableObject
     public bool HasMenuImage => MenuImages != null && MenuImages.Count > 0;
 
 
-    public ICommand AddImageCommand { get; }
-    public ICommand TakePhotoCommand { get; }
     public ICommand RemoveImageCommand { get; }
     public ICommand UploadImagesCommand { get; }
-    public ICommand SkipCommand { get; }
 
     private readonly IStoreMediaService _storeMediaService;
+    private readonly IStoreService _storeService;
+    private readonly string _storeId;
+    public event Action<bool, string> UploadCompleted;
 
-    public StoreMenuViewModel()
+    public StoreMenuViewModel(string storeId)
     {
         _storeMediaService = App.Services.GetService<IStoreMediaService>();
-        AddImageCommand = new AsyncRelayCommand(OnAddImage);
-        TakePhotoCommand = new AsyncRelayCommand(OnTakePhoto);
+        _storeService = App.Services.GetService<IStoreService>();
+        _storeId = storeId;
         RemoveImageCommand = new RelayCommand<MyImageModel>(OnRemoveImage);
         UploadImagesCommand = new AsyncRelayCommand(OnUploadImages, CanUploadImages);
-        SkipCommand = new AsyncRelayCommand(OnSkip);
     }
 
-    private async Task OnAddImage()
+    public void AddImagePaths(IEnumerable<string> imagePaths)
     {
-        try
+        if (imagePaths == null) return;
+        foreach (var path in imagePaths)
         {
-            var result = await MediaPicker.Default.PickPhotoAsync();
+            if (string.IsNullOrWhiteSpace(path)) continue;
+            var imageModel = new MyImageModel
             {
-                var imageModel = new MyImageModel
-                {
-                    Images = ImageSource.FromFile(result.FullPath),
-                    LocalPath = result.FullPath
-                };
-
-                MenuImages.Add(imageModel);
-                UploadStatus = $"Đã chọn {MenuImages.Count} ảnh";
-                ((AsyncRelayCommand)UploadImagesCommand).NotifyCanExecuteChanged();
-                OnPropertyChanged(nameof(HasMenuImage));
-            }
+                Images = ImageSource.FromFile(path),
+                LocalPath = path
+            };
+            MenuImages.Add(imageModel);
         }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"[StoreMenuViewModel] OnAddImage Exception: {ex}");
-            await App.Current.MainPage.DisplayAlert("Lỗi", "Không thể chọn ảnh", "OK");
-        }
-    }
-
-    private async Task OnTakePhoto()
-    {
-        try
-        {
-            if (MediaPicker.IsCaptureSupported)
-            {
-                var photo = await MediaPicker.CapturePhotoAsync();
-                if (photo != null)
-                {
-                    var imageModel = new MyImageModel
-                    {
-                        Images = ImageSource.FromFile(photo.FullPath),
-                        LocalPath = photo.FullPath
-                    };
-
-                    MenuImages.Add(imageModel);
-                    UploadStatus = $"Đã chọn {MenuImages.Count} ảnh";
-                    ((AsyncRelayCommand)UploadImagesCommand).NotifyCanExecuteChanged();
-                    OnPropertyChanged(nameof(HasMenuImage));
-                }
-            }
-            else
-            {
-                await App.Current.MainPage.DisplayAlert("Lỗi", "Thiết bị không hỗ trợ chụp ảnh", "OK");
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"[StoreMenuViewModel] OnTakePhoto Exception: {ex}");
-            await App.Current.MainPage.DisplayAlert("Lỗi", "Không thể chụp ảnh", "OK");
-        }
+        UploadStatus = $"Đã chọn {MenuImages.Count} ảnh";
+        ((AsyncRelayCommand)UploadImagesCommand).NotifyCanExecuteChanged();
+        OnPropertyChanged(nameof(HasMenuImage));
     }
 
     private void OnRemoveImage(MyImageModel image)
@@ -125,83 +83,35 @@ public partial class StoreMenuViewModel : ObservableObject
     {
         if (MenuImages.Count == 0)
         {
-            await App.Current.MainPage.DisplayAlert("Thông báo", "Vui lòng chọn ít nhất một ảnh", "OK");
+            // Không show alert ở VM; chỉ cập nhật trạng thái để UI xử lý
+            UploadCompleted?.Invoke(false, "Vui lòng chọn ít nhất một ảnh");
             return;
         }
 
         IsLoading = true;
-        UploadStatus = "Đang upload ảnh...";
+        UploadStatus = "Đang gửi ảnh nhận diện món...";
 
         try
         {
-            // 1. Lấy categoryMediaId cho "Ảnh nhà hàng"
-            var categoryMediaId = await _storeMediaService.GetThumbnailCategoryMediaIdAsync("Ảnh nhà hàng");
-            if (string.IsNullOrEmpty(categoryMediaId))
-            {
-                await App.Current.MainPage.DisplayAlert("Lỗi", "Không thể lấy thông tin category media", "OK");
-                return;
-            }
+            // Gọi API GenerateFoodFromImage với storeId + danh sách file ảnh
+            var storeId = _storeId;
+            var imagePaths = MenuImages.Select(m => m.LocalPath).ToList();
 
-            // 2. Convert ảnh thành byte array
-            var imageBytesList = new List<byte[]>();
-            foreach (var image in MenuImages)
-            {
-                try
-                {
-                    var bytes = await File.ReadAllBytesAsync(image.LocalPath);
-                    imageBytesList.Add(bytes);
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"[StoreMenuViewModel] Error reading image {image.LocalPath}: {ex}");
-                }
-            }
-
-            if (imageBytesList.Count == 0)
-            {
-                await App.Current.MainPage.DisplayAlert("Lỗi", "Không thể đọc ảnh", "OK");
-                return;
-            }
-
-            // 3. Upload ảnh
-            var storeId = StoreRegistrationData.StoreId;
-            var createdBy = await SecureStorage.GetAsync("userName");
-
-            var uploadResult = await _storeMediaService.UploadMediasAsync(storeId, categoryMediaId, createdBy,imageBytesList,false,true);
-
-            if (uploadResult.IsSuccess)
-            {
-                await App.Current.MainPage.DisplayAlert("Thành công", "Upload ảnh menu thành công!", "OK");
-                await App.Current.MainPage.Navigation.PopToRootAsync();
-            }
+            var result = await _storeService.GenerateFoodFromImageAsync(storeId, imagePaths);
+            if (result.IsSuccess)
+                UploadCompleted?.Invoke(true, "Đã gửi ảnh menu. Hệ thống sẽ tự động sinh món ăn.");
             else
-            {
-                await App.Current.MainPage.DisplayAlert("Lỗi", uploadResult.Message ?? "Upload ảnh thất bại", "OK");
-            }
+                UploadCompleted?.Invoke(false, result.Message ?? "Gửi ảnh thất bại");
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[StoreMenuViewModel] OnUploadImages Exception: {ex}");
-            await App.Current.MainPage.DisplayAlert("Lỗi", $"Có lỗi xảy ra: {ex.Message}", "OK");
+            UploadCompleted?.Invoke(false, $"Có lỗi xảy ra: {ex.Message}");
         }
         finally
         {
             IsLoading = false;
             UploadStatus = "";
-        }
-    }
-
-    private async Task OnSkip()
-    {
-        var result = await App.Current.MainPage.DisplayAlert(
-            "Xác nhận", 
-            "Bạn có chắc chắn muốn bỏ qua việc upload ảnh menu?", 
-            "Có", 
-            "Không");
-
-        if (result)
-        {
-            await App.Current.MainPage.Navigation.PopToRootAsync();
         }
     }
 } 

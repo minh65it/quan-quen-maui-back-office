@@ -16,4 +16,5 @@ public interface IStoreService
     Task<ApiResponse> CreateStoreTypeToStoreAsync(List<string> storeTypeIds, string storeId);
     Task<List<StoreTypeModel>> GetStoreTypeAsync();
     Task<bool> UpdateStoreLocationAsync(string storeId, double latitude, double longitude, string address, string ward = null, string district = null, string city = null);
+    Task<ApiResponse> GenerateFoodFromImageAsync(string storeId, List<string> imagePaths);
 }

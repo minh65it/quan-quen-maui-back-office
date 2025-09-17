@@ -243,7 +243,8 @@ public partial class StoreLevelViewModel : ObservableObject
             }
 
             await App.Current.MainPage.DisplayAlert("Thành công", "Cập nhật level và trạng thái thành công!", "OK");
-            await App.Current.MainPage.Navigation.PushAsync(new Views.Stores.StoreMenuPage());
+            // Quay về trang root thay vì chuyển đến StoreMenuPage
+            await App.Current.MainPage.Navigation.PopToRootAsync();
         }
         finally
         {

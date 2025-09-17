@@ -45,24 +45,11 @@ namespace QuanQuenBackOfficeMobile.ViewModels
         public PhotoStoreUserViewModel(IStoreMediaService storeMediaService)
         {
             _storeMediaService = storeMediaService;
-            PickImageCommand = new AsyncRelayCommand(PickImagesAsync, () => CanAddMoreImages);
-            CaptureImageCommand = new AsyncRelayCommand(CaptureImageAsync, () => CanAddMoreImages);
+            PickImageCommand = new AsyncRelayCommand(DeprecatedPickImagesAsync, () => CanAddMoreImages);
+            CaptureImageCommand = new AsyncRelayCommand(DeprecatedCaptureImageAsync, () => CanAddMoreImages);
             RemoveImageCommand = new RelayCommand<ImageSource>(RemoveImage);
         }
 
-        [RelayCommand]
-        public async Task AddCoverImageAsync()
-        {
-            // Command cũ - giữ lại để tương thích ngược
-            await CaptureImageAsync();
-        }
-
-        [RelayCommand]
-        public async Task AddGalleryImageAtIndexAsync(ImageItem tappedImage)
-        {
-            // Command cũ - giữ lại để tương thích ngược
-            await CaptureImageAsync();
-        }
 
         private async Task<string> CopyFileToAppDirectoryAsync(FileResult file)
         {
@@ -93,10 +80,8 @@ namespace QuanQuenBackOfficeMobile.ViewModels
             }
         }
 
-        private async Task PickImagesAsync()
+        public async Task AddImageFromFileAsync(FileResult file)
         {
-            System.Diagnostics.Debug.WriteLine("[LOG] Bắt đầu chọn ảnh từ thư viện...");
-            
             try
             {
                 if (!CanAddMoreImages)
@@ -105,175 +90,65 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                     return;
                 }
 
-                // Chọn ảnh trực tiếp qua MediaPicker
-                var photosPermission = await Permissions.CheckStatusAsync<Permissions.Photos>();
-                if (photosPermission != PermissionStatus.Granted)
-                {
-                    photosPermission = await Permissions.RequestAsync<Permissions.Photos>();
-                    if (photosPermission != PermissionStatus.Granted)
-                    {
-                        await App.Current.MainPage.DisplayAlert("Lỗi", "Ứng dụng cần quyền truy cập thư viện ảnh!", "OK");
-                        return;
-                    }
-                }
-
-                var result = await MediaPicker.Default.PickPhotoAsync(new MediaPickerOptions { Title = "Chọn ảnh" });
-                
-                if (result != null)
+                if (file != null)
                 {
                     if (StoreImageFiles.Count >= 6)
                     {
                         System.Diagnostics.Debug.WriteLine("[LOG] Đã đủ 6 ảnh, dừng thêm.");
                         return;
                     }
-                    if (StoreImageFiles.Any(f => f.FullPath == result.FullPath))
+                    if (StoreImageFiles.Any(f => f.FullPath == file.FullPath))
                     {
-                        System.Diagnostics.Debug.WriteLine($"[LOG] Ảnh đã tồn tại: {result.FullPath}");
+                        System.Diagnostics.Debug.WriteLine($"[LOG] Ảnh đã tồn tại: {file.FullPath}");
                         return;
                     }
 
-                    // Xử lý file trên background thread
-                    await Task.Run(async () =>
-                    {
-                        try
-                        {
-                            var copiedPath = await CopyFileToAppDirectoryAsync(result);
-                            
-                            await MainThread.InvokeOnMainThreadAsync(() =>
-                            {
-                                StoreImageFiles.Add(result);
-                                System.Diagnostics.Debug.WriteLine($"[LOG] Đã thêm file vào StoreImageFiles: {result.FullPath}");
-                                
-                                var imgSource = ImageSource.FromFile(copiedPath);
-                                StoreImages.Add(new MyImageModel { Images = imgSource, LocalPath = copiedPath });
-                                System.Diagnostics.Debug.WriteLine($"[LOG] Đã thêm vào StoreImages (FromFile): {copiedPath}");
-                                
-                                OnPropertyChanged(nameof(CanAddMoreImages));
-                                OnPropertyChanged(nameof(ButtonBackgroundColor));
-                                OnPropertyChanged(nameof(ButtonTextColor));
-                                OnPropertyChanged(nameof(ImageCounterText));
-                                
-                                PickImageCommand.NotifyCanExecuteChanged();
-                                CaptureImageCommand.NotifyCanExecuteChanged();
-                            });
-                        }
-                        catch (Exception ex)
-                        {
-                            System.Diagnostics.Debug.WriteLine($"[LOG][ERROR] Không thể copy hoặc tạo ImageSource từ file: {result.FullPath} - {ex.Message}");
-                            await MainThread.InvokeOnMainThreadAsync(async () =>
-                            {
-                                await App.Current.MainPage.DisplayAlert("Lỗi", $"Không thể xử lý ảnh: {ex.Message}", "OK");
-                            });
-                        }
-                    });
+                    // Xử lý file đơn giản
+                    var copiedPath = await CopyFileToAppDirectoryAsync(file);
+                    
+                    StoreImageFiles.Add(file);
+                    System.Diagnostics.Debug.WriteLine($"[LOG] Đã thêm file vào StoreImageFiles: {file.FullPath}");
+                    
+                    var imgSource = ImageSource.FromFile(copiedPath);
+                    StoreImages.Add(new MyImageModel { Images = imgSource, LocalPath = copiedPath });
+                    System.Diagnostics.Debug.WriteLine($"[LOG] Đã thêm vào StoreImages (FromFile): {copiedPath}");
+                    
+                    OnPropertyChanged(nameof(CanAddMoreImages));
+                    OnPropertyChanged(nameof(ButtonBackgroundColor));
+                    OnPropertyChanged(nameof(ButtonTextColor));
+                    OnPropertyChanged(nameof(ImageCounterText));
+                    
+                    PickImageCommand.NotifyCanExecuteChanged();
+                    CaptureImageCommand.NotifyCanExecuteChanged();
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("[LOG] Không chọn được ảnh từ thư viện!");
+                    System.Diagnostics.Debug.WriteLine("[LOG] Không có file ảnh hợp lệ để thêm!");
                 }
             }
             catch (UnauthorizedAccessException ex)
             {
                 System.Diagnostics.Debug.WriteLine($"[LOG][PERMISSION] Permission denied: {ex.Message}");
-                await App.Current.MainPage.DisplayAlert("Lỗi", "Ứng dụng cần quyền truy cập thư viện ảnh!", "OK");
+                await App.Current.MainPage.DisplayAlert("Lỗi", "Ứng dụng cần quyền truy cập ảnh!", "OK");
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"[LOG][ERROR] Lỗi trong PickImagesAsync: {ex.Message}");
-                await App.Current.MainPage.DisplayAlert("Lỗi", $"Có lỗi xảy ra khi chọn ảnh: {ex.Message}", "OK");
+                System.Diagnostics.Debug.WriteLine($"[LOG][ERROR] Lỗi trong AddImageFromFileAsync: {ex.Message}");
+                await App.Current.MainPage.DisplayAlert("Lỗi", $"Có lỗi xảy ra khi xử lý ảnh: {ex.Message}", "OK");
             }
             
             System.Diagnostics.Debug.WriteLine($"[LOG] Tổng số ảnh hiện tại: {StoreImages.Count}");
         }
 
-        private async Task CaptureImageAsync()
+        // Các phương thức command cũ: hiển thị thông báo, hướng dẫn thao tác từ UI (Code-behind)
+        private async Task DeprecatedPickImagesAsync()
         {
-            System.Diagnostics.Debug.WriteLine("[LOG] Bắt đầu chụp ảnh...");
-            
-            try
-            {
-                // Bỏ tối ưu hóa qua service để đơn giản hóa
+            await App.Current.MainPage.DisplayAlert("Thông báo", "Vui lòng dùng nút 'Chọn ảnh nhà hàng' trên giao diện.", "OK");
+        }
 
-                if (!CanAddMoreImages)
-                {
-                    System.Diagnostics.Debug.WriteLine("[LOG] Không thể thêm ảnh mới, đã đủ 6 ảnh.");
-                    return;
-                }
-
-                // Kiểm tra quyền camera
-                var cameraStatus = await Permissions.CheckStatusAsync<Permissions.Camera>();
-                if (cameraStatus != PermissionStatus.Granted)
-                {
-                    cameraStatus = await Permissions.RequestAsync<Permissions.Camera>();
-                    if (cameraStatus != PermissionStatus.Granted)
-                    {
-                        await App.Current.MainPage.DisplayAlert("Lỗi", "Ứng dụng cần quyền truy cập camera để chụp ảnh!", "OK");
-                        return;
-                    }
-                }
-
-                var file = await MediaPicker.Default.CapturePhotoAsync();
-                
-                if (file != null)
-                {
-                    System.Diagnostics.Debug.WriteLine($"[LOG] Đã chụp ảnh: {file.FullPath}");
-                    
-                    // Xử lý file trên background thread để tránh block UI
-                    await Task.Run(async () =>
-                    {
-                        try
-                        {
-                            var copiedPath = await CopyFileToAppDirectoryAsync(file);
-                            
-                            // Quay lại main thread để update UI
-                            await MainThread.InvokeOnMainThreadAsync(() =>
-                            {
-                                StoreImageFiles.Add(file);
-                                var imgSource = ImageSource.FromFile(copiedPath);
-                                StoreImages.Add(new MyImageModel { Images = imgSource, LocalPath = copiedPath });
-                                System.Diagnostics.Debug.WriteLine($"[LOG] Đã thêm vào StoreImages (FromFile): {copiedPath}");
-                                
-                                OnPropertyChanged(nameof(CanAddMoreImages));
-                                OnPropertyChanged(nameof(ButtonBackgroundColor));
-                                OnPropertyChanged(nameof(ButtonTextColor));
-                                OnPropertyChanged(nameof(ImageCounterText));
-                                
-                                PickImageCommand.NotifyCanExecuteChanged();
-                                CaptureImageCommand.NotifyCanExecuteChanged();
-                            });
-                        }
-                        catch (Exception ex)
-                        {
-                            System.Diagnostics.Debug.WriteLine($"[LOG][ERROR] Không thể copy hoặc tạo ImageSource từ file: {file.FullPath} - {ex.Message}");
-                            await MainThread.InvokeOnMainThreadAsync(async () =>
-                            {
-                                await App.Current.MainPage.DisplayAlert("Lỗi", $"Không thể xử lý ảnh: {ex.Message}", "OK");
-                            });
-                        }
-                    });
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("[LOG] Không lấy được file ảnh từ camera!");
-                }
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"[LOG][PERMISSION] Permission denied: {ex.Message}");
-                await App.Current.MainPage.DisplayAlert("Lỗi", "Ứng dụng cần quyền truy cập camera để chụp ảnh!", "OK");
-            }
-            catch (NotSupportedException ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"[LOG][NOT_SUPPORTED] Camera not supported: {ex.Message}");
-                await App.Current.MainPage.DisplayAlert("Lỗi", "Thiết bị không hỗ trợ chụp ảnh!", "OK");
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"[LOG][ERROR] Lỗi trong CaptureImageAsync: {ex.Message}");
-                await App.Current.MainPage.DisplayAlert("Lỗi", $"Có lỗi xảy ra khi chụp ảnh: {ex.Message}", "OK");
-            }
-            
-            System.Diagnostics.Debug.WriteLine($"[LOG] Tổng số ảnh hiện tại: {StoreImages.Count}");
+        private async Task DeprecatedCaptureImageAsync()
+        {
+            await App.Current.MainPage.DisplayAlert("Thông báo", "Vui lòng dùng nút 'Chụp ảnh nhà hàng' trên giao diện.", "OK");
         }
 
         private void RemoveImage(ImageSource img)
@@ -393,32 +268,5 @@ namespace QuanQuenBackOfficeMobile.ViewModels
             return null;
         }
 
-        [RelayCommand]
-        public async Task CaptureCoverImageAsync()
-        {
-            // Command cũ - giữ lại để tương thích ngược
-            await CaptureImageAsync();
-        }
-
-        [RelayCommand]
-        public async Task PickCoverImageAsync()
-        {
-            // Command cũ - giữ lại để tương thích ngược
-            await PickImagesAsync();
-        }
-
-        [RelayCommand]
-        public async Task CaptureGalleryImageAsync()
-        {
-            // Command cũ - giữ lại để tương thích ngược
-            await CaptureImageAsync();
-        }
-
-        [RelayCommand]
-        public async Task PickGalleryImageAsync()
-        {
-            // Command cũ - giữ lại để tương thích ngược
-            await PickImagesAsync();
-        }
     }
 }

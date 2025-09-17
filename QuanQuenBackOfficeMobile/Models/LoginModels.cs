@@ -25,6 +25,9 @@ namespace QuanQuenBackOfficeMobile.Models
     public class VsiriusUserDto
     {
 
+        [JsonPropertyName("userId")]
+        public string UserId { get; set; }
+
         [JsonPropertyName("userName")]
         public string UserName { get; set; }
 

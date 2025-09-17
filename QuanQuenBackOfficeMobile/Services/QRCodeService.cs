@@ -133,5 +133,84 @@ namespace QuanQuenBackOfficeMobile.Services
                 throw;
             }
         }
+
+        public async Task<bool> UpdateQRCodeAsync(string qrCode, string qrCodeType, string identityId)
+        {
+            try
+            {
+                var baseUrl = _configuration["API:QRCode:BaseUrl"];
+                var path = _configuration["API:QRCode:UpdateQRCodeStatus"];
+                
+                if (string.IsNullOrEmpty(baseUrl) || string.IsNullOrEmpty(path))
+                {
+                    throw new InvalidOperationException("QRCode configuration is missing. Please check appsettings.json");
+                }
+                
+                var url = $"{baseUrl}{path}";
+
+                // Tạo request body theo format API yêu cầu
+                var request = new UpdateQRCodeRequest
+                {
+                    IdentityId = identityId,
+                    QRCodeType = qrCodeType ?? "Store",
+                    QRCode = qrCode,
+                    QRFormat = 0,
+                    JsonContent = new JsonContentData
+                    {
+                        ObjectId = new string[] { "" },
+                        UserId = new string[] { "" }
+                    }
+                };
+
+                // Serialize request body
+                var jsonContent = JsonSerializer.Serialize(request, new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                });
+
+                // Lấy token xác thực
+                var token = await SecureStorage.GetAsync("auth_token");
+                if (string.IsNullOrEmpty(token))
+                {
+                    throw new UnauthorizedAccessException("No authentication token found");
+                }
+
+                // Thiết lập headers
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                _httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+
+                // Log request details
+                System.Diagnostics.Debug.WriteLine($"[QRCodeService] UpdateQRCode Request URL: {url}");
+                System.Diagnostics.Debug.WriteLine($"[QRCodeService] UpdateQRCode Request Method: PUT");
+                System.Diagnostics.Debug.WriteLine($"[QRCodeService] UpdateQRCode Request Body: {jsonContent}");
+
+                // Tạo HTTP content
+                var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
+
+                // Thực hiện request
+                var response = await _httpClient.PutAsync(url, content);
+                System.Diagnostics.Debug.WriteLine($"[QRCodeService] UpdateQRCode HTTP Status: {(int)response.StatusCode} {response.ReasonPhrase}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    System.Diagnostics.Debug.WriteLine($"[QRCodeService] UpdateQRCode Response: {responseContent}");
+                    return true;
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    System.Diagnostics.Debug.WriteLine($"[QRCodeService] UpdateQRCode Error: {errorContent}");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error in UpdateQRCodeAsync: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"[QRCodeService] UpdateQRCode StackTrace: {ex.StackTrace}");
+                return false;
+            }
+        }
     }
 }

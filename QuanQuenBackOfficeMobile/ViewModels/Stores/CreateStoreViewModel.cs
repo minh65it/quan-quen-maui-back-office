@@ -403,18 +403,6 @@ public partial class CreateStoreViewModel : ObservableObject
                 return;
             }
 
-            // Quyền thư viện ảnh và chọn ảnh trực tiếp
-            var photosPermission = await Permissions.CheckStatusAsync<Permissions.Photos>();
-            if (photosPermission != PermissionStatus.Granted)
-            {
-                photosPermission = await Permissions.RequestAsync<Permissions.Photos>();
-                if (photosPermission != PermissionStatus.Granted)
-                {
-                    await App.Current.MainPage.DisplayAlert("Lỗi", "Ứng dụng cần quyền truy cập thư viện ảnh!", "OK");
-                    return;
-                }
-            }
-
             var result = await MediaPicker.Default.PickPhotoAsync(new MediaPickerOptions { Title = "Chọn ảnh giấy phép" });
             
             if (result != null)
@@ -501,18 +489,6 @@ public partial class CreateStoreViewModel : ObservableObject
                 System.Diagnostics.Debug.WriteLine("[LOG] Thiết bị không hỗ trợ chụp ảnh!");
                 await App.Current.MainPage.DisplayAlert("Lỗi", "Thiết bị không hỗ trợ chụp ảnh!", "OK");
                 return;
-            }
-
-            // Kiểm tra quyền camera và chụp ảnh trực tiếp
-            var cameraStatus = await Permissions.CheckStatusAsync<Permissions.Camera>();
-            if (cameraStatus != PermissionStatus.Granted)
-            {
-                cameraStatus = await Permissions.RequestAsync<Permissions.Camera>();
-                if (cameraStatus != PermissionStatus.Granted)
-                {
-                    await App.Current.MainPage.DisplayAlert("Lỗi", "Ứng dụng cần quyền truy cập camera để chụp ảnh!", "OK");
-                    return;
-                }
             }
 
             var file = await MediaPicker.Default.CapturePhotoAsync();

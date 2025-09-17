@@ -51,6 +51,26 @@
                             FontAttributes="Bold"
                             CornerRadius="8"
                             HeightRequest="50" />
+                    
+                    <!-- Button scan QR Code -->
+                    <Button Text="📱 Scan QR Code" 
+                            Clicked="ScanQRCode_Clicked"
+                            BackgroundColor="#28A745"
+                            TextColor="White"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            CornerRadius="8"
+                            HeightRequest="50" />
+                    
+                    <!-- Button thêm ảnh menu món ăn -->
+                    <Button Text="🍽️ Thêm ảnh menu món ăn" 
+                            Clicked="AddMenuImages_Clicked"
+                            BackgroundColor="#FF6B35"
+                            TextColor="White"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            CornerRadius="8"
+                            HeightRequest="50" />
                 </VerticalStackLayout>
             </Frame>
 
