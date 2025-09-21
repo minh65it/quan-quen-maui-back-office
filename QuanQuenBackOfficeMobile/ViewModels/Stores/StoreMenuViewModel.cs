@@ -11,6 +11,8 @@ using Microsoft.Maui.Storage;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Maui.Graphics;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Media;
 
 namespace QuanQuenBackOfficeMobile.ViewModels.Stores;
 
@@ -30,6 +32,9 @@ public partial class StoreMenuViewModel : ObservableObject
 
     public ICommand RemoveImageCommand { get; }
     public ICommand UploadImagesCommand { get; }
+    public ICommand PickPhotoCommand { get; }
+    public ICommand CapturePhotoCommand { get; }
+    public ICommand SkipCommand { get; }
 
     private readonly IStoreMediaService _storeMediaService;
     private readonly IStoreService _storeService;
@@ -43,6 +48,9 @@ public partial class StoreMenuViewModel : ObservableObject
         _storeId = storeId;
         RemoveImageCommand = new RelayCommand<MyImageModel>(OnRemoveImage);
         UploadImagesCommand = new AsyncRelayCommand(OnUploadImages, CanUploadImages);
+        PickPhotoCommand = new AsyncRelayCommand(OnPickPhoto);
+        CapturePhotoCommand = new AsyncRelayCommand(OnCapturePhoto);
+        SkipCommand = new AsyncRelayCommand(OnSkip);
     }
 
     public void AddImagePaths(IEnumerable<string> imagePaths)
@@ -113,5 +121,63 @@ public partial class StoreMenuViewModel : ObservableObject
             IsLoading = false;
             UploadStatus = "";
         }
+    }
+
+    private async Task OnPickPhoto()
+    {
+        try
+        {
+            var status = await Permissions.RequestAsync<Permissions.Photos>();
+            if (status != PermissionStatus.Granted)
+            {
+                UploadCompleted?.Invoke(false, "Cần quyền truy cập thư viện ảnh để chọn ảnh");
+                return;
+            }
+
+            var result = await MediaPicker.Default.PickPhotoAsync();
+            if (result != null)
+            {
+                AddImagePaths(new[] { result.FullPath });
+            }
+        }
+        catch (Exception ex)
+        {
+            UploadCompleted?.Invoke(false, $"Không thể chọn ảnh: {ex.Message}");
+        }
+    }
+
+    private async Task OnCapturePhoto()
+    {
+        try
+        {
+            var cameraStatus = await Permissions.RequestAsync<Permissions.Camera>();
+            if (cameraStatus != PermissionStatus.Granted)
+            {
+                UploadCompleted?.Invoke(false, "Cần quyền Camera để chụp ảnh");
+                return;
+            }
+
+            if (!MediaPicker.IsCaptureSupported)
+            {
+                UploadCompleted?.Invoke(false, "Thiết bị không hỗ trợ chụp ảnh");
+                return;
+            }
+
+            var photo = await MediaPicker.CapturePhotoAsync();
+            if (photo != null)
+            {
+                AddImagePaths(new[] { photo.FullPath });
+            }
+        }
+        catch (Exception ex)
+        {
+            UploadCompleted?.Invoke(false, $"Không thể chụp ảnh: {ex.Message}");
+        }
+    }
+
+    private async Task OnSkip()
+    {
+        // Event sẽ được xử lý trong code-behind để có thể hiển thị alert và navigation
+        UploadCompleted?.Invoke(true, "skip");
     }
 } 

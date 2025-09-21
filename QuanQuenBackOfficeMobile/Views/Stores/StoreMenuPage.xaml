@@ -49,7 +49,7 @@
             <!-- Action Buttons -->
             <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
                 <Button Text="📷 Chụp Ảnh" 
-                        Clicked="OnCapturePhotoClicked"
+                        Command="{Binding CapturePhotoCommand}"
                         BackgroundColor="{AppThemeBinding Light={StaticResource BlueColor}, Dark={StaticResource BlueColor}}" 
                         TextColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}" 
                         FontAttributes="Bold" 
@@ -58,7 +58,7 @@
                         FontSize="14" />
                 
                 <Button Text="📁 Chọn Ảnh" 
-                        Clicked="OnPickPhotoClicked"
+                        Command="{Binding PickPhotoCommand}"
                         BackgroundColor="{AppThemeBinding Light={StaticResource GreenColor}, Dark={StaticResource GreenColor}}" 
                         TextColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}" 
                         FontAttributes="Bold" 
@@ -137,18 +137,6 @@
                         FontSize="18"
                         IsVisible="{Binding HasMenuImage}" />
                 
-                <!-- Skip handled in code-behind for permission/navigation UX -->
-                <Button Text="Bỏ Qua"
-                        Clicked="OnSkipClicked"
-                        BackgroundColor="Transparent"
-                        TextColor="#FF9900"
-                        FontAttributes="Bold"
-                        HeightRequest="40"
-                        CornerRadius="20"
-                        FontSize="16"
-                        BorderColor="#FF9900"
-                        BorderWidth="2"
-                        HorizontalOptions="Center" />
             </VerticalStackLayout>
         </VerticalStackLayout>
     </ScrollView>

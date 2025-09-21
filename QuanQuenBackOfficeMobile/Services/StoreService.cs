@@ -103,9 +103,22 @@ namespace QuanQuenBackOfficeMobile.Services
                 form.Add(new StringContent(request.RepresentativeName ?? ""), "RepresentativeName");
                 form.Add(new StringContent(request.ProvinceId ?? ""), "ProvinceId");
                 form.Add(new StringContent(request.BusinessType ?? ""), "BusinessType");
+                form.Add(new StringContent(request.CreatedBy ?? ""), "CreatedBy");
+                
+                System.Diagnostics.Debug.WriteLine($"[StoreService] CreatedBy gửi lên: '{request.CreatedBy}'");
 
-                // Sử dụng token được truyền vào hoặc lấy từ SecureStorage
-                var authToken = token ?? await SecureStorage.GetAsync("auth_token");
+                // Luôn ưu tiên token được truyền vào (userToken từ RegisterUser)
+                var authToken = token;
+                if (string.IsNullOrEmpty(authToken))
+                {
+                    authToken = await SecureStorage.GetAsync("auth_token");
+                    System.Diagnostics.Debug.WriteLine($"[StoreService] Không có userToken, dùng auth_token từ SecureStorage");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"[StoreService] Sử dụng userToken từ RegisterUser response");
+                }
+                System.Diagnostics.Debug.WriteLine($"[StoreService] Token value: {authToken?.Substring(0, Math.Min(20, authToken?.Length ?? 0))}...");
                 _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authToken);
 
                 var response = await _httpClient.PostAsync(url, form);

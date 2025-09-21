@@ -147,7 +147,7 @@ namespace QuanQuenBackOfficeMobile.Models
         public string RepresentativeName { get; set; }
         public string ProvinceId { get; set; }
         public string BusinessType { get; set; }
-        public string CreatedBy { get; set; } = string.Empty; // Thông tin người tạo store
+        public string CreatedBy { get; set; } = string.Empty;
     }
 
     public class ApiResponse
