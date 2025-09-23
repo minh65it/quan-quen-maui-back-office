@@ -10,6 +10,7 @@ using QuanQuenBackOfficeMobile.Models;
 using QuanQuenBackOfficeMobile.Views.Stores;
 using System.Collections.Generic;
 using CommunityToolkit.Maui.Views;
+using QuanQuenBackOfficeMobile.ViewModels;
 
 namespace QuanQuenBackOfficeMobile.ViewModels.Stores;
 
@@ -242,9 +243,38 @@ public partial class StoreLevelViewModel : ObservableObject
                 System.Diagnostics.Debug.WriteLine($"[StoreLevel] CreateStoreTypeToStoreAsync exception: {ex.Message}");
             }
 
-            await App.Current.MainPage.DisplayAlert("Thành công", "Cập nhật level và trạng thái thành công!", "OK");
-            // Quay về trang root thay vì chuyển đến StoreMenuPage
-            await App.Current.MainPage.Navigation.PopToRootAsync();
+            // Hiển thị dialog với 2 options
+            var action = await App.Current.MainPage.DisplayActionSheet(
+                "Cập nhật level và trạng thái thành công!",
+                "Hủy",
+                null,
+                "Quay về trang chính",
+                "Thêm chi nhánh mới"
+            );
+
+            if (action == "Quay về trang chính")
+            {
+                await App.Current.MainPage.Navigation.PopToRootAsync();
+            }
+            else if (action == "Thêm chi nhánh mới")
+            {
+                // Navigate to CreateSubStorePage
+                var createSubStoreViewModel = App.Services.GetService<CreateSubStoreViewModel>();
+                if (createSubStoreViewModel != null)
+                {
+                    var createSubStorePage = new CreateSubStorePage(createSubStoreViewModel);
+                    await App.Current.MainPage.Navigation.PushAsync(createSubStorePage);
+                }
+                else
+                {
+                    await App.Current.MainPage.DisplayAlert("Lỗi", "Không thể tạo trang thêm chi nhánh", "OK");
+                    await App.Current.MainPage.Navigation.PopToRootAsync();
+                }
+            }
+            else
+            {
+                // User cancelled, stay on current page
+            }
         }
         finally
         {

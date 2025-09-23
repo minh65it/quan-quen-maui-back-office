@@ -268,5 +268,21 @@ namespace QuanQuenBackOfficeMobile.ViewModels
             return null;
         }
 
+        [RelayCommand]
+        public async Task SkipAsync()
+        {
+            try
+            {
+                // Chuyển trực tiếp đến trang VideoStoreUserPage mà không upload ảnh
+                var serviceProvider = Application.Current.MainPage.Handler.MauiContext.Services;
+                var videoStoreUserPage = serviceProvider.GetRequiredService<VideoStoreUserPage>();
+                await Application.Current.MainPage.Navigation.PushAsync(videoStoreUserPage);
+            }
+            catch (Exception ex)
+            {
+                await App.Current.MainPage.DisplayAlert("Lỗi", $"Có lỗi xảy ra khi chuyển trang: {ex.Message}", "OK");
+            }
+        }
+
     }
 }

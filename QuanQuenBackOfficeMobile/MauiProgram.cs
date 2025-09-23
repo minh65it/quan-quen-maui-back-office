@@ -172,6 +172,9 @@ public static class MauiProgram
 		builder.Services.AddSingleton<LottieViewModel>();
 		builder.Services.AddSingleton<LottiePage>();
 
+		builder.Services.AddSingleton<SupportCenterViewModel>();
+		builder.Services.AddSingleton<SupportCenterPage>();
+
 		builder.Services.AddTransient<StorePageViewModel>();
 		builder.Services.AddTransient<StorePage>();
 		builder.Services.AddTransient<StoreDetailViewModel>();
@@ -184,6 +187,8 @@ public static class MauiProgram
 		builder.Services.AddSingleton<GeographicApiService>();
 
 		builder.Services.AddTransient<CreateStoreViewModel>();
+
+		builder.Services.AddTransient<CreateSubStoreViewModel>();
 
 		builder.Services.AddTransient<PhotoStoreUserViewModel>();
 		builder.Services.AddTransient<PhotoStoreUser>();
