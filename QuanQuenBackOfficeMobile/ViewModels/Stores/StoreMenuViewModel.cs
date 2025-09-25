@@ -33,7 +33,6 @@ public partial class StoreMenuViewModel : ObservableObject
     public ICommand RemoveImageCommand { get; }
     public ICommand UploadImagesCommand { get; }
     public ICommand PickPhotoCommand { get; }
-    public ICommand CapturePhotoCommand { get; }
     public ICommand SkipCommand { get; }
 
     private readonly IStoreMediaService _storeMediaService;
@@ -49,13 +48,16 @@ public partial class StoreMenuViewModel : ObservableObject
         RemoveImageCommand = new RelayCommand<MyImageModel>(OnRemoveImage);
         UploadImagesCommand = new AsyncRelayCommand(OnUploadImages, CanUploadImages);
         PickPhotoCommand = new AsyncRelayCommand(OnPickPhoto);
-        CapturePhotoCommand = new AsyncRelayCommand(OnCapturePhoto);
         SkipCommand = new AsyncRelayCommand(OnSkip);
     }
 
     public void AddImagePaths(IEnumerable<string> imagePaths)
     {
         if (imagePaths == null) return;
+        
+        // Chỉ cho phép 1 ảnh - xóa ảnh cũ nếu có
+        MenuImages.Clear();
+        
         foreach (var path in imagePaths)
         {
             if (string.IsNullOrWhiteSpace(path)) continue;
@@ -65,8 +67,11 @@ public partial class StoreMenuViewModel : ObservableObject
                 LocalPath = path
             };
             MenuImages.Add(imageModel);
+            
+            // Chỉ thêm 1 ảnh đầu tiên
+            break;
         }
-        UploadStatus = $"Đã chọn {MenuImages.Count} ảnh";
+        UploadStatus = MenuImages.Count > 0 ? "Đã chọn 1 ảnh" : "Chưa chọn ảnh";
         ((AsyncRelayCommand)UploadImagesCommand).NotifyCanExecuteChanged();
         OnPropertyChanged(nameof(HasMenuImage));
     }
@@ -76,7 +81,7 @@ public partial class StoreMenuViewModel : ObservableObject
         if (image != null)
         {
             MenuImages.Remove(image);
-            UploadStatus = $"Đã chọn {MenuImages.Count} ảnh";
+            UploadStatus = MenuImages.Count > 0 ? "Đã chọn 1 ảnh" : "Chưa chọn ảnh";
             ((AsyncRelayCommand)UploadImagesCommand).NotifyCanExecuteChanged();
             OnPropertyChanged(nameof(HasMenuImage));
         }
@@ -127,6 +132,13 @@ public partial class StoreMenuViewModel : ObservableObject
     {
         try
         {
+            // Kiểm tra nếu đã có ảnh thì hỏi có muốn thay thế không
+            if (MenuImages.Count > 0)
+            {
+                UploadCompleted?.Invoke(false, "Bạn đã chọn ảnh rồi. Chọn ảnh mới sẽ thay thế ảnh hiện tại.");
+                return;
+            }
+
             var status = await Permissions.RequestAsync<Permissions.Photos>();
             if (status != PermissionStatus.Granted)
             {
@@ -143,35 +155,6 @@ public partial class StoreMenuViewModel : ObservableObject
         catch (Exception ex)
         {
             UploadCompleted?.Invoke(false, $"Không thể chọn ảnh: {ex.Message}");
-        }
-    }
-
-    private async Task OnCapturePhoto()
-    {
-        try
-        {
-            var cameraStatus = await Permissions.RequestAsync<Permissions.Camera>();
-            if (cameraStatus != PermissionStatus.Granted)
-            {
-                UploadCompleted?.Invoke(false, "Cần quyền Camera để chụp ảnh");
-                return;
-            }
-
-            if (!MediaPicker.IsCaptureSupported)
-            {
-                UploadCompleted?.Invoke(false, "Thiết bị không hỗ trợ chụp ảnh");
-                return;
-            }
-
-            var photo = await MediaPicker.CapturePhotoAsync();
-            if (photo != null)
-            {
-                AddImagePaths(new[] { photo.FullPath });
-            }
-        }
-        catch (Exception ex)
-        {
-            UploadCompleted?.Invoke(false, $"Không thể chụp ảnh: {ex.Message}");
         }
     }
 

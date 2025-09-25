@@ -18,6 +18,20 @@
                        BarCodeDetectionEnabled="True"
                        HeightRequest="400" />
         
+        <!-- Camera Switch Button -->
+        <Button x:Name="switchCameraButton"
+                Text="🔄 Chuyển Camera"
+                Clicked="SwitchCamera_Clicked"
+                BackgroundColor="#007BFF"
+                TextColor="White"
+                FontSize="14"
+                FontAttributes="Bold"
+                CornerRadius="20"
+                HeightRequest="40"
+                WidthRequest="150"
+                HorizontalOptions="Center"
+                IsVisible="False" />
+        
         <!-- Button cập nhật -->
         <Button x:Name="confirmUpdateButton"
                 Text="Cập nhật thông tin nhà hàng vào QR"

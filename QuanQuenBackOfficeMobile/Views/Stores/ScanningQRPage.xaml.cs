@@ -1,15 +1,15 @@
 using Camera.MAUI;
-using QuanQuenBackOfficeMobile.Services.Interfaces;
 using QuanQuenBackOfficeMobile.Models;
+using QuanQuenBackOfficeMobile.Services.Interfaces;
 
 namespace QuanQuenBackOfficeMobile.Views.Stores;
 
 public partial class ScanningQRPage : ContentPage
 {
-    private int currentCameraIndex = 0;
     private readonly IQRCodeService _qrCodeService;
     private string _storeId;
     private string _currentQRCode = string.Empty;
+    private int _currentCameraIndex = 0;
 
     public ScanningQRPage()
     {
@@ -22,22 +22,22 @@ public partial class ScanningQRPage : ContentPage
         _storeId = storeId;
     }
 
-   private void cameraView_CamerasLoaded(object sender, EventArgs e)
+    private async void cameraView_CamerasLoaded(object sender, EventArgs e)
     {
         if (cameraView.Cameras.Count > 0)
         {
-            // Ưu tiên camera sau (back camera) - thường là camera cuối cùng
-            currentCameraIndex = cameraView.Cameras.Count - 1;
-            cameraView.Camera = cameraView.Cameras[currentCameraIndex];
-            MainThread.BeginInvokeOnMainThread(async () =>
-            {
-                await cameraView.StartCameraAsync();
-            });
+            _currentCameraIndex = 0;
+            cameraView.Camera = cameraView.Cameras[_currentCameraIndex];
+            
+            // Hiển thị button chuyển đổi nếu có nhiều hơn 1 camera
+            switchCameraButton.IsVisible = cameraView.Cameras.Count > 1;
+            
+            await cameraView.StartCameraAsync();
         }
     }
 
 
-   private void CameraView_BarcodeDetected(object sender, Camera.MAUI.ZXingHelper.BarcodeEventArgs e)
+    private void CameraView_BarcodeDetected(object sender, Camera.MAUI.ZXingHelper.BarcodeEventArgs e)
     {        
         MainThread.BeginInvokeOnMainThread(() =>
         {
@@ -56,6 +56,18 @@ public partial class ScanningQRPage : ContentPage
             // Hiển thị nút cập nhật
             confirmUpdateButton.IsVisible = true;
         });
+    }
+
+    private async void SwitchCamera_Clicked(object sender, EventArgs e)
+    {
+        if (cameraView.Cameras.Count < 2)
+            return; // chỉ có 1 camera thì không switch được
+
+        // đổi sang camera tiếp theo
+        _currentCameraIndex = (_currentCameraIndex + 1) % cameraView.Cameras.Count;
+        cameraView.Camera = cameraView.Cameras[_currentCameraIndex];
+
+        await cameraView.StartCameraAsync();
     }
 
     private async void ConfirmUpdate_Clicked(object sender, EventArgs e)
