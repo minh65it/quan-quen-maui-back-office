@@ -1,6 +1,7 @@
-using Camera.MAUI;
+using ZXing.Net.Maui;
 using QuanQuenBackOfficeMobile.Models;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
+using System.Linq;
 
 namespace QuanQuenBackOfficeMobile.Views.Stores;
 
@@ -9,12 +10,21 @@ public partial class ScanningQRPage : ContentPage
     private readonly IQRCodeService _qrCodeService;
     private string _storeId;
     private string _currentQRCode = string.Empty;
-    private int _currentCameraIndex = 0;
 
     public ScanningQRPage()
     {
         InitializeComponent();
         _qrCodeService = App.Services.GetService<IQRCodeService>();
+
+        // Cấu hình ZXing
+        barcodeReader.Options = new BarcodeReaderOptions
+        {
+            Formats = BarcodeFormat.QrCode,
+            AutoRotate = true,
+            Multiple = true
+        };
+        barcodeReader.CameraLocation = CameraLocation.Rear;
+        barcodeReader.IsDetecting = true;
     }
 
     public ScanningQRPage(string storeId) : this()
@@ -22,28 +32,16 @@ public partial class ScanningQRPage : ContentPage
         _storeId = storeId;
     }
 
-    private async void cameraView_CamerasLoaded(object sender, EventArgs e)
-    {
-        if (cameraView.Cameras.Count > 0)
-        {
-            _currentCameraIndex = 0;
-            cameraView.Camera = cameraView.Cameras[_currentCameraIndex];
-            
-            // Hiển thị button chuyển đổi nếu có nhiều hơn 1 camera
-            switchCameraButton.IsVisible = cameraView.Cameras.Count > 1;
-            
-            await cameraView.StartCameraAsync();
-        }
-    }
-
-
-    private void CameraView_BarcodeDetected(object sender, Camera.MAUI.ZXingHelper.BarcodeEventArgs e)
+    private void CameraView_BarcodeDetected(object sender, ZXing.Net.Maui.BarcodeDetectionEventArgs e)
     {        
         MainThread.BeginInvokeOnMainThread(() =>
         {
-            var qrCodeText = e.Result[0].Text;
+            var first = e.Results?.FirstOrDefault();
+            if (first is null)
+                return;
+
+            var qrCodeText = first.Value;
             
-            // Bỏ qua nếu QR Code giống lần trước
             if (_currentQRCode == qrCodeText)
                 return;
                 
@@ -53,21 +51,18 @@ public partial class ScanningQRPage : ContentPage
             barcodeResult.Text = $"✅ QR Code: {qrCodeText}";
             barcodeResult.TextColor = Colors.Green;
             
-            // Hiển thị nút cập nhật
+            // QR trống (chưa liên kết) => vẫn cho cập nhật
             confirmUpdateButton.IsVisible = true;
         });
     }
 
     private async void SwitchCamera_Clicked(object sender, EventArgs e)
     {
-        if (cameraView.Cameras.Count < 2)
-            return; // chỉ có 1 camera thì không switch được
-
-        // đổi sang camera tiếp theo
-        _currentCameraIndex = (_currentCameraIndex + 1) % cameraView.Cameras.Count;
-        cameraView.Camera = cameraView.Cameras[_currentCameraIndex];
-
-        await cameraView.StartCameraAsync();
+        // Toggle giữa camera trước/sau
+        barcodeReader.CameraLocation = barcodeReader.CameraLocation == CameraLocation.Rear
+            ? CameraLocation.Front
+            : CameraLocation.Rear;
+        await Task.CompletedTask;
     }
 
     private async void ConfirmUpdate_Clicked(object sender, EventArgs e)

@@ -195,10 +195,9 @@ public partial class CreateSubStoreViewModel : ObservableObject
 
             System.Diagnostics.Debug.WriteLine($"[CreateSubStoreViewModel] Sử dụng userToken: {userToken?.Substring(0, Math.Min(20, userToken?.Length ?? 0))}...");
 
-            // Lấy email từ SecureStorage để làm CreatedBy
-            var email = await SecureStorage.GetAsync("email");
+            // Lấy userId từ SecureStorage để làm CreatedBy
             var userId = await SecureStorage.GetAsync("userId");
-            var storePIC = !string.IsNullOrEmpty(email) ? email : userId ?? "Unknown";
+            var storePIC = userId ?? "Unknown";
 
             // Tạo request để gọi createStore API - chỉ truyền thông tin đã nhập
             var storeRequest = new StoreCreateRequest

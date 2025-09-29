@@ -40,8 +40,8 @@ public partial class App : Application
         }
 		else
 		{
-			var loginViewModel = sp.GetService<LoginViewModel>();
-			MainPage = new LoginPage(loginViewModel);
+			// Set AppShell as MainPage to enable Shell navigation
+			MainPage = new AppShell();
         }
            
 	}

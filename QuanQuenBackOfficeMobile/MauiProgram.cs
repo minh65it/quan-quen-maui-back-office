@@ -3,9 +3,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using QuanQuenBackOfficeMobile.Services;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
+using QuanQuenBackOfficeMobile.ViewModels;
 using QuanQuenBackOfficeMobile.ViewModels.Stores;
 using QuanQuenBackOfficeMobile.Views.Stores;
 using System.Reflection;
+using ZXing.Net.Maui.Controls;
 #if IOS && ANDROID
 using QuanQuenBackOfficeMobile.Controls;
 using Camera.MAUI;
@@ -20,11 +22,11 @@ public static class MauiProgram
 		var builder = MauiApp.CreateBuilder();
 		builder
 			.UseMauiApp<App>()
-			.UseSkiaSharp()
 #if ANDROID || IOS
 			.UseMauiMaps()
 			
 #endif
+			.UseBarcodeReader()
 			.UseMauiCameraView()
             .UseMauiCommunityToolkitMediaElement()
 			.UseMauiCommunityToolkit()
@@ -114,10 +116,23 @@ public static class MauiProgram
             client.Timeout = TimeSpan.FromMinutes(5);
         });
 
+        builder.Services.AddHttpClient<IAffiliateService, AffiliateService>((sp, client) =>
+        {
+            var configuration = sp.GetRequiredService<IConfiguration>();
+            var baseUrl = configuration["API:Affiliate:BaseUrl"];
+            client.BaseAddress = new Uri(baseUrl);
+            client.Timeout = TimeSpan.FromMinutes(5);
+        });
+
       
 
         // Register ViewModels
         builder.Services.AddTransient<LoginViewModel>();
+        builder.Services.AddTransient<AffiliateLoginViewModel>();
+        builder.Services.AddTransient<AffiliateRegisterViewModel>();
+        builder.Services.AddTransient<AffiliateCreateStoreViewModel>();
+        builder.Services.AddTransient<AffiliateStoreUserPasswordViewModel>();
+        builder.Services.AddTransient<AffiliateStoreUserAuthenticationViewModel>();
 		builder.Services.AddTransient<MainViewModel>();
 		builder.Services.AddTransient<CreateStoreUserPasswordViewModel>();
 		builder.Services.AddTransient<StoreInformationContractViewModel>();
@@ -132,6 +147,11 @@ public static class MauiProgram
 		
         // Register Views
         builder.Services.AddTransient<LoginPage>();
+        builder.Services.AddTransient<AffiliateLoginPage>();
+        builder.Services.AddTransient<AffiliateRegisterPage>();
+        builder.Services.AddTransient<AffiliateCreateStorePage>();
+        builder.Services.AddTransient<AffiliateStoreUserPasswordPage>();
+        builder.Services.AddTransient<AffiliateStoreUserAuthenticationPage>();
 		builder.Services.AddTransient<RegisterPage>();
 		builder.Services.AddTransient<MainPage>();
 		builder.Services.AddTransient<CreateStorePage>();
@@ -169,8 +189,7 @@ public static class MauiProgram
 		builder.Services.AddSingleton<ExampleMaterialFontUsageViewModel>();
 		builder.Services.AddSingleton<ExampleMaterialFontUsagePage>();
 
-		builder.Services.AddSingleton<LottieViewModel>();
-		builder.Services.AddSingleton<LottiePage>();
+		// Removed SkiaSharp Lottie registrations
 
 		builder.Services.AddSingleton<SupportCenterViewModel>();
 		builder.Services.AddSingleton<SupportCenterPage>();
@@ -201,6 +220,7 @@ public static class MauiProgram
 
 		// Register Converters
 		builder.Services.AddSingleton<Converters.AvatarUrlConverter>();
+		builder.Services.AddSingleton<Converters.EnumToBoolConverter>();
 
 		builder.Services.UsePageResolver();
 

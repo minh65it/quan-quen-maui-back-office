@@ -124,6 +124,14 @@
                     </LinearGradientBrush>
                 </Button.Background>
             </Button>
+            <!-- Affiliate Login Button -->
+            <Button
+                Text="Đăng nhập Affiliate"
+                TextColor="#666666"
+                BackgroundColor="Transparent"
+                HeightRequest="40"
+                Command="{Binding GoToAffiliateLoginCommand}"/>
+
             <HorizontalStackLayout
       HorizontalOptions="Center"
       Spacing="5">

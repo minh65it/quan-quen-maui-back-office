@@ -11,7 +11,17 @@
     <ShellContent
         Title="Login"
         ContentTemplate="{DataTemplate views:LoginPage}"
-        Route="LoginPage" />
+        Route="Login" />
+
+    <ShellContent
+        Title="AffiliateLogin"
+        ContentTemplate="{DataTemplate views:AffiliateLoginPage}"
+        Route="AffiliateLogin" />
+
+    <ShellContent
+        Title="AffiliateRegister"
+        ContentTemplate="{DataTemplate views:AffiliateRegisterPage}"
+        Route="AffiliateRegister" />
 
     <ShellContent
         Title="Main"
@@ -58,10 +68,5 @@
         Title="Example Material Font Usage"
         ContentTemplate="{DataTemplate views:ExampleMaterialFontUsagePage}"
         Route="ExampleMaterialFontUsagePage"
-        Shell.NavBarIsVisible="true" />
-    <ShellContent
-        Title="Lottie"
-        ContentTemplate="{DataTemplate views:LottiePage}"
-        Route="LottiePage"
         Shell.NavBarIsVisible="true" />
 </Shell>
