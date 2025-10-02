@@ -60,6 +60,9 @@
     <FlyoutItem Title="Trung Tâm Hỗ Trợ Agent">
         <ShellContent ContentTemplate="{DataTemplate views:SupportCenterPage}" />    
     </FlyoutItem>
+    <FlyoutItem Title="Gói dịch vụ">
+        <ShellContent ContentTemplate="{DataTemplate views:ServicePackagesPage}" />
+    </FlyoutItem>
     <!--<FlyoutItem Title="Test1">
         <ShellContent ContentTemplate="{DataTemplate views:Stores.AgreementSignaturePage}" />
     </FlyoutItem>

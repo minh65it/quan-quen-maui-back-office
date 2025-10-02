@@ -128,11 +128,13 @@ public static class MauiProgram
 
         // Register ViewModels
         builder.Services.AddTransient<LoginViewModel>();
+        builder.Services.AddTransient<ServicePackagesViewModel>();
         builder.Services.AddTransient<AffiliateLoginViewModel>();
         builder.Services.AddTransient<AffiliateRegisterViewModel>();
         builder.Services.AddTransient<AffiliateCreateStoreViewModel>();
         builder.Services.AddTransient<AffiliateStoreUserPasswordViewModel>();
         builder.Services.AddTransient<AffiliateStoreUserAuthenticationViewModel>();
+        builder.Services.AddTransient<AffiliateStoreListViewModel>();
 		builder.Services.AddTransient<MainViewModel>();
 		builder.Services.AddTransient<CreateStoreUserPasswordViewModel>();
 		builder.Services.AddTransient<StoreInformationContractViewModel>();
@@ -152,6 +154,8 @@ public static class MauiProgram
         builder.Services.AddTransient<AffiliateCreateStorePage>();
         builder.Services.AddTransient<AffiliateStoreUserPasswordPage>();
         builder.Services.AddTransient<AffiliateStoreUserAuthenticationPage>();
+        builder.Services.AddTransient<AffiliateStoreListPage>();
+        builder.Services.AddTransient<ServicePackagesPage>();
 		builder.Services.AddTransient<RegisterPage>();
 		builder.Services.AddTransient<MainPage>();
 		builder.Services.AddTransient<CreateStorePage>();
@@ -201,7 +205,27 @@ public static class MauiProgram
 		builder.Services.AddTransient<StoreMapViewModel>();
 		builder.Services.AddTransient<StoreMapPage>();
 
-		builder.Services.AddSingleton<ITokenService, TokenService>();
+        builder.Services.AddSingleton<ITokenService, TokenService>();
+        builder.Services.AddHttpClient<IServicePackagesService, ServicePackagesService>((sp, client) =>
+        {
+            var configuration = sp.GetRequiredService<IConfiguration>();
+            var baseUrl = configuration["API:Store:BaseUrl"];
+            if (!string.IsNullOrEmpty(baseUrl))
+            {
+                client.BaseAddress = new Uri(baseUrl);
+            }
+            client.Timeout = TimeSpan.FromMinutes(2);
+        });
+        builder.Services.AddHttpClient<ISystemConfigService, SystemConfigService>((sp, client) =>
+        {
+            var configuration = sp.GetRequiredService<IConfiguration>();
+            var baseUrl = configuration["API:Identity:BaseUrl"];
+            if (!string.IsNullOrEmpty(baseUrl))
+            {
+                client.BaseAddress = new Uri(baseUrl);
+            }
+            client.Timeout = TimeSpan.FromMinutes(2);
+        });
 
 		builder.Services.AddSingleton<GeographicApiService>();
 

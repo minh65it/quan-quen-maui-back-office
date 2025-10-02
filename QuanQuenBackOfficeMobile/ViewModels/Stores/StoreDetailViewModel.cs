@@ -3,15 +3,23 @@ using CommunityToolkit.Mvvm.Input;
 using QuanQuenBackOfficeMobile.Models;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
 using System.Threading.Tasks;
+using System.Collections.ObjectModel;
 
 namespace QuanQuenBackOfficeMobile.ViewModels.Stores
 {
     public partial class StoreDetailViewModel : ObservableObject
     {
         private readonly IStoreService _storeService;
+        private readonly IServicePackagesService _servicePackagesService;
 
         [ObservableProperty]
         private StoreDetailModel storeDetail;
+
+        [ObservableProperty]
+        private ObservableCollection<string> storePackageOptions = new(new[] { "None", "QuanQuen", "QuanMoi", "DongHanh" });
+
+        [ObservableProperty]
+        private int selectedStorePackageIndex = 0;
 
         public StoreDetailViewModel(IStoreService storeService)
         {
@@ -78,6 +86,34 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
             {
                 System.Diagnostics.Debug.WriteLine($"[StoreDetailViewModel] Error: {ex.Message}");
                 await App.Current.MainPage.DisplayAlert("Lỗi", "Không thể mở bản đồ: " + ex.Message, "OK");
+            }
+        }
+
+        [RelayCommand]
+        private async Task UpdateStorePackage()
+        {
+            if (StoreDetail?.StoreId is null)
+            {
+                await App.Current.MainPage.DisplayAlert("Lỗi", "Không tìm thấy StoreId", "OK");
+                return;
+            }
+
+            try
+            {
+                var svc = App.Services.GetService<IServicePackagesService>();
+                var response = await svc.UpdateStorePackageAsync(StoreDetail.StoreId, SelectedStorePackageIndex);
+                if (response.IsSuccess)
+                {
+                    await App.Current.MainPage.DisplayAlert("Thành công", "Đã cập nhật gói dịch vụ", "OK");
+                }
+                else
+                {
+                    await App.Current.MainPage.DisplayAlert("Lỗi", response.Message ?? "Cập nhật thất bại", "OK");
+                }
+            }
+            catch (Exception ex)
+            {
+                await App.Current.MainPage.DisplayAlert("Lỗi", ex.Message, "OK");
             }
         }
     }

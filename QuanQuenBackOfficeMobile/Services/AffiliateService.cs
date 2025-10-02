@@ -48,7 +48,7 @@ namespace QuanQuenBackOfficeMobile.Services
                     // Parse response
                     var result = JsonSerializer.Deserialize<ReferralUserResponse>(responseContent, new JsonSerializerOptions
                     {
-                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                        PropertyNameCaseInsensitive = true
                     });
 
                     return result ?? new ReferralUserResponse
@@ -127,10 +127,10 @@ namespace QuanQuenBackOfficeMobile.Services
                     // Parse response
                     var result = JsonSerializer.Deserialize<ReferralUserResponse>(responseContent, new JsonSerializerOptions
                     {
-                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                        PropertyNameCaseInsensitive = true
                     });
 
-                    _logger.LogInformation("Parsed result - Success: {Success}, Data: {Data}", result?.Success, result?.Data != null);
+                    _logger.LogInformation("Parsed result - Success: {Success}, Data: {Data}, Token: {Token}", result?.Success, result?.Data != null, result?.Data?.Token);
 
                     return result ?? new ReferralUserResponse
                     {
@@ -272,8 +272,8 @@ namespace QuanQuenBackOfficeMobile.Services
 
                 // Add authorization header
                 _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                _logger.LogInformation($"Added Authorization header with token: {token?.Substring(0, Math.Min(20, token?.Length ?? 0))}...");
 
-                // Convert AffiliateCreateStoreRequest to StoreCreateRequest format
                 var storeRequest = new StoreCreateRequest
                 {
                     StoreName = request.StoreName,
@@ -288,8 +288,7 @@ namespace QuanQuenBackOfficeMobile.Services
                     RepresentativeName = request.RepresentativeName,
                     ProvinceId = request.ProvinceId ?? "",
                     BusinessType = request.BusinessType,
-                    CreatedBy = request.CreatedBy,
-                    StoreId = "" // Empty for new store
+                    CreatedBy = request.CreatedBy
                 };
 
                 // Use MultipartFormDataContent like user thường
@@ -307,6 +306,12 @@ namespace QuanQuenBackOfficeMobile.Services
                 form.Add(new StringContent(storeRequest.ProvinceId ?? ""), "ProvinceId");
                 form.Add(new StringContent(storeRequest.BusinessType ?? ""), "BusinessType");
                 form.Add(new StringContent(storeRequest.CreatedBy ?? ""), "CreatedBy");
+                form.Add(new StringContent(request.ReferralId ?? ""), "ReferralId");                
+                _logger.LogInformation($"Affiliate create store Request data:");
+                _logger.LogInformation($"  Token: {token?.Substring(0, Math.Min(20, token?.Length ?? 0))}...");
+                _logger.LogInformation($"  CreatedBy: '{request.CreatedBy}' (length: {request.CreatedBy?.Length ?? 0})");
+                _logger.LogInformation($"  ReferralId: '{request.ReferralId}' (length: {request.ReferralId?.Length ?? 0})");
+                _logger.LogInformation($"  ReferrerId(dup): '{request.ReferralId}' (length: {request.ReferralId?.Length ?? 0})");
 
                 var response = await _httpClient.PostAsync(endpoint, form);
                 var responseContent = await response.Content.ReadAsStringAsync();
@@ -479,6 +484,54 @@ namespace QuanQuenBackOfficeMobile.Services
                     IsSuccess = false,
                     Message = "An unexpected error occurred. Please try again."
                 };
+            }
+        }
+
+        public async Task<AffiliateStoreListResponse> GetStoresByReferralIdAsync(string referralId, string token)
+        {
+            try
+            {
+                var baseUrl = _configuration["API:Affiliate:BaseUrl"];
+                var path = _configuration["API:Affiliate:GetStoresByReferral"];
+                var endpoint = $"{baseUrl}{path}?ReferralId={referralId}";
+
+                // Add Authorization header với affiliate token
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+                var response = await _httpClient.GetAsync(endpoint);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                _logger.LogInformation($"Get stores by referral response: {responseContent}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = JsonSerializer.Deserialize<AffiliateStoreListResponse>(responseContent, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+                    return result ?? new AffiliateStoreListResponse { Result = new List<AffiliateStore>() };
+                }
+                else
+                {
+                    _logger.LogError($"Get stores by referral failed. Status: {response.StatusCode}, Content: {responseContent}");
+                    return new AffiliateStoreListResponse { Result = new List<AffiliateStore>() };
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "Network error during get stores by referral");
+                return new AffiliateStoreListResponse { Result = new List<AffiliateStore>() };
+            }
+            catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException)
+            {
+                _logger.LogError(ex, "Timeout during get stores by referral");
+                return new AffiliateStoreListResponse { Result = new List<AffiliateStore>() };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error during get stores by referral");
+                return new AffiliateStoreListResponse { Result = new List<AffiliateStore>() };
             }
         }
     }

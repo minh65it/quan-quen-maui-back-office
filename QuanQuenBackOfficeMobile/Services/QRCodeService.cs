@@ -29,7 +29,7 @@ namespace QuanQuenBackOfficeMobile.Services
                 // Serialize dữ liệu store thành JSON với Unicode support
                 var qrText = JsonSerializer.Serialize(storeData, new JsonSerializerOptions
                 {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    PropertyNamingPolicy = null, // Sử dụng JsonPropertyName thay vì CamelCase
                     Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
                 });
 
@@ -165,7 +165,7 @@ namespace QuanQuenBackOfficeMobile.Services
                 // Serialize request body
                 var jsonContent = JsonSerializer.Serialize(request, new JsonSerializerOptions
                 {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    PropertyNamingPolicy = null, // Sử dụng JsonPropertyName thay vì CamelCase
                     Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
                 });
 
@@ -184,6 +184,7 @@ namespace QuanQuenBackOfficeMobile.Services
                 System.Diagnostics.Debug.WriteLine($"[QRCodeService] UpdateQRCode Request URL: {url}");
                 System.Diagnostics.Debug.WriteLine($"[QRCodeService] UpdateQRCode Request Method: PUT");
                 System.Diagnostics.Debug.WriteLine($"[QRCodeService] UpdateQRCode Request Body: {jsonContent}");
+                System.Diagnostics.Debug.WriteLine($"[QRCodeService] UpdateQRCode Params: qrCode={qrCode}, qrCodeType={qrCodeType}, identityId={identityId}");
 
                 // Tạo HTTP content
                 var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
@@ -196,12 +197,14 @@ namespace QuanQuenBackOfficeMobile.Services
                 {
                     var responseContent = await response.Content.ReadAsStringAsync();
                     System.Diagnostics.Debug.WriteLine($"[QRCodeService] UpdateQRCode Response: {responseContent}");
+                    System.Diagnostics.Debug.WriteLine($"[QRCodeService] UpdateQRCode Success: true");
                     return true;
                 }
                 else
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
                     System.Diagnostics.Debug.WriteLine($"[QRCodeService] UpdateQRCode Error: {errorContent}");
+                    System.Diagnostics.Debug.WriteLine($"[QRCodeService] UpdateQRCode Success: false");
                     return false;
                 }
             }

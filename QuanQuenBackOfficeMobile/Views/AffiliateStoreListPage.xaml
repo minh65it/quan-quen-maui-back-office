@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:QuanQuenBackOfficeMobile.ViewModels"
+             xmlns:models="clr-namespace:QuanQuenBackOfficeMobile.Models"
+             xmlns:converters="clr-namespace:QuanQuenBackOfficeMobile.Converters"
+             x:Class="QuanQuenBackOfficeMobile.Views.AffiliateStoreListPage"
+             x:DataType="viewmodels:AffiliateStoreListViewModel"
+             Title="Quán của Tôi"
+             BackgroundColor="#FAFAFA">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:StringToBoolConverter x:Key="StringToBoolConverter" />
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+
+            <!-- Card Style -->
+            <Style x:Key="StoreCardStyle" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="White" />
+                <Setter Property="Padding" Value="16" />
+                <Setter Property="StrokeThickness" Value="0" />
+                <Setter Property="Margin" Value="15,10" />
+                <Setter Property="StrokeShape">
+                    <RoundRectangle CornerRadius="20"/>
+                </Setter>
+                <Setter Property="Shadow">
+                    <Shadow Brush="#33000000" Offset="0,3" Radius="6"/>
+                </Setter>
+            </Style>
+
+            <!-- Text Styles -->
+            <Style x:Key="StoreNameStyle" TargetType="Label">
+                <Setter Property="FontSize" Value="18" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="#1E1E1E" />
+                <Setter Property="Margin" Value="0,0,0,6" />
+            </Style>
+
+            <Style x:Key="InfoStyle" TargetType="Label">
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="TextColor" Value="#555" />
+                <Setter Property="Margin" Value="0,2" />
+            </Style>
+
+            <!-- Tag Label -->
+            <Style x:Key="TagStyle" TargetType="Label">
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="TextColor" Value="White" />
+                <Setter Property="BackgroundColor" Value="#3498DB" />
+                <Setter Property="Padding" Value="8,4" />
+                <Setter Property="Margin" Value="0,0,6,0" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Frame Grid.Row="0"
+               BackgroundColor="#E67E22"
+               CornerRadius="0"
+               Padding="20,30"
+               HasShadow="False">
+            <VerticalStackLayout Spacing="20">
+
+                <!-- Logo + Title -->
+                <HorizontalStackLayout Spacing="15" HorizontalOptions="Center">
+                    <Image Source="logo_qq_new.png" HeightRequest="42" WidthRequest="42"/>
+                    <VerticalStackLayout VerticalOptions="Center">
+                        <Label Text="Quán của Tôi"
+                               FontSize="22"
+                               TextColor="White"
+                               FontAttributes="Bold" />
+                        <Label Text="{Binding ReferralName, StringFormat='Xin chào {0}'}"
+                               FontSize="14"
+                               TextColor="#FFF3CD"/>
+                    </VerticalStackLayout>
+                </HorizontalStackLayout>
+
+                <!-- Stats + Buttons -->
+                <HorizontalStackLayout Spacing="20" HorizontalOptions="Center">
+                    <Border BackgroundColor="White"
+                            Padding="14,8"
+                            StrokeShape="RoundRectangle;CornerRadius=20">
+                        <HorizontalStackLayout Spacing="6">
+                            <Label Text="🏪" FontSize="16"/>
+                            <Label Text="{Binding TotalCount}"
+                                   FontSize="15"
+                                   TextColor="#2C3E50"
+                                   FontAttributes="Bold"/>
+                        </HorizontalStackLayout>
+                    </Border>
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+        </Frame>
+
+        <!-- Content -->
+        <Grid Grid.Row="1">
+            <!-- Store List -->
+            <CollectionView ItemsSource="{Binding Stores}"
+                            BackgroundColor="Transparent"
+                            VerticalOptions="Fill">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"/>
+                    </CollectionView.ItemsLayout>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:AffiliateStore">
+                            <Border Style="{StaticResource StoreCardStyle}">
+                                <VerticalStackLayout Spacing="12">
+
+                                    <!-- Header -->
+                                    <VerticalStackLayout>
+                                        <Label Text="{Binding StoreName}" Style="{StaticResource StoreNameStyle}"/>
+                                        <HorizontalStackLayout Spacing="5">
+                                            <Label Text="⭐" FontSize="14"/>
+                                            <Label Text="{Binding ReviewPoint, StringFormat='{0:F1}'}"
+                                                   Style="{StaticResource InfoStyle}" TextColor="#FF9800"/>
+                                            <Label Text="·" Style="{StaticResource InfoStyle}"/>
+                                            <Label Text="{Binding CreatedDate, StringFormat='{0:dd/MM/yyyy}'}"
+                                                   Style="{StaticResource InfoStyle}"/>
+                                        </HorizontalStackLayout>
+                                    </VerticalStackLayout>
+
+                                    <!-- Contact -->
+                                    <VerticalStackLayout BackgroundColor="#F9FAFB"
+                                                         Padding="12"
+                                                         Spacing="6">
+                                        <HorizontalStackLayout Spacing="10">
+                                            <Label Text="📞" FontSize="14" VerticalOptions="Center"/>
+                                            <Label Text="{Binding StorePhone}" Style="{StaticResource InfoStyle}"/>
+                                        </HorizontalStackLayout>
+                                        <HorizontalStackLayout Spacing="10">
+                                            <Label Text="📧" FontSize="14" VerticalOptions="Center"/>
+                                            <Label Text="{Binding StoreEmail}" Style="{StaticResource InfoStyle}"/>
+                                        </HorizontalStackLayout>
+                                        <HorizontalStackLayout Spacing="10">
+                                            <Label Text="📍" FontSize="14" VerticalOptions="Center"/>
+                                            <Label Text="{Binding Address}" Style="{StaticResource InfoStyle}"/>
+                                        </HorizontalStackLayout>
+                                        <HorizontalStackLayout Spacing="10">
+                                            <Label Text="👤" FontSize="14" VerticalOptions="Center"/>
+                                            <Label Text="{Binding RepresentativeName}" Style="{StaticResource InfoStyle}"/>
+                                        </HorizontalStackLayout>
+                                    </VerticalStackLayout>
+
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                    
+                    <!-- Loading Indicator -->
+                    <CollectionView.Footer>
+                        <ActivityIndicator IsRunning="{Binding IsLoading}"
+                                          IsVisible="{Binding IsLoading}"
+                                          HorizontalOptions="Center"
+                                          VerticalOptions="Center"
+                                          Color="#E67E22"
+                                          WidthRequest="30" HeightRequest="30"
+                                          Margin="0,20"/>
+                    </CollectionView.Footer>
+                </CollectionView>
+            </Grid>
+
+        <!-- Floating Button -->
+        <Button Grid.Row="1"
+                Text="+"
+                FontSize="24"
+                FontAttributes="Bold"
+                BackgroundColor="#E67E22"
+                TextColor="White"
+                CornerRadius="30"
+                WidthRequest="60"
+                HeightRequest="60"
+                HorizontalOptions="End"
+                VerticalOptions="End"
+                Margin="0,0,20,20"
+                Command="{Binding BackToCreateStoreCommand}"/>
+    </Grid>
+</ContentPage>

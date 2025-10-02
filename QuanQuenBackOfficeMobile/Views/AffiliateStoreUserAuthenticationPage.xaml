@@ -35,25 +35,14 @@
             </Frame>
 
             <!-- Resend OTP -->
-            <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center" HorizontalOptions="Center">
-                <Label
-                Grid.Column="0"
-                Text="{Binding CountdownText}"
-                FontSize="16"
-                VerticalOptions="Center"
-                HorizontalOptions="End" />
-                <Button
-                Grid.Column="1"
-                Text="Gửi Lại OTP"
-                Command="{Binding ResendOtpCommand}"
-                IsEnabled="{Binding CanResend}"
-                FontSize="16"
-                HeightRequest="40"
-                CornerRadius="20"
-                VerticalOptions="Center"
-                HorizontalOptions="Start"
-                Margin="10,0,0,0"/>    
-            </Grid>
+            <Button Text="{Binding CountdownText}"
+                    Command="{Binding ResendOtpCommand}"
+                    IsEnabled="{Binding CanResend}"
+                    FontSize="16"
+                    HeightRequest="40"
+                    CornerRadius="20"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"/>    
 
             <!-- Next Button -->
             <Button Text="Xác thực"

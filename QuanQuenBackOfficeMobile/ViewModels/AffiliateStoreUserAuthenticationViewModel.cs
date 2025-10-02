@@ -59,7 +59,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                 {
                     timer.Stop();
                     CanResend = true;
-                    CountdownText = "0s";
+                    CountdownText = "Gửi lại OTP";
                     (ResendOtpCommand as AsyncRelayCommand)?.NotifyCanExecuteChanged();
                 }
             };
@@ -108,12 +108,15 @@ namespace QuanQuenBackOfficeMobile.ViewModels
         {
             var action = await Application.Current.MainPage.DisplayActionSheet(
                 "Bạn muốn làm gì tiếp theo?", 
-                "Hủy", 
+                "Hoàn Tất", 
                 "Đăng xuất", 
                 "Tạo store mới");
 
             switch (action)
             {
+                case "Hoàn Tất":
+                    await NavigateToStoreList();
+                    break;
                 case "Đăng xuất":
                     await LogoutFromAffiliate();
                     break;
@@ -121,7 +124,8 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                     await NavigateToCreateStore();
                     break;
                 default:
-                    // User cancelled, stay on current page
+                    // Navigate to store list as default behavior
+                    await NavigateToStoreList();
                     break;
             }
         }
@@ -150,6 +154,20 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                 // Navigate về affiliate create store để tạo store mới
                 var affiliateCreateStoreViewModel = IPlatformApplication.Current.Services.GetService<AffiliateCreateStoreViewModel>();
                 Application.Current.MainPage = new AffiliateCreateStorePage(affiliateCreateStoreViewModel);
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert("Lỗi", $"Không thể chuyển trang: {ex.Message}", "OK");
+            }
+        }
+
+        private async Task NavigateToStoreList()
+        {
+            try
+            {
+                // Navigate đến affiliate store list page
+                var affiliateStoreListViewModel = IPlatformApplication.Current.Services.GetService<AffiliateStoreListViewModel>();
+                Application.Current.MainPage = new AffiliateStoreListPage(affiliateStoreListViewModel);
             }
             catch (Exception ex)
             {

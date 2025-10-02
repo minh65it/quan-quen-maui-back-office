@@ -157,16 +157,17 @@ public partial class AffiliateStoreUserPasswordViewModel : ObservableObject
                     return;
                 }
                 
-                System.Diagnostics.Debug.WriteLine($"[DEBUG][AffiliateStoreUserPasswordViewModel] Token từ RegisterUser: {userToken}");
+                System.Diagnostics.Debug.WriteLine($"[DEBUG][AffiliateStoreUserPasswordViewModel] Token từ RegisterUser: {userToken?.Substring(0, Math.Min(20, userToken?.Length ?? 0))}... (total length: {userToken?.Length ?? 0})");
 
                 // Lưu token vào AffiliateStoreData để sử dụng sau này
                 AffiliateStoreData.RegisterToken = userToken;
 
-                // Lấy ReferrerId từ SecureStorage để làm CreatedBy
-                var referrerId = await SecureStorage.GetAsync("affiliate_referral_id");
+                // Lấy ReferrerId từ AffiliateStoreData hoặc SecureStorage để thuần nhất
+                var referrerId =await SecureStorage.GetAsync("affiliate_referral_id");
                 
                 // Debug để kiểm tra giá trị
-                System.Diagnostics.Debug.WriteLine($"[DEBUG][AffiliateStoreUserPasswordViewModel] ReferrerId từ SecureStorage: {referrerId}");
+                System.Diagnostics.Debug.WriteLine($"[DEBUG][AffiliateStoreUserPasswordViewModel] ReferrerId từ AffiliateStoreData: {AffiliateStoreData.ReferrerId}");
+                System.Diagnostics.Debug.WriteLine($"[DEBUG][AffiliateStoreUserPasswordViewModel] SecureStorage fallback: {await SecureStorage.GetAsync("affiliate_referral_id")}");
                 
                 var storePIC = referrerId ?? "Unknown";
                 System.Diagnostics.Debug.WriteLine($"[DEBUG][AffiliateStoreUserPasswordViewModel] Final storePIC: {storePIC}");
@@ -183,6 +184,7 @@ public partial class AffiliateStoreUserPasswordViewModel : ObservableObject
                 System.Diagnostics.Debug.WriteLine($"[DEBUG][AffiliateStoreUserPasswordViewModel] WardId: {AffiliateStoreData.WardId}");
                 System.Diagnostics.Debug.WriteLine($"[DEBUG][AffiliateStoreUserPasswordViewModel] BusinessType: {AffiliateStoreData.SelectedBusinessType}");
                 System.Diagnostics.Debug.WriteLine($"[DEBUG][AffiliateStoreUserPasswordViewModel] CreatedBy: {storePIC}");
+                System.Diagnostics.Debug.WriteLine($"[DEBUG][AffiliateStoreUserPasswordViewModel] ReferralId sẽ set: '{storePIC}' (length: {storePIC?.Length ?? 0})");
 
                 var storeRequest = new AffiliateCreateStoreRequest
                 {
@@ -195,8 +197,8 @@ public partial class AffiliateStoreUserPasswordViewModel : ObservableObject
                     DistrictId = AffiliateStoreData.DistrictId,
                     WardId = AffiliateStoreData.WardId,
                     BusinessType = AffiliateStoreData.SelectedBusinessType,
-                    LicenseImages = new List<Microsoft.Maui.Storage.FileResult>(), // Empty list
-                    CreatedBy = storePIC
+                    CreatedBy = storePIC,
+                    ReferralId = storePIC // Sử dụng cùng referrer ID
                 };
 
                 System.Diagnostics.Debug.WriteLine($"[DEBUG][AffiliateStoreUserPasswordViewModel] Gọi CreateAffiliateStoreAsync với token: {userToken?.Substring(0, Math.Min(20, userToken?.Length ?? 0))}...");

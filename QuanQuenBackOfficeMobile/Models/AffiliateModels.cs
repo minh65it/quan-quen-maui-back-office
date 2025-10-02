@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace QuanQuenBackOfficeMobile.Models
 {
@@ -36,6 +37,10 @@ namespace QuanQuenBackOfficeMobile.Models
     {
         public bool IsLogin { get; set; }
         public ReferralUserDetail? ReferralUserDetail { get; set; }
+        
+        [JsonPropertyName("token")]
+        public string? Token { get; set; }
+        public string? Message { get; set; }
     }
 
     public class ReferralUserDetail
@@ -111,8 +116,8 @@ namespace QuanQuenBackOfficeMobile.Models
         public string DistrictId { get; set; }
         public string WardId { get; set; }
         public string BusinessType { get; set; }
-        public List<Microsoft.Maui.Storage.FileResult> LicenseImages { get; set; }
         public string CreatedBy { get; set; }
+        public string ReferralId { get; set; }
     }
 
     public class AffiliateCreateStoreResponse
@@ -147,9 +152,71 @@ namespace QuanQuenBackOfficeMobile.Models
         public static string DistrictId { get; set; } = string.Empty;
         public static string WardId { get; set; } = string.Empty;
         public static string SelectedBusinessType { get; set; }
-        public static List<Microsoft.Maui.Storage.FileResult> LicenseImageFiles { get; set; } = new();
         public static string ReferrerId { get; set; }
         public static string RegisterToken { get; set; }
         public static string StoreId { get; set; } = string.Empty;
+    }
+
+    public class AffiliateStoreListResponse
+    {
+        public PaginationData Pagination { get; set; }
+        public List<AffiliateStore> Result { get; set; }
+    }
+
+    public class PaginationData
+    {
+        public int TotalCount { get; set; }
+        public int TotalPage { get; set; }
+        public int PageNumber { get; set; }
+        public int PageSize { get; set; }
+        public int Skip { get; set; }
+    }
+
+    public class AffiliateStore
+    {
+        public string StoreId { get; set; }
+        public string StoreName { get; set; }
+        public string StorePhone { get; set; }
+        public string StorePhone2 { get; set; }
+        public string StoreLandlinePhone { get; set; }
+        public string StoreLandlinePhone2 { get; set; }
+        public string StoreEmail { get; set; }
+        public string Address { get; set; }
+        public string Ward { get; set; }
+        public string District { get; set; }
+        public string City { get; set; }
+        public string NoteAddress { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+        public string Hashtag { get; set; }
+        public string Avatar { get; set; }
+        public string CoverImage { get; set; }
+        public double ReviewPoint { get; set; }
+        public string ImageMenu { get; set; }
+        public string FrontPicIdentityCard { get; set; }
+        public string BackPicIdentityCard { get; set; }
+        public bool? IsDelete { get; set; }
+        public string Description { get; set; }
+        public bool IsRegisterByCompany { get; set; }
+        public bool IsRegisterByPersonality { get; set; }
+        public string CompanyName { get; set; }
+        public string CompanyAddress { get; set; }
+        public string RepresentativeName { get; set; }
+        public string RepresentativeEmail { get; set; }
+        public string RepresentativePhone { get; set; }
+        public string RepresentativePhoneOther { get; set; }
+        public string OtherRepresentativePhone { get; set; }
+        public string TaxCode { get; set; }
+        public string Status { get; set; }
+        public string ReferralId { get; set; }
+        public string ReferralName { get; set; }
+        public string PhoneReferrer { get; set; }
+        public string EmailReferrer { get; set; }
+        public string ReferrerType { get; set; }
+        public string Note { get; set; }
+        public string Transactions { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public string CreatedBy { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

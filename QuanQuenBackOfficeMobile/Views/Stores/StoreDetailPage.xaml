@@ -71,6 +71,21 @@
                             FontAttributes="Bold"
                             CornerRadius="8"
                             HeightRequest="50" />
+
+                    <!-- Chọn gói dịch vụ và cập nhật -->
+                    <Label Text="Gói dịch vụ" 
+                           FontAttributes="Bold" 
+                           TextColor="{StaticResource Primary}" />
+                    <Picker ItemsSource="{Binding StorePackageOptions}"
+                            SelectedIndex="{Binding SelectedStorePackageIndex}" />
+                    <Button Text="🔄 Cập nhật gói"
+                            Command="{Binding UpdateStorePackageCommand}"
+                            BackgroundColor="#6C63FF"
+                            TextColor="White"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            CornerRadius="8"
+                            HeightRequest="50" />
                 </VerticalStackLayout>
             </Frame>
 

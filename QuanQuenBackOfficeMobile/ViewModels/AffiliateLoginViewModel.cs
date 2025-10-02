@@ -222,8 +222,9 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                     
                     try
                     {
+                        await SecureStorage.SetAsync("affiliate_token", response.Data.Token ?? "");
                         await SecureStorage.SetAsync("affiliate_id", userDetail.ReferralId ?? "");
-                        await SecureStorage.SetAsync("affiliate_name", userDetail.ReferralName ?? "");
+                        await SecureStorage.SetAsync("affiliate_referral_name", userDetail.ReferralName ?? "");
                         await SecureStorage.SetAsync("affiliate_email", userDetail.EmailReferrer ?? "");
                         await SecureStorage.SetAsync("affiliate_phone", userDetail.PhoneReferrer ?? "");
                         await SecureStorage.SetAsync("affiliate_referral_id", userDetail.ReferralId ?? "");
@@ -232,17 +233,18 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                     catch (Exception ex)
                     {
 #if DEBUG
+                        Preferences.Set("affiliate_token", response.Data.Token ?? "");
                         Preferences.Set("affiliate_id", userDetail.ReferralId ?? "");
-                        Preferences.Set("affiliate_name", userDetail.ReferralName ?? "");
+                        Preferences.Set("affiliate_referral_name", userDetail.ReferralName ?? "");
                         Preferences.Set("affiliate_email", userDetail.EmailReferrer ?? "");
                         Preferences.Set("affiliate_phone", userDetail.PhoneReferrer ?? "");
                         Preferences.Set("affiliate_referral_id", userDetail.ReferralId ?? "");
                         Preferences.Set("is_affiliate", "true");
 #endif
                     }
-                    // Navigate to affiliate create store page
-                    var affiliateCreateStoreViewModel = IPlatformApplication.Current.Services.GetService<AffiliateCreateStoreViewModel>();
-                    Application.Current.MainPage = new AffiliateCreateStorePage(affiliateCreateStoreViewModel);
+                    // Navigate to affiliate store list page
+                    var affiliateStoreListViewModel = IPlatformApplication.Current.Services.GetService<AffiliateStoreListViewModel>();
+                    Application.Current.MainPage = new AffiliateStoreListPage(affiliateStoreListViewModel);
                 }
                 else
                 {
