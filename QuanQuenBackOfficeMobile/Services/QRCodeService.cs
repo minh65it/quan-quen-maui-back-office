@@ -148,7 +148,6 @@ namespace QuanQuenBackOfficeMobile.Services
                 
                 var url = $"{baseUrl}{path}";
 
-                // Tạo request body theo format API yêu cầu
                 var request = new UpdateQRCodeRequest
                 {
                     IdentityId = identityId,
@@ -212,6 +211,97 @@ namespace QuanQuenBackOfficeMobile.Services
             {
                 System.Diagnostics.Debug.WriteLine($"Error in UpdateQRCodeAsync: {ex.Message}");
                 System.Diagnostics.Debug.WriteLine($"[QRCodeService] UpdateQRCode StackTrace: {ex.StackTrace}");
+                return false;
+            }
+        }
+
+        public async Task<bool> ScanQRCodeAndCreateTableAsync(
+            string qrCode,
+            string storeId,
+            string? tableAreaId = null,
+            string? tableName = null,
+            string? tableNumber = null,
+            int? capacity = null,
+            string? tableDescription = null,
+            string? userId = null,
+            string? userName = null)
+        {
+            try
+            {
+                // Dùng cấu hình của Store API theo appsettings
+                var baseUrl = _configuration["API:Store:BaseUrl"]; // ví dụ: https://api.quanquen.com/store/
+                var path = _configuration["API:Store:UpdateTableQRCode"]; // ví dụ: api/Table/ScanQRCodeAndCreateTable
+
+                if (string.IsNullOrEmpty(baseUrl))
+                {
+                    throw new InvalidOperationException("API base url is missing. Please check appsettings.json");
+                }
+                if (string.IsNullOrEmpty(path))
+                {
+                    throw new InvalidOperationException("API path is missing. Please check appsettings.json (API:Store:UpdateTableQRCode)");
+                }
+
+                var url = $"{baseUrl}{path}";
+
+                var requestBody = new
+                {
+                    qrCode = qrCode,
+                    storeId = storeId,
+                    tableAreaId = tableAreaId,
+                    tableName = tableName,
+                    tableNumber = tableNumber,
+                    capacity = capacity,
+                    tableDescription = tableDescription,
+                    userId = userId,
+                    userName = userName
+                };
+
+                var jsonContent = JsonSerializer.Serialize(requestBody, new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                });
+
+                var token = await SecureStorage.GetAsync("auth_token");
+                if (string.IsNullOrEmpty(token))
+                {
+                    throw new UnauthorizedAccessException("No authentication token found");
+                }
+
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                _httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+
+                var correlationId = Guid.NewGuid().ToString("N");
+                var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+                var maskedStoreId = string.IsNullOrEmpty(storeId) || storeId.Length < 8
+                    ? storeId
+                    : $"{storeId.Substring(0, 4)}...{storeId.Substring(storeId.Length - 4)}";
+                System.Diagnostics.Debug.WriteLine($"[QRCodeService][{correlationId}] POST {url}");
+                System.Diagnostics.Debug.WriteLine($"[QRCodeService][{correlationId}] BodyLength={jsonContent.Length} chars, storeId={maskedStoreId}");
+
+                var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync(url, content);
+
+                stopwatch.Stop();
+                System.Diagnostics.Debug.WriteLine($"[QRCodeService][{correlationId}] Status {(int)response.StatusCode} {response.ReasonPhrase} in {stopwatch.ElapsedMilliseconds}ms");
+
+                var responseText = await response.Content.ReadAsStringAsync();
+                var preview = responseText?.Length > 800 ? responseText.Substring(0, 800) + " ...[truncated]" : responseText;
+                System.Diagnostics.Debug.WriteLine($"[QRCodeService][{correlationId}] ResponsePreview: {preview}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[QRCodeService] Error in ScanQRCodeAndCreateTableAsync: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"[QRCodeService] StackTrace: {ex.StackTrace}");
                 return false;
             }
         }

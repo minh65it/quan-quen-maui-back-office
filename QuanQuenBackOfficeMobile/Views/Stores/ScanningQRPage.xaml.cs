@@ -53,6 +53,7 @@ public partial class ScanningQRPage : ContentPage
             
             // QR trống (chưa liên kết) => vẫn cho cập nhật
             confirmUpdateButton.IsVisible = true;
+            createTableButton.IsVisible = true;
         });
     }
 
@@ -107,6 +108,51 @@ public partial class ScanningQRPage : ContentPage
             barcodeResult.Text = $"❌ Lỗi: {ex.Message}";
             barcodeResult.TextColor = Colors.Red;
             
+            await DisplayAlert("Lỗi", $"Có lỗi xảy ra: {ex.Message}", "OK");
+        }
+    }
+
+    private async void CreateTableAndAssignQR_Clicked(object sender, EventArgs e)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(_currentQRCode) || string.IsNullOrEmpty(_storeId))
+            {
+                await DisplayAlert("Lỗi", "Thông tin QR Code hoặc Store ID không hợp lệ", "OK");
+                return;
+            }
+
+            barcodeResult.Text = "Đang tạo bàn và gán QR...";
+            barcodeResult.TextColor = Colors.Blue;
+
+            var ok = await _qrCodeService.ScanQRCodeAndCreateTableAsync(
+                qrCode: _currentQRCode,
+                storeId: _storeId,
+                tableAreaId: null,
+                tableName: null,
+                tableNumber: null,
+                capacity: null,
+                tableDescription: null,
+                userId: null,
+                userName: null
+            );
+
+            if (ok)
+            {
+                barcodeResult.Text = "✅ Tạo bàn và gán QR thành công!";
+                barcodeResult.TextColor = Colors.Green;
+                await DisplayAlert("Thành công", "Đã tạo bàn và gán QRCode thành công.", "OK");
+                await Navigation.PopAsync();
+            }
+            else
+            {
+                barcodeResult.Text = "❌ Tạo bàn và gán QR thất bại!";
+                barcodeResult.TextColor = Colors.Red;
+                await DisplayAlert("Lỗi", "Không thể tạo bàn/gán QR. Vui lòng thử lại.", "OK");
+            }
+        }
+        catch (Exception ex)
+        {
             await DisplayAlert("Lỗi", $"Có lỗi xảy ra: {ex.Message}", "OK");
         }
     }

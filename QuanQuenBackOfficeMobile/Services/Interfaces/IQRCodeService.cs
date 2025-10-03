@@ -20,5 +20,29 @@ namespace QuanQuenBackOfficeMobile.Services.Interfaces
         /// <param name="identityId">ID của store</param>
         /// <returns>Kết quả cập nhật</returns>
         Task<bool> UpdateQRCodeAsync(string qrCode, string qrCodeType, string identityId);
+
+        /// <summary>
+        /// Quét QRCode và tạo bàn, đồng thời gán QRCode cho bàn
+        /// </summary>
+        /// <param name="qrCode">Giá trị QRCode đã quét</param>
+        /// <param name="storeId">ID cửa hàng</param>
+        /// <param name="tableAreaId">Khu vực bàn (tùy chọn)</param>
+        /// <param name="tableName">Tên bàn (tùy chọn)</param>
+        /// <param name="tableNumber">Số bàn (tùy chọn)</param>
+        /// <param name="capacity">Sức chứa (tùy chọn)</param>
+        /// <param name="tableDescription">Mô tả bàn (tùy chọn)</param>
+        /// <param name="userId">Người phụ trách (tùy chọn)</param>
+        /// <param name="userName">Tên người phụ trách (tùy chọn)</param>
+        /// <returns>Thành công/Thất bại</returns>
+        Task<bool> ScanQRCodeAndCreateTableAsync(
+            string qrCode,
+            string storeId,
+            string? tableAreaId = null,
+            string? tableName = null,
+            string? tableNumber = null,
+            int? capacity = null,
+            string? tableDescription = null,
+            string? userId = null,
+            string? userName = null);
     }
 }

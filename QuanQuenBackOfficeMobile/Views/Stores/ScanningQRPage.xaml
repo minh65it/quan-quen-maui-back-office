@@ -42,6 +42,18 @@
                 CornerRadius="8"
                 HeightRequest="50"
                 IsVisible="False" />
+        
+        <!-- Button tạo bàn và gán QR -->
+        <Button x:Name="createTableButton"
+                Text="Tạo bàn và thêm QRCode cho bàn"
+                Clicked="CreateTableAndAssignQR_Clicked"
+                BackgroundColor="#6C63FF"
+                TextColor="White"
+                FontSize="16"
+                FontAttributes="Bold"
+                CornerRadius="8"
+                HeightRequest="50"
+                IsVisible="False" />
         <Label x:Name="barcodeResult"
                HorizontalOptions="Center"
                FontSize="16"/>
