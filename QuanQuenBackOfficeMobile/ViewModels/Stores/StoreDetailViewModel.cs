@@ -4,6 +4,9 @@ using QuanQuenBackOfficeMobile.Models;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
+using Microsoft.Maui.Media;
+using Microsoft.Maui.Storage;
+using System.IO;
 
 namespace QuanQuenBackOfficeMobile.ViewModels.Stores
 {
@@ -20,6 +23,15 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
 
         [ObservableProperty]
         private int selectedStorePackageIndex = 0;
+
+        [ObservableProperty]
+        private ObservableCollection<string> monthOptions = new(new[] { "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12" });
+
+        [ObservableProperty]
+        private int selectedMonthIndex = 0;
+
+        [ObservableProperty]
+        private bool isUploadingInvoice = false;
 
         public StoreDetailViewModel(IStoreService storeService)
         {
@@ -114,6 +126,64 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
             catch (Exception ex)
             {
                 await App.Current.MainPage.DisplayAlert("Lỗi", ex.Message, "OK");
+            }
+        }
+
+        [RelayCommand]
+        private async Task UploadInvoiceImage()
+        {
+            if (StoreDetail?.StoreId is null)
+            {
+                await App.Current.MainPage.DisplayAlert("Lỗi", "Không tìm thấy StoreId", "OK");
+                return;
+            }
+
+            try
+            {
+                IsUploadingInvoice = true;
+
+                // Chọn ảnh từ thư viện
+                var photo = await MediaPicker.PickPhotoAsync();
+                if (photo == null)
+                {
+                    IsUploadingInvoice = false;
+                    return;
+                }
+
+                // Đọc file ảnh
+                using var stream = await photo.OpenReadAsync();
+                using var memoryStream = new MemoryStream();
+                await stream.CopyToAsync(memoryStream);
+                var imageBytes = memoryStream.ToArray();
+
+                // Lấy tháng được chọn (từ 1-12)
+                var selectedMonth = SelectedMonthIndex + 1;
+
+                // Upload ảnh
+                var storeMediaService = App.Services.GetService<IStoreMediaService>();
+                var response = await storeMediaService.UploadInvoiceImageAsync(
+                    StoreDetail.StoreId, 
+                    selectedMonth, 
+                    imageBytes, 
+                    photo.FileName ?? "invoice.jpg"
+                );
+
+                if (response.IsSuccess)
+                {
+                    await App.Current.MainPage.DisplayAlert("Thành công", "Đã upload ảnh hóa đơn thành công", "OK");
+                }
+                else
+                {
+                    await App.Current.MainPage.DisplayAlert("Lỗi", response.Message ?? "Upload thất bại", "OK");
+                }
+            }
+            catch (Exception ex)
+            {
+                await App.Current.MainPage.DisplayAlert("Lỗi", $"Có lỗi khi upload ảnh hóa đơn: {ex.Message}", "OK");
+            }
+            finally
+            {
+                IsUploadingInvoice = false;
             }
         }
     }

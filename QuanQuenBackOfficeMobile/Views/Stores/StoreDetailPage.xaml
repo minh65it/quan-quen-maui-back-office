@@ -8,6 +8,9 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <converters:NullOrEmptyToNAConverter x:Key="NullOrEmptyToNAConverter" />
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+            <converters:BoolToColorConverter x:Key="BoolToColorConverter" />
+            <converters:BoolToTextConverter x:Key="BoolToTextConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
     <ScrollView>
@@ -71,6 +74,75 @@
                             FontAttributes="Bold"
                             CornerRadius="8"
                             HeightRequest="50" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Phần quản lý và cập nhật -->
+            <Frame BorderColor="{StaticResource Gray200}"
+                   CornerRadius="8"
+                   Padding="12"
+                   Margin="0,8">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Quản lý và cập nhật" 
+                           FontSize="18" 
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource Primary}"/>
+
+                    <!-- Upload ảnh hóa đơn -->
+                    <Frame BorderColor="#E3F2FD"
+                           BackgroundColor="#F8F9FA"
+                           CornerRadius="12"
+                           Padding="16"
+                           Margin="0,8">
+                        <VerticalStackLayout Spacing="12">
+                            <Label Text="📄 Upload ảnh hóa đơn" 
+                                   FontSize="16" 
+                                   FontAttributes="Bold"
+                                   TextColor="#1976D2"
+                                   HorizontalOptions="Center" />
+                            
+                            <Label Text="Chọn tháng để upload ảnh hóa đơn:" 
+                                   FontSize="14" 
+                                   TextColor="#666"
+                                   HorizontalOptions="Center" />
+                            
+                            <Frame BorderColor="#BBDEFB"
+                                   BackgroundColor="White"
+                                   CornerRadius="8"
+                                   Padding="12">
+                                <Picker ItemsSource="{Binding MonthOptions}"
+                                        SelectedIndex="{Binding SelectedMonthIndex}"
+                                        Title="Chọn tháng"
+                                        TextColor="#1976D2"
+                                        FontSize="16"
+                                        FontAttributes="Bold" />
+                            </Frame>
+                            
+                            <Button Text="{Binding IsUploadingInvoice, Converter={StaticResource BoolToTextConverter}, ConverterParameter='📤 Đang upload...|📄 Chọn ảnh hóa đơn'}" 
+                                    Command="{Binding UploadInvoiceImageCommand}"
+                                    IsEnabled="{Binding IsUploadingInvoice, Converter={StaticResource InverseBoolConverter}}"
+                                    BackgroundColor="#1976D2"
+                                    TextColor="White"
+                                    FontSize="16"
+                                    FontAttributes="Bold"
+                                    CornerRadius="10"
+                                    HeightRequest="55"
+                                    Margin="0,8,0,0">
+                                <Button.Triggers>
+                                    <DataTrigger TargetType="Button" Binding="{Binding IsUploadingInvoice}" Value="True">
+                                        <Setter Property="BackgroundColor" Value="#FFC107" />
+                                    </DataTrigger>
+                                </Button.Triggers>
+                            </Button>
+                            
+                            <Label Text="💡 Lưu ý: Ảnh sẽ được lưu theo định dạng /private/InvoiceImage/{tháng}/{storeId}.png"
+                                   FontSize="12" 
+                                   TextColor="#999"
+                                   HorizontalOptions="Center"
+                                   HorizontalTextAlignment="Center"
+                                   Margin="0,8,0,0" />
+                        </VerticalStackLayout>
+                    </Frame>
 
                     <!-- Chọn gói dịch vụ và cập nhật -->
                     <Label Text="Gói dịch vụ" 
