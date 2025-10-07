@@ -124,6 +124,17 @@ public static class MauiProgram
             client.Timeout = TimeSpan.FromMinutes(5);
         });
 
+        builder.Services.AddHttpClient<IStoreStatisticService, StoreStatisticService>((sp, client) =>
+        {
+            var configuration = sp.GetRequiredService<IConfiguration>();
+            var baseUrl = configuration["API:Payment:BaseUrl"];
+            if (!string.IsNullOrEmpty(baseUrl))
+            {
+                client.BaseAddress = new Uri(baseUrl);
+            }
+            client.Timeout = TimeSpan.FromMinutes(2);
+        });
+
       
 
         // Register ViewModels
@@ -203,7 +214,8 @@ public static class MauiProgram
 		builder.Services.AddTransient<StoreDetailViewModel>();
 		builder.Services.AddTransient<StoreDetailPage>();
 		builder.Services.AddTransient<StoreMapViewModel>();
-		builder.Services.AddTransient<StoreMapPage>();
+        builder.Services.AddTransient<StoreMapPage>();
+        builder.Services.AddTransient<StoreStatisticPage>();
 
         builder.Services.AddSingleton<ITokenService, TokenService>();
         builder.Services.AddHttpClient<IServicePackagesService, ServicePackagesService>((sp, client) =>

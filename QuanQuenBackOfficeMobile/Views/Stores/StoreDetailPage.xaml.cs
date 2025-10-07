@@ -1,5 +1,6 @@
 using QuanQuenBackOfficeMobile.ViewModels.Stores;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
+using QuanQuenBackOfficeMobile.Views.Stores;
 
 namespace QuanQuenBackOfficeMobile.Views.Stores;
 
@@ -90,6 +91,35 @@ public partial class StoreDetailPage : ContentPage
         catch (Exception ex)
         {
             await DisplayAlert("Lỗi", $"Không thể mở trang thêm ảnh menu: {ex.Message}", "OK");
+        }
+    }
+
+    private async void ViewStatistic_Clicked(object sender, EventArgs e)
+    {
+        try
+        {
+            if (_viewModel.StoreDetail?.StoreName == null)
+            {
+                await DisplayAlert("Lỗi", "Không tìm thấy thông tin nhà hàng", "OK");
+                return;
+            }
+
+            var statisticService = App.Services.GetService<IStoreStatisticService>();
+            var geoService = App.Services.GetService<GeographicApiService>();
+            var storeService = App.Services.GetService<IStoreService>();
+            if (statisticService == null)
+            {
+                await DisplayAlert("Lỗi", "Không thể khởi tạo service thống kê", "OK");
+                return;
+            }
+
+            var vm = new StoreStatisticViewModel(statisticService, geoService, storeService, _viewModel.StoreDetail.StoreName, _viewModel.StoreDetail.StoreId);
+            var page = new StoreStatisticPage(vm);
+            await Navigation.PushAsync(page);
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Lỗi", $"Không thể mở trang thống kê: {ex.Message}", "OK");
         }
     }
 } 
