@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:QuanQuenBackOfficeMobile.ViewModels.Affiliates"
+             xmlns:converters="clr-namespace:QuanQuenBackOfficeMobile.Converters"
+             x:Class="QuanQuenBackOfficeMobile.Views.Affiliates.AffiliateAgreementPage"
+             x:DataType="vm:AffiliateAgreementPageViewModel"
+             Title="Bản thỏa thuận (Affiliate)">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+            <converters:StringToBoolConverter x:Key="StringToBoolConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="*,Auto">
+        <WebView Grid.Row="0"
+                 x:Name="AgreementWebView"
+                 Source="{Binding PdfSource}"
+                 IsVisible="{Binding IsPdfLoaded}" />
+
+        <ActivityIndicator Grid.Row="0"
+                           IsRunning="{Binding IsBusy}"
+                           IsVisible="{Binding IsBusy}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+
+        <VerticalStackLayout Grid.Row="1" Padding="16" Spacing="12">
+            <Button Text="Tiếp tục" Clicked="OnContinueClicked"
+                    IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>
+
+

@@ -172,7 +172,31 @@ public partial class AffiliateStoreUserPasswordViewModel : ObservableObject
                 var storePIC = referrerId ?? "Unknown";
                 System.Diagnostics.Debug.WriteLine($"[DEBUG][AffiliateStoreUserPasswordViewModel] Final storePIC: {storePIC}");
 
-                // 2. Gọi API tạo cửa hàng với token từ RegisterUser
+                // 2. Lấy tọa độ từ địa chỉ bằng geocoding (giống user thường)
+                (double Latitude, double Longitude)? coordinates = null;
+                try
+                {
+                    var fullAddress = $"{AffiliateStoreData.Address}";
+                    System.Diagnostics.Debug.WriteLine($"[DEBUG][AffiliateStoreUserPasswordViewModel] Geocoding address: {fullAddress}");
+                    
+                    var locations = await Microsoft.Maui.Devices.Sensors.Geocoding.GetLocationsAsync(fullAddress);
+                    var location = locations?.FirstOrDefault();
+                    if (location != null)
+                    {
+                        coordinates = (location.Latitude, location.Longitude);
+                        System.Diagnostics.Debug.WriteLine($"[DEBUG][AffiliateStoreUserPasswordViewModel] Geocoding success: Lat={coordinates.Value.Latitude}, Lng={coordinates.Value.Longitude}");
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[DEBUG][AffiliateStoreUserPasswordViewModel] Geocoding failed: No location found");
+                    }
+                }
+                catch (Exception geoEx)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[DEBUG][AffiliateStoreUserPasswordViewModel] Geocoding error: {geoEx.Message}");
+                }
+
+                // 3. Gọi API tạo cửa hàng với token từ RegisterUser
                 System.Diagnostics.Debug.WriteLine($"[DEBUG][AffiliateStoreUserPasswordViewModel] Bắt đầu tạo store request");
                 System.Diagnostics.Debug.WriteLine($"[DEBUG][AffiliateStoreUserPasswordViewModel] StoreName: {AffiliateStoreData.StoreName}");
                 System.Diagnostics.Debug.WriteLine($"[DEBUG][AffiliateStoreUserPasswordViewModel] RepresentativeName: {AffiliateStoreData.RepresentativeName}");
@@ -185,6 +209,7 @@ public partial class AffiliateStoreUserPasswordViewModel : ObservableObject
                 System.Diagnostics.Debug.WriteLine($"[DEBUG][AffiliateStoreUserPasswordViewModel] BusinessType: {AffiliateStoreData.SelectedBusinessType}");
                 System.Diagnostics.Debug.WriteLine($"[DEBUG][AffiliateStoreUserPasswordViewModel] CreatedBy: {storePIC}");
                 System.Diagnostics.Debug.WriteLine($"[DEBUG][AffiliateStoreUserPasswordViewModel] ReferralId sẽ set: '{storePIC}' (length: {storePIC?.Length ?? 0})");
+                System.Diagnostics.Debug.WriteLine($"[DEBUG][AffiliateStoreUserPasswordViewModel] Coordinates: Lat={coordinates?.Latitude}, Lng={coordinates?.Longitude}");
 
                 var storeRequest = new AffiliateCreateStoreRequest
                 {
@@ -198,7 +223,9 @@ public partial class AffiliateStoreUserPasswordViewModel : ObservableObject
                     WardId = AffiliateStoreData.WardId,
                     BusinessType = AffiliateStoreData.SelectedBusinessType,
                     CreatedBy = storePIC,
-                    ReferralId = storePIC // Sử dụng cùng referrer ID
+                    ReferralId = storePIC, // Sử dụng cùng referrer ID
+                    Latitude = coordinates?.Latitude,
+                    Longitude = coordinates?.Longitude
                 };
 
                 System.Diagnostics.Debug.WriteLine($"[DEBUG][AffiliateStoreUserPasswordViewModel] Gọi CreateAffiliateStoreAsync với token: {userToken?.Substring(0, Math.Min(20, userToken?.Length ?? 0))}...");
@@ -225,6 +252,8 @@ public partial class AffiliateStoreUserPasswordViewModel : ObservableObject
                 {
                     // Lưu StoreId từ response của CreateStore endpoint để sử dụng cho các API khác
                     AffiliateStoreData.StoreId = storeId;
+                    // Đồng bộ sang StoreRegistrationData để các service (ContractService) dùng chung
+                    StoreRegistrationData.StoreId = storeId;
                     // 3. Thành công cả hai, chuyển sang trang xác thực OTP
                     var affiliateStoreUserAuthenticationViewModel = IPlatformApplication.Current.Services.GetService<AffiliateStoreUserAuthenticationViewModel>();
                     Application.Current.MainPage = new AffiliateStoreUserAuthenticationPage(affiliateStoreUserAuthenticationViewModel);

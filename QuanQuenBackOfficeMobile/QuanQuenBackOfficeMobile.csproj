@@ -146,10 +146,4 @@
 	  <CodesignEntitlements>Platforms\iOS\Entitlements.plist</CodesignEntitlements>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(TargetFramework)'=='net9.0-ios'">
-	  <ProvisioningType>manual</ProvisioningType>
-	  <CodesignKey>Apple Distribution: Michael Nguyen (7VCH3ZJZF3)</CodesignKey>
-	  <CodesignProvision>Quan Quen Back Office Mobile App Ad Hoc Distr.</CodesignProvision>
-	</PropertyGroup>
-
 </Project>

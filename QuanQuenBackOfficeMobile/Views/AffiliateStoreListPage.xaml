@@ -123,6 +123,9 @@
                                             <Label Text="·" Style="{StaticResource InfoStyle}"/>
                                             <Label Text="{Binding CreatedDate, StringFormat='{0:dd/MM/yyyy}'}"
                                                    Style="{StaticResource InfoStyle}"/>
+                                            <Label Text="·" Style="{StaticResource InfoStyle}"/>
+                                            <Label Text="{Binding Status, StringFormat='Trạng thái: {0}'}"
+                                                   Style="{StaticResource InfoStyle}" TextColor="#27AE60"/>
                                         </HorizontalStackLayout>
                                     </VerticalStackLayout>
 
@@ -143,8 +146,9 @@
                                             <Label Text="{Binding Address}" Style="{StaticResource InfoStyle}"/>
                                         </HorizontalStackLayout>
                                         <HorizontalStackLayout Spacing="10">
-                                            <Label Text="👤" FontSize="14" VerticalOptions="Center"/>
-                                            <Label Text="{Binding RepresentativeName}" Style="{StaticResource InfoStyle}"/>
+                                            <Label Text="🏷️" FontSize="14" VerticalOptions="Center"/>
+                                            <Label Text="{Binding ReferralId, StringFormat='Mã Affiliate: {0}'}" 
+                                                   Style="{StaticResource InfoStyle}" TextColor="#E67E22"/>
                                         </HorizontalStackLayout>
                                     </VerticalStackLayout>
 

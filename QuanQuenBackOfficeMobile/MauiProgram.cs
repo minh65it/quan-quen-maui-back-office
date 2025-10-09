@@ -146,6 +146,10 @@ public static class MauiProgram
         builder.Services.AddTransient<AffiliateStoreUserPasswordViewModel>();
         builder.Services.AddTransient<AffiliateStoreUserAuthenticationViewModel>();
         builder.Services.AddTransient<AffiliateStoreListViewModel>();
+        builder.Services.AddTransient<QuanQuenBackOfficeMobile.ViewModels.Affiliates.AffiliateAgreementInformationViewModel>();
+        builder.Services.AddTransient<QuanQuenBackOfficeMobile.ViewModels.Affiliates.AffiliateAgreementPreviewViewModel>();
+        builder.Services.AddTransient<QuanQuenBackOfficeMobile.ViewModels.Affiliates.AffiliateAgreementSignatureViewModel>();
+        builder.Services.AddTransient<QuanQuenBackOfficeMobile.ViewModels.Affiliates.AffiliateAgreementPageViewModel>();
 		builder.Services.AddTransient<MainViewModel>();
 		builder.Services.AddTransient<CreateStoreUserPasswordViewModel>();
 		builder.Services.AddTransient<StoreInformationContractViewModel>();
@@ -166,6 +170,12 @@ public static class MauiProgram
         builder.Services.AddTransient<AffiliateStoreUserPasswordPage>();
         builder.Services.AddTransient<AffiliateStoreUserAuthenticationPage>();
         builder.Services.AddTransient<AffiliateStoreListPage>();
+        builder.Services.AddTransient<QuanQuenBackOfficeMobile.Views.Affiliates.AffiliateAgreementInformationPage>();
+        builder.Services.AddTransient<QuanQuenBackOfficeMobile.Views.Affiliates.AffiliateAgreementPreviewPage>();
+        builder.Services.AddTransient<QuanQuenBackOfficeMobile.Views.Affiliates.AffiliateAgreementSignaturePage>();
+        builder.Services.AddTransient<QuanQuenBackOfficeMobile.Views.Affiliates.AffiliateAgreementPage>();
+        builder.Services.AddTransient<QuanQuenBackOfficeMobile.Views.Affiliates.AffiliatePhotoPage>();
+        builder.Services.AddTransient<QuanQuenBackOfficeMobile.ViewModels.Affiliates.AffiliatePhotoViewModel>();
         builder.Services.AddTransient<ServicePackagesPage>();
 		builder.Services.AddTransient<RegisterPage>();
 		builder.Services.AddTransient<MainPage>();

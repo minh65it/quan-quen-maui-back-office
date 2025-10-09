@@ -84,10 +84,33 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                 var response = await _affiliateService.VerifyAffiliateOtpAsync(Email, OtpCode);
                 if (response.IsSuccess)
                 {
-                    // OTP xác thực thành công, hỏi user muốn làm gì tiếp theo
-                    await Application.Current.MainPage.DisplayAlert("Thành công", "Xác thực OTP thành công! Store đã được tạo.", "OK");
-                    
-                    await ShowNextActionOptions();
+                    // OTP xác thực thành công → chuyển sang luồng Agreement (Affiliate)
+                    await Application.Current.MainPage.DisplayAlert("Thành công", "Xác thực OTP thành công! Tiếp tục điền thông tin thỏa thuận.", "OK");
+
+                    // Ensure StoreId đã được set vào StoreRegistrationData từ AffiliateStoreData
+                    if (!string.IsNullOrEmpty(AffiliateStoreData.StoreId))
+                    {
+                        StoreRegistrationData.StoreId = AffiliateStoreData.StoreId;
+                    }
+
+                    // Map affiliate_token -> auth_token để ContractService sử dụng
+                    try
+                    {
+                        var affiliateToken = await SecureStorage.GetAsync("affiliate_token");
+                        if (string.IsNullOrEmpty(affiliateToken))
+                        {
+                            affiliateToken = Preferences.Get("affiliate_token", "");
+                        }
+                        if (!string.IsNullOrEmpty(affiliateToken))
+                        {
+                            await SecureStorage.SetAsync("auth_token", affiliateToken);
+                        }
+                    }
+                    catch { }
+
+                    var infoPage = new QuanQuenBackOfficeMobile.Views.Affiliates.AffiliateAgreementInformationPage();
+                    // Dùng Navigation thay vì PushAsync: đặt MainPage là NavigationPage bọc trang mới
+                    Application.Current.MainPage = new NavigationPage(infoPage);
                 }
                 else
                 {

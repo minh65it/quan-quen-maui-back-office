@@ -204,6 +204,20 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                 AffiliateStoreData.DistrictId = SelectedDistrict?.territoryId ?? "";
                 AffiliateStoreData.WardId = SelectedWard?.stateId ?? "";
                 AffiliateStoreData.SelectedBusinessType = SelectedBusinessType;
+
+                // Cũng lưu vào StoreRegistrationData để dùng cho agreement (giống user thường)
+                StoreRegistrationData.StoreName = StoreName;
+                StoreRegistrationData.RepresentativeName = RepresentativeName;
+                StoreRegistrationData.Address = Address;
+                StoreRegistrationData.PhoneNumber = PhoneNumber;
+                StoreRegistrationData.Email = Email;
+                StoreRegistrationData.Province = SelectedProvince?.Name ?? "";
+                StoreRegistrationData.District = SelectedDistrict?.Name ?? "";
+                StoreRegistrationData.Ward = SelectedWard?.Name ?? "";
+                StoreRegistrationData.ProvinceId = SelectedProvince?.zoneId ?? "";
+                StoreRegistrationData.DistrictId = SelectedDistrict?.territoryId ?? "";
+                StoreRegistrationData.WardId = SelectedWard?.stateId ?? "";
+                StoreRegistrationData.BusinessType = SelectedBusinessType;
                 
                 // Get referrer ID from affiliate login data
                 try
