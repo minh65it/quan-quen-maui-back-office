@@ -32,13 +32,14 @@
                    HorizontalOptions="Center"
                    Margin="0,0,0,20" />
 
-            <Label Text="Ảnh nhà hàng (tối đa 6 ảnh)"
+            <!-- Khu 1: Ảnh Nhà hàng (3 ảnh: 1 tổng quan, 2 không gian) -->
+            <Label Text="Ảnh Nhà hàng (tối đa 3 ảnh: 1 tổng quan, 2 không gian)"
                    FontSize="14"
                    TextColor="Black" />
             <HorizontalStackLayout Spacing="10">
                 <Button Text="Chụp ảnh nhà hàng"
-                        Clicked="OnCapturePhotoClicked"
-                        IsEnabled="{Binding CanAddMoreImages}"
+                        Clicked="OnCaptureRestaurantPhotoClicked"
+                        IsEnabled="{Binding CanAddMoreRestaurantImages}"
                         HeightRequest="44"
                         FontSize="16"
                         BackgroundColor="#F5F5F5"
@@ -46,8 +47,8 @@
                         BorderColor="#F58220"
                         CornerRadius="12"/>
                 <Button Text="Chọn ảnh nhà hàng"
-                        Clicked="OnPickPhotoClicked"
-                        IsEnabled="{Binding CanAddMoreImages}"
+                        Clicked="OnPickRestaurantPhotoClicked"
+                        IsEnabled="{Binding CanAddMoreRestaurantImages}"
                         HeightRequest="44"
                         FontSize="16"
                         BackgroundColor="#F5F5F5"
@@ -56,7 +57,7 @@
                         CornerRadius="12"/>
             </HorizontalStackLayout>
             <CollectionView x:Name="PhotoCollectionView"
-                ItemsSource="{Binding StoreImages}"
+                ItemsSource="{Binding RestaurantImages}"
                 HeightRequest="200"
                 Margin="0,5,0,0"
                 >
@@ -98,6 +99,38 @@
                     <ContentView WidthRequest="15"/>
                 </CollectionView.Footer>
             </CollectionView>
+
+            <!-- Khu 2: CCCD 2 mặt -->
+            <Label Text="CCCD chủ/quản lý (2 mặt)" FontSize="14" TextColor="Black" />
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                <VerticalStackLayout Grid.Column="0" Spacing="6">
+                    <Button Text="Chọn CCCD mặt trước" Clicked="OnPickIdentityFrontClicked" />
+                    <Image Source="{Binding IdentityFront.Images}" HeightRequest="120" Aspect="AspectFill" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="1" Spacing="6">
+                    <Button Text="Chọn CCCD mặt sau" Clicked="OnPickIdentityBackClicked" />
+                    <Image Source="{Binding IdentityBack.Images}" HeightRequest="120" Aspect="AspectFill" />
+                </VerticalStackLayout>
+            </Grid>
+
+            <!-- Khu 3: Ảnh Menu -->
+            <Label Text="Ảnh Menu" FontSize="14" TextColor="Black" />
+            <HorizontalStackLayout Spacing="10">
+                <Button Text="Chọn ảnh menu" Clicked="OnPickMenuPhotoClicked" IsEnabled="{Binding CanAddMoreMenuImages}" />
+            </HorizontalStackLayout>
+            <Frame BackgroundColor="LightGray" Padding="10" Margin="0,5,0,0" HeightRequest="120">
+                <Grid>
+                    <Image Source="{Binding MenuImages[0].Images}" 
+                           HeightRequest="100" 
+                           Aspect="AspectFill" 
+                           IsVisible="{Binding MenuImages.Count, Converter={StaticResource StringNotNullOrEmptyConverter}}" />
+                    <Label Text="Chưa có ảnh menu" 
+                           HorizontalOptions="Center" 
+                           VerticalOptions="Center"
+                           TextColor="Gray"
+                           IsVisible="{Binding MenuImages.Count, Converter={StaticResource InverseBoolConverter}}" />
+                </Grid>
+            </Frame>
 
             <!-- Nút Lưu và Bỏ qua -->
             <Grid Margin="0,30,0,0" RowDefinitions="Auto" ColumnDefinitions="*,*" ColumnSpacing="15">

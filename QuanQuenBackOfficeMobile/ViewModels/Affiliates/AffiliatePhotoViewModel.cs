@@ -28,11 +28,22 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Affiliates
     {
         private readonly IStoreMediaService _storeMediaService;
         
+        // Khu 1: Ảnh Nhà hàng (tối đa 3)
+        public ObservableCollection<MyImageModel> RestaurantImages { get; } = new();
+        // Khu 2: CCCD 2 mặt
+        public MyImageModel IdentityFront { get; private set; }
+        public MyImageModel IdentityBack { get; private set; }
+        // Khu 3: Ảnh Menu (1 ảnh)
+        public ObservableCollection<MyImageModel> MenuImages { get; } = new();
+
+        // Khu cũ (giữ tương thích nếu cần)
         public ObservableCollection<MyImageModel> StoreImages { get; } = new();
         public List<FileResult> StoreImageFiles { get; } = new();
         public IAsyncRelayCommand PickImageCommand { get; }
         public IAsyncRelayCommand CaptureImageCommand { get; }
         public bool CanAddMoreImages => StoreImages.Count < 6;
+        public bool CanAddMoreRestaurantImages => RestaurantImages.Count < 3;
+        public bool CanAddMoreMenuImages => MenuImages.Count < 1;
         public string ButtonBackgroundColor => CanAddMoreImages ? "#F5F5F5" : "Gray";
         public string ButtonTextColor => CanAddMoreImages ? "#F58220" : "Gray";
         public string ImageCounterText => $"Đã chọn {StoreImages.Count}/6 ảnh";
@@ -139,6 +150,40 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Affiliates
             System.Diagnostics.Debug.WriteLine($"[LOG] Tổng số ảnh hiện tại: {StoreImages.Count}");
         }
 
+        // --- API cho từng khu ảnh mới ---
+        public async Task AddRestaurantImageFromFileAsync(FileResult file)
+        {
+            if (!CanAddMoreRestaurantImages || file == null) return;
+            var copiedPath = await CopyFileToAppDirectoryAsync(file);
+            RestaurantImages.Add(new MyImageModel { Images = ImageSource.FromFile(copiedPath), LocalPath = copiedPath });
+            OnPropertyChanged(nameof(CanAddMoreRestaurantImages));
+        }
+
+        public async Task SetIdentityFrontFromFileAsync(FileResult file)
+        {
+            if (file == null) return;
+            var copiedPath = await CopyFileToAppDirectoryAsync(file);
+            IdentityFront = new MyImageModel { Images = ImageSource.FromFile(copiedPath), LocalPath = copiedPath };
+            OnPropertyChanged(nameof(IdentityFront));
+        }
+
+        public async Task SetIdentityBackFromFileAsync(FileResult file)
+        {
+            if (file == null) return;
+            var copiedPath = await CopyFileToAppDirectoryAsync(file);
+            IdentityBack = new MyImageModel { Images = ImageSource.FromFile(copiedPath), LocalPath = copiedPath };
+            OnPropertyChanged(nameof(IdentityBack));
+        }
+
+        public async Task AddMenuImageFromFileAsync(FileResult file)
+        {
+            if (!CanAddMoreMenuImages || file == null) return;
+            var copiedPath = await CopyFileToAppDirectoryAsync(file);
+            MenuImages.Clear();
+            MenuImages.Add(new MyImageModel { Images = ImageSource.FromFile(copiedPath), LocalPath = copiedPath });
+            OnPropertyChanged(nameof(CanAddMoreMenuImages));
+        }
+
         // Các phương thức command cũ: hiển thị thông báo, hướng dẫn thao tác từ UI (Code-behind)
         private async Task DeprecatedPickImagesAsync()
         {
@@ -186,9 +231,10 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Affiliates
         [RelayCommand]  
         public async Task SavePhotoAsync()
         {
-            if (StoreImages.Count == 0)
+            // Kiểm tra có ít nhất một loại ảnh nào đó
+            if (RestaurantImages.Count == 0 && IdentityFront == null && IdentityBack == null && MenuImages.Count == 0)
             {
-                await Shell.Current.DisplayAlert("Lỗi", "Chưa có ảnh nào!", "OK");
+                await Shell.Current.DisplayAlert("Lỗi", "Chưa có ảnh nào để lưu!", "OK");
                 return;
             }
             
@@ -200,37 +246,109 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Affiliates
                 await Shell.Current.DisplayAlert("Lỗi", "Thiếu thông tin xác thực hoặc storeId!", "OK");
                 return;
             }
-            
-            var nameMedia = "Ảnh bìa";
-            var categoryMediaId = await _storeMediaService.GetThumbnailCategoryMediaIdAsync(nameMedia);
-            if (string.IsNullOrEmpty(categoryMediaId))
-            {
-                await Shell.Current.DisplayAlert("Lỗi", "Không tìm thấy categoryMediaId cho ảnh nhà hàng!", "OK");
-                return;
-            }
-
-            var imageBytesList = new List<byte[]>();
-            foreach (var img in StoreImages)
-            {
-                if (img == null) continue;
-                var bytes = await ImageSourceToBytesAsync(img.Images);
-                if (bytes != null) imageBytesList.Add(bytes);
-            }
 
             IsLoading = true;
             OnPropertyChanged(nameof(IsLoading));
             try
             {
-                var result = await _storeMediaService.UploadMediasAsync(storeId, categoryMediaId, createdBy, imageBytesList, false, false);
-                if (result.IsSuccess)
+                // Lưu từng loại ảnh riêng biệt
+                var successCount = 0;
+                var totalTasks = 0;
+
+                // 1. Lưu ảnh nhà hàng
+                if (RestaurantImages.Count > 0)
                 {
-                    await App.Current.MainPage.DisplayAlert("Thành công", "Thêm ảnh nhà hàng thành công!", "OK");
-                    // Hiển thị ActionSheet thay vì chuyển sang VideoStoreUserPage
+                    totalTasks++;
+                    var restaurantCategoryId = await _storeMediaService.GetThumbnailCategoryMediaIdAsync("Ảnh bìa");
+                    if (!string.IsNullOrEmpty(restaurantCategoryId))
+                    {
+                        var restaurantBytes = new List<byte[]>();
+                        foreach (var img in RestaurantImages)
+                        {
+                            if (img?.Images != null)
+                            {
+                                var bytes = await ImageSourceToBytesAsync(img.Images);
+                                if (bytes != null) restaurantBytes.Add(bytes);
+                            }
+                        }
+                        if (restaurantBytes.Count > 0)
+                        {
+                            var result = await _storeMediaService.UploadMediasAsync(storeId, restaurantCategoryId, createdBy, restaurantBytes, false, false);
+                            if (result.IsSuccess) successCount++;
+                        }
+                    }
+                }
+
+                // 2. Lưu CCCD mặt trước
+                if (IdentityFront?.Images != null)
+                {
+                    totalTasks++;
+                    var identityCategoryId = await _storeMediaService.GetThumbnailCategoryMediaIdAsync("Hồ sơ nhà hàng");
+                    if (!string.IsNullOrEmpty(identityCategoryId))
+                    {
+                        var identityBytes = await ImageSourceToBytesAsync(IdentityFront.Images);
+                        if (identityBytes != null)
+                        {
+                            var result = await _storeMediaService.UploadMediasAsync(storeId, identityCategoryId, createdBy, new List<byte[]> { identityBytes }, true, false);
+                            if (result.IsSuccess) successCount++;
+                        }
+                    }
+                }
+
+                // 3. Lưu CCCD mặt sau
+                if (IdentityBack?.Images != null)
+                {
+                    totalTasks++;
+                    var identityCategoryId = await _storeMediaService.GetThumbnailCategoryMediaIdAsync("Hồ sơ nhà hàng");
+                    if (!string.IsNullOrEmpty(identityCategoryId))
+                    {
+                        var identityBytes = await ImageSourceToBytesAsync(IdentityBack.Images);
+                        if (identityBytes != null)
+                        {
+                            var result = await _storeMediaService.UploadMediasAsync(storeId, identityCategoryId, createdBy, new List<byte[]> { identityBytes }, true, false);
+                            if (result.IsSuccess) successCount++;
+                        }
+                    }
+                }
+
+                // 4. Lưu ảnh menu
+                if (MenuImages.Count > 0)
+                {
+                    totalTasks++;
+                    var menuCategoryId = await _storeMediaService.GetThumbnailCategoryMediaIdAsync("Ảnh nhà hàng");
+                    if (!string.IsNullOrEmpty(menuCategoryId))
+                    {
+                        var menuBytes = new List<byte[]>();
+                        foreach (var img in MenuImages)
+                        {
+                            if (img?.Images != null)
+                            {
+                                var bytes = await ImageSourceToBytesAsync(img.Images);
+                                if (bytes != null) menuBytes.Add(bytes);
+                            }
+                        }
+                        if (menuBytes.Count > 0)
+                        {
+                            var result = await _storeMediaService.UploadMediasAsync(storeId, menuCategoryId, createdBy, menuBytes, false, true);
+                            if (result.IsSuccess) successCount++;
+                        }
+                    }
+                }
+
+                // Hiển thị kết quả
+                if (successCount == totalTasks && totalTasks > 0)
+                {
+                    await App.Current.MainPage.DisplayAlert("Thành công", $"Đã lưu thành công {successCount}/{totalTasks} loại ảnh!", "OK");
+                    await ShowNextActionOptions();
+                }
+                else if (successCount > 0)
+                {
+                    await App.Current.MainPage.DisplayAlert("Thành công một phần", $"Đã lưu thành công {successCount}/{totalTasks} loại ảnh!", "OK");
                     await ShowNextActionOptions();
                 }
                 else
                 {
-                    await Shell.Current.DisplayAlert("Lỗi", result.Message, "OK");
+                    await Shell.Current.DisplayAlert("Lỗi", "Không thể lưu ảnh nào!", "OK");
                 }
             }
             finally

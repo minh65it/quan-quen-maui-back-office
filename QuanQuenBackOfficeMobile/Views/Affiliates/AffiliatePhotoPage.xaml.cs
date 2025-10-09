@@ -76,7 +76,37 @@ namespace QuanQuenBackOfficeMobile.Views.Affiliates
 
         private AffiliatePhotoViewModel Vm => BindingContext as AffiliatePhotoViewModel;
 
-        private async void OnCapturePhotoClicked(object sender, EventArgs e)
+        // Handler cho ảnh nhà hàng
+        private async void OnCaptureRestaurantPhotoClicked(object sender, EventArgs e)
+        {
+            await CapturePhotoAsync(async (file) => await Vm.AddRestaurantImageFromFileAsync(file));
+        }
+
+        private async void OnPickRestaurantPhotoClicked(object sender, EventArgs e)
+        {
+            await PickPhotoAsync(async (file) => await Vm.AddRestaurantImageFromFileAsync(file));
+        }
+
+        // Handler cho CCCD mặt trước
+        private async void OnPickIdentityFrontClicked(object sender, EventArgs e)
+        {
+            await PickPhotoAsync(async (file) => await Vm.SetIdentityFrontFromFileAsync(file));
+        }
+
+        // Handler cho CCCD mặt sau
+        private async void OnPickIdentityBackClicked(object sender, EventArgs e)
+        {
+            await PickPhotoAsync(async (file) => await Vm.SetIdentityBackFromFileAsync(file));
+        }
+
+        // Handler cho ảnh menu
+        private async void OnPickMenuPhotoClicked(object sender, EventArgs e)
+        {
+            await PickPhotoAsync(async (file) => await Vm.AddMenuImageFromFileAsync(file));
+        }
+
+        // Handler chung cho chụp ảnh
+        private async Task CapturePhotoAsync(Func<FileResult, Task> onSuccess)
         {
             try
             {
@@ -100,7 +130,7 @@ namespace QuanQuenBackOfficeMobile.Views.Affiliates
                 var file = await MediaPicker.Default.CapturePhotoAsync();
                 if (file != null && Vm != null)
                 {
-                    await Vm.AddImageFromFileAsync(file);
+                    await onSuccess(file);
                 }
             }
             catch (Exception ex)
@@ -109,7 +139,8 @@ namespace QuanQuenBackOfficeMobile.Views.Affiliates
             }
         }
 
-        private async void OnPickPhotoClicked(object sender, EventArgs e)
+        // Handler chung cho chọn ảnh
+        private async Task PickPhotoAsync(Func<FileResult, Task> onSuccess)
         {
             try
             {
@@ -144,13 +175,24 @@ namespace QuanQuenBackOfficeMobile.Views.Affiliates
                 var result = await MediaPicker.Default.PickPhotoAsync(new MediaPickerOptions { Title = "Chọn ảnh" });
                 if (result != null && Vm != null)
                 {
-                    await Vm.AddImageFromFileAsync(result);
+                    await onSuccess(result);
                 }
             }
             catch (Exception ex)
             {
                 await DisplayAlert("Lỗi", $"Không thể chọn ảnh: {ex.Message}", "OK");
             }
+        }
+
+        // Handler cũ để tương thích
+        private async void OnCapturePhotoClicked(object sender, EventArgs e)
+        {
+            await CapturePhotoAsync(async (file) => await Vm.AddImageFromFileAsync(file));
+        }
+
+        private async void OnPickPhotoClicked(object sender, EventArgs e)
+        {
+            await PickPhotoAsync(async (file) => await Vm.AddImageFromFileAsync(file));
         }
     }
 }
