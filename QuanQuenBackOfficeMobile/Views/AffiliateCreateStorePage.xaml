@@ -156,6 +156,32 @@
                    IsVisible="{Binding BusinessTypeError, Converter={StaticResource StringToBoolConverter}}"
                    Margin="0,2,0,0"/>
 
+            <!-- Điều kiện nhà hàng -->
+            <VerticalStackLayout Spacing="10" Margin="0,20,0,0">
+                <HorizontalStackLayout Spacing="10">
+                    <CheckBox IsChecked="{Binding HasMinimumTables}" />
+                    <Label Text="Nhà hàng có từ 05 bàn trở lên" 
+                           FontSize="14" 
+                           TextColor="Black" 
+                           VerticalOptions="Center" />
+                </HorizontalStackLayout>
+                
+                <HorizontalStackLayout Spacing="10">
+                    <CheckBox IsChecked="{Binding IsFAndB}" />
+                    <Label Text="Hoạt động trong lĩnh vực F&amp;B" 
+                           FontSize="14" 
+                           TextColor="Black" 
+                           VerticalOptions="Center" />
+                </HorizontalStackLayout>
+                
+                <HorizontalStackLayout Spacing="10">
+                    <CheckBox IsChecked="{Binding CanLinkWithApps}" />
+                    <Label Text="Có khả năng liên kết với ứng dụng tương tự" 
+                           FontSize="14" 
+                           TextColor="Black" 
+                           VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
 
             <!-- Nút Tạo Store -->
             <Button Text="Tạo Store"

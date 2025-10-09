@@ -58,6 +58,15 @@ namespace QuanQuenBackOfficeMobile.ViewModels
         [ObservableProperty]
         private bool isBusy;
 
+        [ObservableProperty]
+        private bool hasMinimumTables = false;
+
+        [ObservableProperty]
+        private bool isFAndB = false;
+
+        [ObservableProperty]
+        private bool canLinkWithApps = false;
+
         public ICommand CreateStoreCommand { get; }
 
         public AffiliateCreateStoreViewModel(IAffiliateService affiliateService, GeographicApiService geoService)
