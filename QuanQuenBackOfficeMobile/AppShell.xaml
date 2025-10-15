@@ -18,10 +18,6 @@
         ContentTemplate="{DataTemplate views:AffiliateLoginPage}"
         Route="AffiliateLogin" />
 
-    <ShellContent
-        Title="AffiliateRegister"
-        ContentTemplate="{DataTemplate views:AffiliateRegisterPage}"
-        Route="AffiliateRegister" />
 
     <ShellContent
         Title="Main"

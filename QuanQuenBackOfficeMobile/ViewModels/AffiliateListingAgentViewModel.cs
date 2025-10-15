@@ -25,6 +25,8 @@ namespace QuanQuenBackOfficeMobile.ViewModels
         private double _userLongitude;
         private ObservableCollection<StoreRecommendation> _stores = new();
         private PaginationData _pagination;
+        private int _currentPage = 1;
+        private bool _canLoadMore = true;
         
         // Form properties
         private bool _showStoreFormPopup = false;
@@ -80,6 +82,27 @@ namespace QuanQuenBackOfficeMobile.ViewModels
             set => SetProperty(ref _pagination, value);
         }
 
+        public int CurrentPage
+        {
+            get => _currentPage;
+            set => SetProperty(ref _currentPage, value);
+        }
+
+        public bool CanLoadMore
+        {
+            get => _canLoadMore;
+            set => SetProperty(ref _canLoadMore, value);
+        }
+
+        public string PageInfo
+        {
+            get
+            {
+                if (Pagination == null) return string.Empty;
+                return $"Trang {CurrentPage}/{Pagination.TotalPage}";
+            }
+        }
+
         // Form properties
         public bool ShowStoreFormPopup
         {
@@ -102,6 +125,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels
         public ICommand ConfirmLocationCommand { get; }
         public ICommand LoadStoresCommand { get; }
         public ICommand RefreshCommand { get; }
+        public ICommand LoadMoreCommand { get; }
         
         public ICommand SubmitFormCommand { get; }
         public ICommand CancelFormCommand { get; }
@@ -124,6 +148,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels
             ConfirmLocationCommand = new Command(async () => await ConfirmLocationAsync());
             LoadStoresCommand = new Command(async () => await LoadStoresAsync());
             RefreshCommand = new Command(async () => await RefreshAsync());
+            LoadMoreCommand = new Command(async () => await LoadMoreAsync());
             SubmitFormCommand = new Command(async () => await SubmitFormAsync());
             CancelFormCommand = new Command(async () => await CancelFormAsync());
             GoToDataAffiliatePreviewCommand = new Command(async () => await GoToDataAffiliatePreviewAsync());
@@ -166,7 +191,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels
             }
         }
 
-        private async Task CallStoreRecommendationsAPIAsync(double latitude, double longitude)
+        private async Task CallStoreRecommendationsAPIAsync(double latitude, double longitude, int pageNumber = 1, bool isLoadMore = false)
         {
             try
             {
@@ -196,7 +221,8 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                     LonPoint3 = null,
                     LatPoint4 = null,
                     LonPoint4 = null,
-                    PageSize = 5
+                    PageSize = 5,
+                    PageNumber = pageNumber
                 };
 
                 _logger.LogInformation($"Calling GetStoreRecommendationsByLocationAsync with LatUser: {request.LatUser}, LonUser: {request.LonUser}");
@@ -205,15 +231,31 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                 
                 if (response?.Result != null)
                 {
-                    _logger.LogInformation($"Adding {response.Result.Count} stores to UI");
-                    Stores.Clear();
+                    _logger.LogInformation($"Adding {response.Result.Count} stores to UI (Page {pageNumber})");
+                    
+                    if (!isLoadMore)
+                    {
+                        // Reset stores for first page or refresh
+                        Stores.Clear();
+                        CurrentPage = 1;
+                    }
+                    
                     foreach (var store in response.Result)
                     {
                         Stores.Add(store);
                         _logger.LogInformation($"Added store: {store.StoreName} at {store.Distance}");
                     }
+                    
                     Pagination = response.Pagination;
-                    _logger.LogInformation($"UI updated with {Stores.Count} stores");
+                    CurrentPage = pageNumber;
+                    
+                    // Check if can load more
+                    CanLoadMore = Pagination != null && CurrentPage < Pagination.TotalPage;
+                    
+                    // Trigger PageInfo update
+                    OnPropertyChanged(nameof(PageInfo));
+                    
+                    _logger.LogInformation($"UI updated with {Stores.Count} stores total. Page {CurrentPage}/{Pagination?.TotalPage ?? 0}");
                 }
                 else
                 {
@@ -233,12 +275,35 @@ namespace QuanQuenBackOfficeMobile.ViewModels
 
         private async Task LoadStoresAsync()
         {
-            await CallStoreRecommendationsAPIAsync(UserLatitude, UserLongitude);
+            await CallStoreRecommendationsAPIAsync(UserLatitude, UserLongitude, 1, false);
         }
 
         private async Task RefreshAsync()
         {
             await LoadStoresAsync();
+        }
+
+        private async Task LoadMoreAsync()
+        {
+            if (IsBusy || !CanLoadMore) return;
+
+            try
+            {
+                IsBusy = true;
+                var nextPage = CurrentPage + 1;
+                _logger.LogInformation($"Loading more stores - Page {nextPage}");
+                
+                await CallStoreRecommendationsAPIAsync(UserLatitude, UserLongitude, nextPage, true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error loading more stores");
+                ErrorMessage = $"Có lỗi xảy ra khi tải thêm nhà hàng: {ex.Message}";
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         

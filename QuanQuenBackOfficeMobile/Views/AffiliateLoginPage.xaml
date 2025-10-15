@@ -110,7 +110,7 @@
                 FontSize="Small"
                 IsVisible="{Binding ShowAuthError}"
                 Margin="10,0,0,0"/>
-            
+
             <Button
                 Text="Đăng nhập Affiliate"
                 TextColor="White"
@@ -124,14 +124,6 @@
                     </LinearGradientBrush>
                 </Button.Background>
             </Button>
-
-            <!-- Register Button -->
-            <Button
-                Text="Đăng ký Affiliate"
-                TextColor="#4CAF50"
-                BackgroundColor="Transparent"
-                HeightRequest="40"
-                Command="{Binding GoToAffiliateRegisterCommand}"/>
 
             <!-- Back to Normal Login -->
             <Button

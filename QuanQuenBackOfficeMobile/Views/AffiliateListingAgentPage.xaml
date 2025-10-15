@@ -149,6 +149,42 @@
                             Padding="24,12"
                             CornerRadius="8" />
                 </StackLayout>
+                
+                <!-- Pagination Info -->
+                <Frame BackgroundColor="White"
+                       Padding="16"
+                       HasShadow="True"
+                       CornerRadius="8"
+                       IsVisible="{Binding Stores.Count, Converter={StaticResource CountToBoolConverter}}">
+                    <StackLayout Spacing="8">
+                        <Label Text="{Binding Pagination.TotalCount, StringFormat='Tổng cộng: {0} nhà hàng'}"
+                               FontSize="14"
+                               HorizontalOptions="Center"
+                               TextColor="#666666" />
+                        
+                        <Label Text="{Binding PageInfo}"
+                               FontSize="14"
+                               HorizontalOptions="Center"
+                               TextColor="#666666" />
+                        
+                        <!-- Load More Button -->
+                        <Button Text="Tải thêm nhà hàng"
+                                Command="{Binding LoadMoreCommand}"
+                                BackgroundColor="#FC8312"
+                                TextColor="White"
+                                FontSize="14"
+                                Padding="0,12"
+                                CornerRadius="6"
+                                IsVisible="{Binding CanLoadMore}" />
+                        
+                        <!-- No More Data -->
+                        <Label Text="Đã hiển thị tất cả nhà hàng"
+                               FontSize="14"
+                               HorizontalOptions="Center"
+                               TextColor="#999999"
+                               IsVisible="{Binding CanLoadMore, Converter={StaticResource InverseBoolConverter}}" />
+                    </StackLayout>
+                </Frame>
             </StackLayout>
         </ScrollView>
 

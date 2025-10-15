@@ -141,7 +141,6 @@ public static class MauiProgram
         builder.Services.AddTransient<LoginViewModel>();
         builder.Services.AddTransient<ServicePackagesViewModel>();
         builder.Services.AddTransient<AffiliateLoginViewModel>();
-        builder.Services.AddTransient<AffiliateRegisterViewModel>();
         builder.Services.AddTransient<AffiliateCreateStoreViewModel>();
         builder.Services.AddTransient<AffiliateStoreUserPasswordViewModel>();
         builder.Services.AddTransient<AffiliateStoreUserAuthenticationViewModel>();
@@ -171,7 +170,6 @@ public static class MauiProgram
         // Register Views
         builder.Services.AddTransient<LoginPage>();
         builder.Services.AddTransient<AffiliateLoginPage>();
-        builder.Services.AddTransient<AffiliateRegisterPage>();
         builder.Services.AddTransient<AffiliateCreateStorePage>();
         builder.Services.AddTransient<AffiliateStoreUserPasswordPage>();
         builder.Services.AddTransient<AffiliateStoreUserAuthenticationPage>();

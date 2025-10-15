@@ -21,83 +21,6 @@ namespace QuanQuenBackOfficeMobile.Services
             _configuration = configuration;
         }
 
-        public async Task<ReferralUserResponse> RegisterReferralUserAsync(ReferralUserRequest request)
-        {
-            try
-            {
-                _logger.LogInformation("Starting affiliate registration for: {Email}", request.EmailReferrer);
-
-                var json = JsonSerializer.Serialize(request, new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                    WriteIndented = false
-                });
-
-                var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-
-                var baseUrl = _configuration["API:Affiliate:BaseUrl"];
-                var path = _configuration["API:Affiliate:Register"];
-                var url = $"{baseUrl}{path}";
-                var response = await _httpClient.PostAsync(url, content);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseContent = await response.Content.ReadAsStringAsync();
-                    _logger.LogInformation("Affiliate registration successful for: {Email}", request.EmailReferrer);
-
-                    // Parse response
-                    var result = JsonSerializer.Deserialize<ReferralUserResponse>(responseContent, new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
-
-                    return result ?? new ReferralUserResponse
-                    {
-                        Success = true,
-                        Message = "Đăng ký thành công"
-                    };
-                }
-                else
-                {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    _logger.LogError("Affiliate registration failed. Status: {StatusCode}, Content: {Content}", 
-                        response.StatusCode, errorContent);
-
-                    return new ReferralUserResponse
-                    {
-                        Success = false,
-                        Message = $"Đăng ký thất bại: {response.StatusCode}"
-                    };
-                }
-            }
-            catch (HttpRequestException ex)
-            {
-                _logger.LogError(ex, "Network error during affiliate registration");
-                return new ReferralUserResponse
-                {
-                    Success = false,
-                    Message = "Lỗi kết nối mạng. Vui lòng kiểm tra kết nối internet."
-                };
-            }
-            catch (TaskCanceledException ex)
-            {
-                _logger.LogError(ex, "Timeout during affiliate registration");
-                return new ReferralUserResponse
-                {
-                    Success = false,
-                    Message = "Hết thời gian chờ. Vui lòng thử lại."
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Unexpected error during affiliate registration");
-                return new ReferralUserResponse
-                {
-                    Success = false,
-                    Message = "Có lỗi xảy ra. Vui lòng thử lại sau."
-                };
-            }
-        }
 
         public async Task<ReferralUserResponse> LoginReferralUserAsync(ReferralUserLoginRequest request)
         {
@@ -544,11 +467,15 @@ namespace QuanQuenBackOfficeMobile.Services
                 var baseUrl = _configuration["API:Store:BaseUrl"];
                 var path = _configuration["API:Store:GetStoreRecommendation"];
                 
-                // Add PageSize to URL query parameter
+                // Add PageSize and PageNumber to URL query parameter
                 var queryParams = new List<string>();
                 if (request.PageSize.HasValue)
                 {
                     queryParams.Add($"PageSize={request.PageSize.Value}");
+                }
+                if (request.PageNumber.HasValue)
+                {
+                    queryParams.Add($"PageNumber={request.PageNumber.Value}");
                 }
                 
                 var endpoint = $"{baseUrl}{path}";
@@ -558,7 +485,7 @@ namespace QuanQuenBackOfficeMobile.Services
                 }
 
                 _logger.LogInformation($"Calling StoreRecommendationsByLocation API: {endpoint}");
-                _logger.LogInformation($"Request data: LatUser={request.LatUser}, LonUser={request.LonUser}, PageSize={request.PageSize}");
+                _logger.LogInformation($"Request data: LatUser={request.LatUser}, LonUser={request.LonUser}, PageSize={request.PageSize}, PageNumber={request.PageNumber}");
 
                 // Add Authorization header
                 _httpClient.DefaultRequestHeaders.Clear();

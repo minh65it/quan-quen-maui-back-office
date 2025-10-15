@@ -30,7 +30,6 @@ namespace QuanQuenBackOfficeMobile.ViewModels
             LoginCommand = new Command(async () => await LoginAsync());
             TogglePasswordVisibilityCommand = new Command(TogglePasswordVisibility);
             BackToNormalLoginCommand = new Command(async () => await BackToNormalLoginAsync());
-            GoToAffiliateRegisterCommand = new Command(async () => await GoToAffiliateRegisterAsync());
         }
 
         public string AuthError
@@ -121,29 +120,6 @@ namespace QuanQuenBackOfficeMobile.ViewModels
         {
             IsPasswordHidden = !IsPasswordHidden;
             PasswordVisibilityIcon = IsPasswordHidden ? "🙈" : "🐵";
-        }
-
-        private async Task GoToAffiliateRegisterAsync()
-        {
-            try
-            {
-                if (Shell.Current != null)
-                {
-                    await Shell.Current.GoToAsync("//AffiliateRegister");
-                }
-                else
-                {
-                    // Fallback: Navigate using Application.Current.MainPage
-                    var affiliateRegisterViewModel = IPlatformApplication.Current.Services.GetService<AffiliateRegisterViewModel>();
-                    Application.Current.MainPage = new AffiliateRegisterPage(affiliateRegisterViewModel);
-                }
-            }
-            catch (Exception ex)
-            {
-                // Fallback navigation
-                var affiliateRegisterViewModel = IPlatformApplication.Current.Services.GetService<AffiliateRegisterViewModel>();
-                Application.Current.MainPage = new AffiliateRegisterPage(affiliateRegisterViewModel);
-            }
         }
 
         private async Task BackToNormalLoginAsync()

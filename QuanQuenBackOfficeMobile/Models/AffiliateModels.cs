@@ -3,17 +3,6 @@ using System.Text.Json.Serialization;
 
 namespace QuanQuenBackOfficeMobile.Models
 {
-    public class ReferralUserRequest
-    {
-        public string? ReferralName { get; set; }
-        public string? PhoneReferrer { get; set; }
-        public string? EmailReferrer { get; set; }
-        public string? Password { get; set; }
-        public string? ReferrerType { get; set; }
-        public string? Address { get; set; }
-        public string? Note { get; set; }
-        public string? CreatedBy { get; set; }
-    }
 
     public class ReferralUserLoginRequest
     {
@@ -76,34 +65,12 @@ namespace QuanQuenBackOfficeMobile.Models
         public bool IsDeleted { get; set; }
     }
 
-    public enum ReferrerType
-    {
-        [Display(Name = "Cá Nhân")]
-        Personal = 1,
-        
-        [Display(Name = "Công Ty")]
-        Company = 2
-    }
+
 
     public class AffiliateUserRegisterRequest
     {
         public string Email { get; set; }
         public string Password { get; set; }
-    }
-
-    public class AffiliateUserRegisterResponse
-    {
-        public string Message { get; set; }
-        public bool Success { get; set; }
-        public string Token { get; set; }
-        public AffiliateUserData Data { get; set; }
-    }
-
-    public class AffiliateUserData
-    {
-        public string Id { get; set; }
-        public string Email { get; set; }
-        public string ReferrerId { get; set; }
     }
 
     public class AffiliateCreateStoreRequest
@@ -240,6 +207,7 @@ namespace QuanQuenBackOfficeMobile.Models
         public double? LatPoint4 { get; set; }
         public double? LonPoint4 { get; set; }
         public int? PageSize { get; set; }
+        public int? PageNumber { get; set; }
     }
 
     public class StoreRecommendationsResponse
