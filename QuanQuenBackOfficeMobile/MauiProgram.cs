@@ -146,6 +146,11 @@ public static class MauiProgram
         builder.Services.AddTransient<AffiliateStoreUserPasswordViewModel>();
         builder.Services.AddTransient<AffiliateStoreUserAuthenticationViewModel>();
         builder.Services.AddTransient<AffiliateStoreListViewModel>();
+        builder.Services.AddTransient<AffiliateListingAgentViewModel>();
+        builder.Services.AddTransient<DataAffiliatePreviewViewModel>();
+        builder.Services.AddTransient<DataAffiliateInfoViewModel>();
+        builder.Services.AddTransient<DataAffiliateSignatureViewModel>();
+        builder.Services.AddTransient<DataAffiliateFinalViewModel>();
         builder.Services.AddTransient<QuanQuenBackOfficeMobile.ViewModels.Affiliates.AffiliateAgreementInformationViewModel>();
         builder.Services.AddTransient<QuanQuenBackOfficeMobile.ViewModels.Affiliates.AffiliateAgreementPreviewViewModel>();
         builder.Services.AddTransient<QuanQuenBackOfficeMobile.ViewModels.Affiliates.AffiliateAgreementSignatureViewModel>();
@@ -161,6 +166,7 @@ public static class MauiProgram
 		// Register Services
 		builder.Services.AddTransient<IContractService, ContractService>();
 		builder.Services.AddTransient<IGeocodingService, GeocodingService>();
+		builder.Services.AddTransient<ILocationService, LocationService>();
 		
         // Register Views
         builder.Services.AddTransient<LoginPage>();
@@ -170,6 +176,11 @@ public static class MauiProgram
         builder.Services.AddTransient<AffiliateStoreUserPasswordPage>();
         builder.Services.AddTransient<AffiliateStoreUserAuthenticationPage>();
         builder.Services.AddTransient<AffiliateStoreListPage>();
+        builder.Services.AddTransient<AffiliateListingAgentPage>();
+        builder.Services.AddTransient<DataAffiliatePreviewPage>();
+        builder.Services.AddTransient<DataAffiliateInfoPage>();
+        builder.Services.AddTransient<DataAffiliateSignaturePage>();
+        builder.Services.AddTransient<DataAffiliateFinalPage>();
         builder.Services.AddTransient<QuanQuenBackOfficeMobile.Views.Affiliates.AffiliateAgreementInformationPage>();
         builder.Services.AddTransient<QuanQuenBackOfficeMobile.Views.Affiliates.AffiliateAgreementPreviewPage>();
         builder.Services.AddTransient<QuanQuenBackOfficeMobile.Views.Affiliates.AffiliateAgreementSignaturePage>();
@@ -268,7 +279,13 @@ public static class MauiProgram
 		builder.Services.AddSingleton<Converters.AvatarUrlConverter>();
 		builder.Services.AddSingleton<Converters.EnumToBoolConverter>();
 
-		builder.Services.UsePageResolver();
+        builder.Services.UsePageResolver();
+
+        // Shell route registrations for Data Affiliate flow (không cần add vào AppShell)
+        Routing.RegisterRoute("DataAffiliateInfoPage", typeof(QuanQuenBackOfficeMobile.Views.DataAffiliateInfoPage));
+        Routing.RegisterRoute("DataAffiliatePreviewPage", typeof(QuanQuenBackOfficeMobile.Views.DataAffiliatePreviewPage));
+        Routing.RegisterRoute("DataAffiliateSignaturePage", typeof(QuanQuenBackOfficeMobile.Views.DataAffiliateSignaturePage));
+        Routing.RegisterRoute("DataAffiliateFinalPage", typeof(QuanQuenBackOfficeMobile.Views.DataAffiliateFinalPage));
 
 #if DEBUG
 		builder.Logging.AddDebug();
@@ -281,6 +298,6 @@ public static class MauiProgram
         handlers.AddHandler(typeof(Camera.MAUI.CameraView), typeof(Camera.MAUI.CameraViewHandler));
     });
 #endif
-		return builder.Build();
+        return builder.Build();
 	}
 }

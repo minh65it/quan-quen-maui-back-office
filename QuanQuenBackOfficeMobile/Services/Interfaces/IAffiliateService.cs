@@ -11,5 +11,7 @@ namespace QuanQuenBackOfficeMobile.Services.Interfaces
         Task<ApiResponse> SendAffiliateOtpAsync(string email);
         Task<ApiResponse> VerifyAffiliateOtpAsync(string email, string otpCode);
         Task<AffiliateStoreListResponse> GetStoresByReferralIdAsync(string referralId, string token);
+        Task<StoreRecommendationsResponse> GetStoreRecommendationsByLocationAsync(StoreRecommendationsRequest request, string token);
+        Task<PreviewCrawlDataAgreementResponse> PreviewCrawlDataAgreementAsync(PreviewCrawlDataAgreementRequest request, string token);
     }
 }

@@ -228,6 +228,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                         await SecureStorage.SetAsync("affiliate_email", userDetail.EmailReferrer ?? "");
                         await SecureStorage.SetAsync("affiliate_phone", userDetail.PhoneReferrer ?? "");
                         await SecureStorage.SetAsync("affiliate_referral_id", userDetail.ReferralId ?? "");
+                        await SecureStorage.SetAsync("affiliate_referrer_user_type", userDetail.ReferrerUserType ?? "");
                         await SecureStorage.SetAsync("is_affiliate", "true");
                     }
                     catch (Exception ex)
@@ -239,12 +240,24 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                         Preferences.Set("affiliate_email", userDetail.EmailReferrer ?? "");
                         Preferences.Set("affiliate_phone", userDetail.PhoneReferrer ?? "");
                         Preferences.Set("affiliate_referral_id", userDetail.ReferralId ?? "");
+                        Preferences.Set("affiliate_referrer_user_type", userDetail.ReferrerUserType ?? "");
                         Preferences.Set("is_affiliate", "true");
 #endif
                     }
-                    // Navigate to affiliate store list page
-                    var affiliateStoreListViewModel = IPlatformApplication.Current.Services.GetService<AffiliateStoreListViewModel>();
-                    Application.Current.MainPage = new AffiliateStoreListPage(affiliateStoreListViewModel);
+                    
+                    // Navigate based on affiliate role
+                    if (userDetail.ReferrerUserType == "ListingAgent")
+                    {
+                        // DataAffiliate - Navigate to AffiliateListingAgentPage
+                        var affiliateListingAgentViewModel = IPlatformApplication.Current.Services.GetService<AffiliateListingAgentViewModel>();
+                        Application.Current.MainPage = new AffiliateListingAgentPage(affiliateListingAgentViewModel);
+                    }
+                    else
+                    {
+                        // ContractAffiliate - Navigate to AffiliateStoreListPage
+                        var affiliateStoreListViewModel = IPlatformApplication.Current.Services.GetService<AffiliateStoreListViewModel>();
+                        Application.Current.MainPage = new AffiliateStoreListPage(affiliateStoreListViewModel);
+                    }
                 }
                 else
                 {

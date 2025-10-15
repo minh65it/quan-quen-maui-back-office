@@ -536,5 +536,189 @@ namespace QuanQuenBackOfficeMobile.Services
                 return new AffiliateStoreListResponse { Result = new List<AffiliateStore>() };
             }
         }
+
+        public async Task<StoreRecommendationsResponse> GetStoreRecommendationsByLocationAsync(StoreRecommendationsRequest request, string token)
+        {
+            try
+            {
+                var baseUrl = _configuration["API:Store:BaseUrl"];
+                var path = _configuration["API:Store:GetStoreRecommendation"];
+                
+                // Add PageSize to URL query parameter
+                var queryParams = new List<string>();
+                if (request.PageSize.HasValue)
+                {
+                    queryParams.Add($"PageSize={request.PageSize.Value}");
+                }
+                
+                var endpoint = $"{baseUrl}{path}";
+                if (queryParams.Any())
+                {
+                    endpoint += "?" + string.Join("&", queryParams);
+                }
+
+                _logger.LogInformation($"Calling StoreRecommendationsByLocation API: {endpoint}");
+                _logger.LogInformation($"Request data: LatUser={request.LatUser}, LonUser={request.LonUser}, PageSize={request.PageSize}");
+
+                // Add Authorization header
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+                // Create request without PageSize for JSON body
+                var jsonRequest = new
+                {
+                    latUser = request.LatUser,
+                    lonUser = request.LonUser,
+                    radius = request.Radius,
+                    isRecently = request.IsRecently,
+                    isMap = request.IsMap,
+                    latPoint1 = request.LatPoint1,
+                    lonPoint1 = request.LonPoint1,
+                    latPoint2 = request.LatPoint2,
+                    lonPoint2 = request.LonPoint2,
+                    latPoint3 = request.LatPoint3,
+                    lonPoint3 = request.LonPoint3,
+                    latPoint4 = request.LatPoint4,
+                    lonPoint4 = request.LonPoint4
+                };
+
+                var json = JsonSerializer.Serialize(jsonRequest, new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    WriteIndented = false
+                });
+
+                _logger.LogInformation($"Request JSON: {json}");
+
+                var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync(endpoint, content);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                _logger.LogInformation($"Store recommendations response status: {response.StatusCode}");
+                _logger.LogInformation($"Store recommendations response content: {responseContent}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = JsonSerializer.Deserialize<StoreRecommendationsResponse>(responseContent, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+                    return result ?? new StoreRecommendationsResponse { Result = new List<StoreRecommendation>() };
+                }
+                else
+                {
+                    _logger.LogError($"Store recommendations failed. Status: {response.StatusCode}, Content: {responseContent}");
+                    return new StoreRecommendationsResponse { Result = new List<StoreRecommendation>() };
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "Network error during get store recommendations");
+                return new StoreRecommendationsResponse { Result = new List<StoreRecommendation>() };
+            }
+            catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException)
+            {
+                _logger.LogError(ex, "Timeout during get store recommendations");
+                return new StoreRecommendationsResponse { Result = new List<StoreRecommendation>() };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error during get store recommendations");
+                return new StoreRecommendationsResponse { Result = new List<StoreRecommendation>() };
+            }
+        }
+
+        public async Task<PreviewCrawlDataAgreementResponse> PreviewCrawlDataAgreementAsync(PreviewCrawlDataAgreementRequest request, string token)
+        {
+            try
+            {
+                var baseUrl = _configuration["API:Identity:BaseUrl"];
+                var path = _configuration["API:Identity:PreviewDataAgreement"];
+                var endpoint = $"{baseUrl}{path}";
+
+                _logger.LogInformation("Calling PreviewCrawlDataAgreement API: {Endpoint}", endpoint);
+                _logger.LogInformation("Request data: StoreId={StoreId}, StoreName={StoreName}", request.StoreId, request.StoreName);
+
+                using var formContent = new MultipartFormDataContent();
+                formContent.Add(new StringContent(request.StoreId), "StoreId");
+                formContent.Add(new StringContent(request.StoreName), "StoreName");
+                formContent.Add(new StringContent(request.PhoneNumber), "PhoneNumber");
+                formContent.Add(new StringContent(request.Address), "Address");
+                formContent.Add(new StringContent(request.RepresentativeName), "RepresentativeName");
+                formContent.Add(new StringContent(request.AffiliateName), "AffiliateName");
+                formContent.Add(new StringContent(request.AffiliatePhoneNumber), "AffiliatePhoneNumber");
+                
+                // Add signature files
+                if (request.SignatureFile != null && request.SignatureFile.Length > 0)
+                {
+                    formContent.Add(new ByteArrayContent(request.SignatureFile), "SignatureFile", "store_signature.png");
+                }
+                else
+                {
+                    formContent.Add(new StringContent(string.Empty), "SignatureFile");
+                }
+                
+                if (request.SignatureFileAffilate != null && request.SignatureFileAffilate.Length > 0)
+                {
+                    formContent.Add(new ByteArrayContent(request.SignatureFileAffilate), "SignatureFileAffilate", "affiliate_signature.png");
+                }
+                else
+                {
+                    formContent.Add(new StringContent(string.Empty), "SignatureFileAffilate");
+                }
+                
+                // Add QR signature file (optional)
+                if (request.SignatureQrFile != null && request.SignatureQrFile.Length > 0)
+                {
+                    formContent.Add(new ByteArrayContent(request.SignatureQrFile), "SignatureQrFile", "qr_signature.png");
+                }
+                else
+                {
+                    formContent.Add(new StringContent(string.Empty), "SignatureQrFile");
+                }
+
+                using var requestMessage = new HttpRequestMessage(HttpMethod.Post, endpoint)
+                {
+                    Content = formContent
+                };
+
+                requestMessage.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                using var response = await _httpClient.SendAsync(requestMessage);
+                var content = await response.Content.ReadAsStringAsync();
+
+                _logger.LogInformation("Preview data agreement response status: {Status}", response.StatusCode);
+                _logger.LogInformation("Preview data agreement response content: {Content}", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = JsonSerializer.Deserialize<PreviewCrawlDataAgreementResponse>(content, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+                    return result ?? new PreviewCrawlDataAgreementResponse();
+                }
+                else
+                {
+                    _logger.LogError("Preview data agreement failed. Status: {Status}, Content: {Content}", response.StatusCode, content);
+                    return new PreviewCrawlDataAgreementResponse { Success = false };
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "Network error during preview data agreement");
+                return new PreviewCrawlDataAgreementResponse { Success = false };
+            }
+            catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException)
+            {
+                _logger.LogError(ex, "Timeout during preview data agreement");
+                return new PreviewCrawlDataAgreementResponse { Success = false };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error during preview data agreement");
+                return new PreviewCrawlDataAgreementResponse { Success = false };
+            }
+        }
     }
 }

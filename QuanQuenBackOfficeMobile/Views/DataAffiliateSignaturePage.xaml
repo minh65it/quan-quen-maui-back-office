@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="QuanQuenBackOfficeMobile.Views.DataAffiliateSignaturePage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:converters="clr-namespace:QuanQuenBackOfficeMobile.Converters"
+             Title="Ký hợp đồng"
+             BackgroundColor="#F5F5F5">
+
+    <ContentPage.Resources>
+        <converters:StringNotNullOrEmptyConverter x:Key="StringNotNullOrEmptyConverter" />
+    </ContentPage.Resources>
+
+    <Grid>
+        <!-- Main Content -->
+        <ScrollView>
+            <StackLayout Padding="20" Spacing="20">
+                
+                <!-- Header -->
+                <Frame BackgroundColor="#FFFFFF" 
+                       CornerRadius="12" 
+                       Padding="20"
+                       HasShadow="True">
+                    <StackLayout>
+                        <Label Text="Ký hợp đồng dữ liệu" 
+                               FontSize="20" 
+                               FontAttributes="Bold" 
+                               TextColor="#000000"
+                               HorizontalOptions="Center" />
+                        <Label Text="Vui lòng ký vào các khung bên dưới để hoàn tất hợp đồng" 
+                               FontSize="14" 
+                               TextColor="#666666"
+                               HorizontalOptions="Center"
+                               HorizontalTextAlignment="Center" />
+                    </StackLayout>
+                </Frame>
+
+                <!-- Store Info -->
+                <Frame BackgroundColor="#FFFFFF" 
+                       CornerRadius="12" 
+                       Padding="20"
+                       HasShadow="True">
+                    <StackLayout Spacing="8">
+                        <Label Text="Thông tin hợp đồng" 
+                               FontSize="16" 
+                               FontAttributes="Bold" 
+                               TextColor="#000000" />
+                        <Label Text="{Binding StoreName}" 
+                               FontSize="14" 
+                               TextColor="#666666" />
+                        <Label Text="{Binding ContractDate}" 
+                               FontSize="12" 
+                               TextColor="#999999" />
+                    </StackLayout>
+                </Frame>
+
+                <!-- Two signature boxes only: Affiliate and Store Owner -->
+                <VerticalStackLayout Spacing="20">
+                    <!-- Affiliate Signature Drawing -->
+                    <Frame CornerRadius="12" Padding="16" BackgroundColor="#E3F2FD" HasShadow="True">
+                        <VerticalStackLayout Spacing="12">
+                            <Grid ColumnDefinitions="*,Auto,*" Padding="0,0,0,4">
+                                <Label Text="Chữ ký Cộng tác viên" FontSize="20" FontAttributes="Bold" TextColor="#1976D2" VerticalOptions="Center" />
+                            </Grid>
+                            <Border Stroke="#E0E0E0" StrokeThickness="1" Background="#F9F9F9">
+                                <toolkit:DrawingView x:Name="AffiliateDrawingView"
+                                                     HeightRequest="180"
+                                                     BackgroundColor="Transparent"
+                                                     VerticalOptions="Fill"
+                                                     HorizontalOptions="FillAndExpand"
+                                                     Lines="{Binding AffiliateLines, Mode=TwoWay}" />
+                            </Border>
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <!-- Store Owner Signature Drawing -->
+                    <Frame CornerRadius="12" Padding="16" BackgroundColor="#FFF8E1" HasShadow="True">
+                        <VerticalStackLayout Spacing="12">
+                            <Grid ColumnDefinitions="*,Auto,*" Padding="0,0,0,4">
+                                <Label Text="Chữ ký Chủ nhà hàng" FontSize="20" FontAttributes="Bold" TextColor="#F58220" VerticalOptions="Center" />
+                            </Grid>
+                            <Border Stroke="#E0E0E0" StrokeThickness="1" Background="#F9F9F9">
+                                <toolkit:DrawingView x:Name="StoreOwnerDrawingView"
+                                                     HeightRequest="180"
+                                                     BackgroundColor="Transparent"
+                                                     VerticalOptions="Fill"
+                                                     HorizontalOptions="FillAndExpand"
+                                                     Lines="{Binding StoreOwnerLines, Mode=TwoWay}" />
+                            </Border>
+                        </VerticalStackLayout>
+                    </Frame>
+                </VerticalStackLayout>
+
+                <!-- Action Buttons -->
+                <StackLayout Orientation="Horizontal" HorizontalOptions="Center" Spacing="15">
+                    <Button Text="Quay lại" Command="{Binding GoBackCommand}" BackgroundColor="#8E8E93" TextColor="#FFFFFF" CornerRadius="8" Padding="20,12" FontSize="16" />
+                    <Button Text="Hoàn tất" Command="{Binding CompleteSignatureCommand}" BackgroundColor="#34C759" TextColor="#FFFFFF" CornerRadius="8" Padding="20,12" FontSize="16" FontAttributes="Bold" />
+                </StackLayout>
+
+            </StackLayout>
+        </ScrollView>
+
+        <!-- Loading Overlay -->
+        <Grid x:Name="LoadingOverlay" 
+              IsVisible="{Binding IsBusy}"
+              BackgroundColor="#80000000">
+            <StackLayout HorizontalOptions="Center" 
+                         VerticalOptions="Center"
+                         BackgroundColor="#FFFFFF"
+                         Padding="30">
+                <ActivityIndicator IsRunning="{Binding IsBusy}" 
+                                   Color="#007AFF" />
+                <Label Text="Đang xử lý..." 
+                       FontSize="16" 
+                       TextColor="#000000"
+                       Margin="0,15,0,0"
+                       HorizontalOptions="Center" />
+            </StackLayout>
+        </Grid>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="QuanQuenBackOfficeMobile.Views.DataAffiliatePreviewPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:QuanQuenBackOfficeMobile.Converters"
+             Title="Xem trước hợp đồng"
+             BackgroundColor="#F5F5F5">
+
+    <ContentPage.Resources>
+        <converters:StringNotNullOrEmptyConverter x:Key="StringNotNullOrEmptyConverter" />
+    </ContentPage.Resources>
+
+    <Grid>
+        <!-- Main Content (bỏ ScrollView để WebView tự scroll tất cả trang) -->
+        <StackLayout Padding="20" Spacing="20">
+                
+                <!-- Header -->
+                <Frame BackgroundColor="#FFFFFF" 
+                       CornerRadius="12" 
+                       Padding="20"
+                       HasShadow="True">
+                    <StackLayout>
+                        <Label Text="Xem trước hợp đồng dữ liệu" 
+                               FontSize="20" 
+                               FontAttributes="Bold" 
+                               TextColor="#000000"
+                               HorizontalOptions="Center" />
+                        <Label Text="Tài liệu hợp đồng được tạo tự động dựa trên thông tin bạn đã cung cấp" 
+                               FontSize="14" 
+                               TextColor="#666666"
+                               HorizontalOptions="Center"
+                               HorizontalTextAlignment="Center" />
+                    </StackLayout>
+                </Frame>
+
+                <!-- PDF Preview -->
+                <Frame BackgroundColor="#FFFFFF" 
+                       CornerRadius="12" 
+                       Padding="0"
+                       HasShadow="True">
+                    <StackLayout>
+                        <!-- PDF Content -->
+                        <WebView x:Name="PdfWebView"
+                                 HeightRequest="600"
+                                 BackgroundColor="#FFFFFF"
+                                 Source="{Binding PdfHtmlSource}" />
+                        
+                        <!-- Loading State -->
+                        <StackLayout x:Name="LoadingStack" 
+                                     IsVisible="{Binding IsLoading}"
+                                     Padding="40"
+                                     HorizontalOptions="Center"
+                                     VerticalOptions="Center">
+                            <ActivityIndicator IsRunning="True" 
+                                               Color="#007AFF" />
+                            <Label Text="Đang tải tài liệu..." 
+                                   FontSize="16" 
+                                   TextColor="#666666"
+                                   Margin="0,10,0,0"
+                                   HorizontalOptions="Center" />
+                        </StackLayout>
+
+                        <!-- Error State -->
+                        <StackLayout x:Name="ErrorStack" 
+                                     IsVisible="False"
+                                     Padding="40"
+                                     HorizontalOptions="Center"
+                                     VerticalOptions="Center">
+                            <Label Text="⚠️" 
+                                   FontSize="40"
+                                   HorizontalOptions="Center" />
+                            <Label Text="Không thể tải tài liệu" 
+                                   FontSize="16" 
+                                   FontAttributes="Bold"
+                                   TextColor="#FF3B30"
+                                   HorizontalOptions="Center"
+                                   Margin="0,10,0,0" />
+                            <Label Text="Vui lòng thử lại sau" 
+                                   FontSize="14" 
+                                   TextColor="#666666"
+                                   HorizontalOptions="Center"
+                                   Margin="0,5,0,0" />
+                        </StackLayout>
+                    </StackLayout>
+                </Frame>
+
+                <!-- Action Buttons -->
+                <StackLayout Orientation="Horizontal" 
+                             HorizontalOptions="Center" 
+                             Spacing="15">
+                    <Button Text="Ký hợp đồng" 
+                            BackgroundColor="#FC8312"
+                            TextColor="#FFFFFF"
+                            CornerRadius="8"
+                            Padding="20,12"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            Clicked="OnSignContractClicked" />
+                </StackLayout>
+
+            </StackLayout>
+
+        <!-- Loading Overlay -->
+        <Grid x:Name="LoadingOverlay" 
+              IsVisible="False"
+              BackgroundColor="#80000000">
+            <StackLayout HorizontalOptions="Center" 
+                         VerticalOptions="Center"
+                         BackgroundColor="#FFFFFF"
+                         Padding="30">
+                <ActivityIndicator IsRunning="True" 
+                                   Color="#007AFF" />
+                <Label Text="Đang xử lý..." 
+                       FontSize="16" 
+                       TextColor="#000000"
+                       Margin="0,15,0,0"
+                       HorizontalOptions="Center" />
+            </StackLayout>
+        </Grid>
+    </Grid>
+</ContentPage>

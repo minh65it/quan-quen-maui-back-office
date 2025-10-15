@@ -118,19 +118,7 @@
             <HorizontalStackLayout Spacing="10">
                 <Button Text="Chọn ảnh menu" Clicked="OnPickMenuPhotoClicked" IsEnabled="{Binding CanAddMoreMenuImages}" />
             </HorizontalStackLayout>
-            <Frame BackgroundColor="LightGray" Padding="10" Margin="0,5,0,0" HeightRequest="120">
-                <Grid>
-                    <Image Source="{Binding MenuImages[0].Images}" 
-                           HeightRequest="100" 
-                           Aspect="AspectFill" 
-                           IsVisible="{Binding MenuImages.Count, Converter={StaticResource StringNotNullOrEmptyConverter}}" />
-                    <Label Text="Chưa có ảnh menu" 
-                           HorizontalOptions="Center" 
-                           VerticalOptions="Center"
-                           TextColor="Gray"
-                           IsVisible="{Binding MenuImages.Count, Converter={StaticResource InverseBoolConverter}}" />
-                </Grid>
-            </Frame>
+            <Image Source="{Binding MenuImages[0].Images}" HeightRequest="120" Aspect="AspectFill" Margin="0,5,0,0" />
 
             <!-- Nút Lưu và Bỏ qua -->
             <Grid Margin="0,30,0,0" RowDefinitions="Auto" ColumnDefinitions="*,*" ColumnSpacing="15">

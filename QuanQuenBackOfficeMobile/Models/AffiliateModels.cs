@@ -69,6 +69,7 @@ namespace QuanQuenBackOfficeMobile.Models
         public string? PhoneReferrer { get; set; }
         public string? EmailReferrer { get; set; }
         public string? ReferrerType { get; set; }
+        public string? ReferrerUserType { get; set; }
         public List<object>? Transactions { get; set; }
         public DateTime? CreatedDate { get; set; }
         public string? CreatedBy { get; set; }
@@ -220,5 +221,76 @@ namespace QuanQuenBackOfficeMobile.Models
         public DateTime? CreatedDate { get; set; }
         public string CreatedBy { get; set; }
         public bool? IsDeleted { get; set; }
+    }
+
+    // Store Recommendations Models
+    public class StoreRecommendationsRequest
+    {
+        public string LatUser { get; set; }
+        public string LonUser { get; set; }
+        public double? Radius { get; set; }
+        public bool? IsRecently { get; set; }
+        public bool? IsMap { get; set; }
+        public double? LatPoint1 { get; set; }
+        public double? LonPoint1 { get; set; }
+        public double? LatPoint2 { get; set; }
+        public double? LonPoint2 { get; set; }
+        public double? LatPoint3 { get; set; }
+        public double? LonPoint3 { get; set; }
+        public double? LatPoint4 { get; set; }
+        public double? LonPoint4 { get; set; }
+        public int? PageSize { get; set; }
+    }
+
+    public class StoreRecommendationsResponse
+    {
+        public PaginationData Pagination { get; set; }
+        public List<StoreRecommendation> Result { get; set; }
+    }
+
+    public class StoreRecommendation
+    {
+        public string StoreId { get; set; }
+        public string StoreName { get; set; }
+        public string StoreSlug { get; set; }
+        public string Avatar { get; set; }
+        public string Address { get; set; }
+        public string Ward { get; set; }
+        public string District { get; set; }
+        public string City { get; set; }
+        public string StoreType { get; set; }
+        public double ReviewPoint { get; set; }
+        public string Hashtag { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+        public DateTime? CreateDate { get; set; }
+        public string Distance { get; set; }
+        public string StoreNameWithoutDiacritics { get; set; }
+        public string HashTagWithoutDiacritics { get; set; }
+    }
+
+    // Preview Data Agreement Models
+    public class PreviewCrawlDataAgreementRequest
+    {
+        public string StoreId { get; set; }
+        public string StoreName { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Address { get; set; }
+        public string RepresentativeName { get; set; }
+        public string AffiliateName { get; set; }
+        public string AffiliatePhoneNumber { get; set; }
+        public byte[]? SignatureFile { get; set; } // Store owner signature
+        public byte[]? SignatureFileAffilate { get; set; } // Affiliate signature
+        public byte[]? SignatureQrFile { get; set; } // QR signature (optional)
+    }
+
+    public class PreviewCrawlDataAgreementResponse
+    {
+        public string Message { get; set; } // PDF file path
+        public bool Success { get; set; }
+        public object? Data { get; set; }
+        public string? Caption { get; set; }
+        public object? ValidateData { get; set; }
+        public object? NoSMS { get; set; }
     }
 }
