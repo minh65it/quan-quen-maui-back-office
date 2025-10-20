@@ -70,6 +70,17 @@
                                                      HorizontalOptions="FillAndExpand"
                                                      Lines="{Binding AffiliateLines, Mode=TwoWay}" />
                             </Border>
+                            <Button Text="Xóa chữ ký cộng tác viên"
+                                    Command="{Binding ClearAffiliateSignatureCommand}"
+                                    CornerRadius="18"
+                                    BorderColor="#80000000"
+                                    BorderWidth="1"
+                                    BackgroundColor="White"
+                                    TextColor="Black"
+                                    FontSize="14"
+                                    FontAttributes="Bold"
+                                    HeightRequest="36"
+                                    Padding="14,6" />
                         </VerticalStackLayout>
                     </Frame>
 
@@ -87,6 +98,17 @@
                                                      HorizontalOptions="FillAndExpand"
                                                      Lines="{Binding StoreOwnerLines, Mode=TwoWay}" />
                             </Border>
+                            <Button Text="Xóa chữ ký chủ nhà hàng"
+                                    Command="{Binding ClearStoreOwnerSignatureCommand}"
+                                    CornerRadius="18"
+                                    BorderColor="#80000000"
+                                    BorderWidth="1"
+                                    BackgroundColor="White"
+                                    TextColor="Black"
+                                    FontSize="14"
+                                    FontAttributes="Bold"
+                                    HeightRequest="36"
+                                    Padding="14,6" />
                         </VerticalStackLayout>
                     </Frame>
                 </VerticalStackLayout>

@@ -4,6 +4,7 @@ using QuanQuenBackOfficeMobile.Models;
 using System.Text.Json;
 using System.Text.Encodings.Web;
 using Microsoft.Maui.Storage;
+using Microsoft.Maui.Controls;
 
 namespace QuanQuenBackOfficeMobile.Services
 {
@@ -16,6 +17,125 @@ namespace QuanQuenBackOfficeMobile.Services
         {
             _httpClient = httpClient;
             _configuration = configuration;
+        }
+
+        /// <summary>
+        /// Lấy cả 2 token (auth_token và affiliate_token) nếu có
+        /// </summary>
+        /// <returns>Dictionary chứa cả 2 token</returns>
+        private async Task<Dictionary<string, string?>> GetAllAuthenticationTokensAsync()
+        {
+            var tokens = new Dictionary<string, string?>();
+            
+            try
+            {
+                // Lấy auth_token
+                var authToken = await SecureStorage.GetAsync("auth_token");
+                if (string.IsNullOrEmpty(authToken))
+                {
+                    authToken = Preferences.Get("auth_token", "");
+                }
+                tokens["auth_token"] = authToken;
+                
+                // Lấy affiliate_token
+                var affiliateToken = await SecureStorage.GetAsync("affiliate_token");
+                if (string.IsNullOrEmpty(affiliateToken))
+                {
+                    affiliateToken = Preferences.Get("affiliate_token", "");
+                }
+                tokens["affiliate_token"] = affiliateToken;
+                
+                // Log thông tin token
+                var authStatus = string.IsNullOrEmpty(authToken) ? "NOT_FOUND" : "FOUND";
+                var affiliateStatus = string.IsNullOrEmpty(affiliateToken) ? "NOT_FOUND" : "FOUND";
+                System.Diagnostics.Debug.WriteLine($"[QRCodeService] Token status - auth_token: {authStatus}, affiliate_token: {affiliateStatus}");
+                
+                return tokens;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[QRCodeService] Error getting authentication tokens: {ex.Message}");
+                return tokens;
+            }
+        }
+
+        /// <summary>
+        /// Lấy token chính để sử dụng (ưu tiên affiliate_token nếu có)
+        /// </summary>
+        /// <returns>Token string hoặc null nếu không tìm thấy</returns>
+        private async Task<string?> GetPrimaryAuthenticationTokenAsync()
+        {
+            try
+            {
+                var tokens = await GetAllAuthenticationTokensAsync();
+                
+                // Ưu tiên affiliate_token nếu có
+                if (!string.IsNullOrEmpty(tokens["affiliate_token"]))
+                {
+                    System.Diagnostics.Debug.WriteLine("[QRCodeService] Using affiliate_token as primary token");
+                    return tokens["affiliate_token"];
+                }
+                
+                // Fallback về auth_token
+                if (!string.IsNullOrEmpty(tokens["auth_token"]))
+                {
+                    System.Diagnostics.Debug.WriteLine("[QRCodeService] Using auth_token as primary token");
+                    return tokens["auth_token"];
+                }
+                
+                System.Diagnostics.Debug.WriteLine("[QRCodeService] No authentication token found");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[QRCodeService] Error getting primary authentication token: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Thực hiện HTTP request với cả 2 token (thử affiliate_token trước, nếu fail thì thử auth_token)
+        /// </summary>
+        /// <param name="requestFunc">Function thực hiện HTTP request với token</param>
+        /// <returns>Kết quả của request</returns>
+        private async Task<T> ExecuteWithBothTokensAsync<T>(Func<string, Task<T>> requestFunc)
+        {
+            var tokens = await GetAllAuthenticationTokensAsync();
+            
+            // Thử affiliate_token trước nếu có
+            if (!string.IsNullOrEmpty(tokens["affiliate_token"]))
+            {
+                try
+                {
+                    System.Diagnostics.Debug.WriteLine("[QRCodeService] Trying request with affiliate_token");
+                    return await requestFunc(tokens["affiliate_token"]);
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    System.Diagnostics.Debug.WriteLine("[QRCodeService] affiliate_token failed, trying auth_token");
+                }
+                catch (HttpRequestException ex) when (ex.Message.Contains("401") || ex.Message.Contains("Unauthorized"))
+                {
+                    System.Diagnostics.Debug.WriteLine("[QRCodeService] affiliate_token returned 401, trying auth_token");
+                }
+            }
+            
+            // Thử auth_token nếu affiliate_token không có hoặc fail
+            if (!string.IsNullOrEmpty(tokens["auth_token"]))
+            {
+                try
+                {
+                    System.Diagnostics.Debug.WriteLine("[QRCodeService] Trying request with auth_token");
+                    return await requestFunc(tokens["auth_token"]);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[QRCodeService] auth_token also failed: {ex.Message}");
+                    throw;
+                }
+            }
+            
+            throw new UnauthorizedAccessException("No valid authentication token found");
         }
 
         public async Task<QRCodeResponse> GenerateStoreQRCodeAsync(QRCodeData storeData, AgentInfo agentInfo)
@@ -66,25 +186,22 @@ namespace QuanQuenBackOfficeMobile.Services
 
                 var fullUrl = $"{url}?{string.Join("&", queryParams)}";
 
-                // Lấy token xác thực
-                var token = await SecureStorage.GetAsync("auth_token");
-                if (string.IsNullOrEmpty(token))
-                {
-                    throw new UnauthorizedAccessException("No authentication token found");
-                }
-
-                // Thiết lập headers
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                _httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("*/*"));
-
                 // Log request details
                 System.Diagnostics.Debug.WriteLine($"[QRCodeService] Request URL: {fullUrl}");
                 System.Diagnostics.Debug.WriteLine($"[QRCodeService] Request Method: GET");
                 System.Diagnostics.Debug.WriteLine($"[QRCodeService] QRText: {qrText}");
                 System.Diagnostics.Debug.WriteLine($"[QRCodeService] Text: Registration");
 
-                // Thực hiện request
-                var response = await _httpClient.GetAsync(fullUrl);
+                // Thực hiện request với cả 2 token
+                var response = await ExecuteWithBothTokensAsync(async token =>
+                {
+                    // Thiết lập headers
+                    _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    _httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("*/*"));
+
+                    // Thực hiện request
+                    return await _httpClient.GetAsync(fullUrl);
+                });
                 System.Diagnostics.Debug.WriteLine($"[QRCodeService] HTTP Status: {(int)response.StatusCode} {response.ReasonPhrase}");
                 System.Diagnostics.Debug.WriteLine($"[QRCodeService] Content-Type: {response.Content.Headers.ContentType}");
                 System.Diagnostics.Debug.WriteLine($"[QRCodeService] Content-Length: {response.Content.Headers.ContentLength?.ToString() ?? "(unknown)"}");
@@ -168,17 +285,6 @@ namespace QuanQuenBackOfficeMobile.Services
                     Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
                 });
 
-                // Lấy token xác thực
-                var token = await SecureStorage.GetAsync("auth_token");
-                if (string.IsNullOrEmpty(token))
-                {
-                    throw new UnauthorizedAccessException("No authentication token found");
-                }
-
-                // Thiết lập headers
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                _httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-
                 // Log request details
                 System.Diagnostics.Debug.WriteLine($"[QRCodeService] UpdateQRCode Request URL: {url}");
                 System.Diagnostics.Debug.WriteLine($"[QRCodeService] UpdateQRCode Request Method: PUT");
@@ -188,8 +294,16 @@ namespace QuanQuenBackOfficeMobile.Services
                 // Tạo HTTP content
                 var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
 
-                // Thực hiện request
-                var response = await _httpClient.PutAsync(url, content);
+                // Thực hiện request với cả 2 token
+                var response = await ExecuteWithBothTokensAsync(async token =>
+                {
+                    // Thiết lập headers
+                    _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    _httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+
+                    // Thực hiện request
+                    return await _httpClient.PutAsync(url, content);
+                });
                 System.Diagnostics.Debug.WriteLine($"[QRCodeService] UpdateQRCode HTTP Status: {(int)response.StatusCode} {response.ReasonPhrase}");
 
                 if (response.IsSuccessStatusCode)
@@ -262,15 +376,6 @@ namespace QuanQuenBackOfficeMobile.Services
                     Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
                 });
 
-                var token = await SecureStorage.GetAsync("auth_token");
-                if (string.IsNullOrEmpty(token))
-                {
-                    throw new UnauthorizedAccessException("No authentication token found");
-                }
-
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                _httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-
                 var correlationId = Guid.NewGuid().ToString("N");
                 var stopwatch = System.Diagnostics.Stopwatch.StartNew();
                 var maskedStoreId = string.IsNullOrEmpty(storeId) || storeId.Length < 8
@@ -280,7 +385,15 @@ namespace QuanQuenBackOfficeMobile.Services
                 System.Diagnostics.Debug.WriteLine($"[QRCodeService][{correlationId}] BodyLength={jsonContent.Length} chars, storeId={maskedStoreId}");
 
                 var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
-                var response = await _httpClient.PostAsync(url, content);
+
+                // Thực hiện request với cả 2 token
+                var response = await ExecuteWithBothTokensAsync(async token =>
+                {
+                    _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    _httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+
+                    return await _httpClient.PostAsync(url, content);
+                });
 
                 stopwatch.Stop();
                 System.Diagnostics.Debug.WriteLine($"[QRCodeService][{correlationId}] Status {(int)response.StatusCode} {response.ReasonPhrase} in {stopwatch.ElapsedMilliseconds}ms");

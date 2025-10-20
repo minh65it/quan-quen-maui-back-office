@@ -9,6 +9,7 @@ using Microsoft.Maui.Controls;
 using Microsoft.Maui.Storage;
 using QuanQuenBackOfficeMobile.Models;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
+using QuanQuenBackOfficeMobile.Views.Stores;
 
 namespace QuanQuenBackOfficeMobile.ViewModels
 {
@@ -40,6 +41,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels
         public ICommand LoadStoresCommand { get; }
         public ICommand RefreshStoresCommand { get; }
         public ICommand BackToCreateStoreCommand { get; }
+        public ICommand NavigateToScanQRCommand { get; }
 
         public AffiliateStoreListViewModel(IAffiliateService affiliateService)
         {
@@ -47,6 +49,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels
             LoadStoresCommand = new AsyncRelayCommand(LoadStoresAsync);
             RefreshStoresCommand = new AsyncRelayCommand(RefreshStoresAsync);
             BackToCreateStoreCommand = new AsyncRelayCommand(BackToCreateStoreAsync);
+            NavigateToScanQRCommand = new AsyncRelayCommand(NavigateToScanQRAsync);
         }
 
         public async Task InitializeAsync()
@@ -157,6 +160,22 @@ namespace QuanQuenBackOfficeMobile.ViewModels
         private string GetFormattedDate(DateTime date)
         {
             return date.ToString("dd/MM/yyyy");
+        }
+
+        private async Task NavigateToScanQRAsync()
+        {
+            try
+            {
+                // Chuyển đến trang ScanQR
+                // Lưu ý: Cần chỉ định storeId nếu cần thiết
+                // Hiện tại sẽ chuyển đến trang ScanQR mà không chỉ định store cụ thể
+                var scanningQRPage = new ScanningQRPage();
+                await Application.Current.MainPage.Navigation.PushAsync(scanningQRPage);
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert("Lỗi", $"Không thể chuyển đến trang ScanQR: {ex.Message}", "OK");
+            }
         }
     }
 }

@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:QuanQuenBackOfficeMobile.Converters"
+             x:Class="QuanQuenBackOfficeMobile.Views.Stores.StoreTableAreaPage"
+             Title="Khu vực bàn"
+             BackgroundColor="#FAFAFA">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:BoolToTextConverter x:Key="BoolToTextConverter" />
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+            <converters:StringToBoolConverter x:Key="StringToBoolConverter" />
+            <converters:InverseStringToBoolConverter x:Key="InverseStringToBoolConverter" />
+            <converters:EditVisibilityConverter x:Key="EditVisibilityConverter" />
+
+            <!-- Style chung -->
+            <Style TargetType="Entry">
+                <Setter Property="BackgroundColor" Value="White"/>
+                <Setter Property="TextColor" Value="#333"/>
+                <Setter Property="Margin" Value="0,4,0,0"/>
+                <Setter Property="HeightRequest" Value="44"/>
+                <Setter Property="PlaceholderColor" Value="#999"/>
+                <Setter Property="VisualStateManager.VisualStateGroups">
+                    <VisualStateGroupList>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Focused">
+                                <VisualState.Setters>
+                                    <Setter Property="BackgroundColor" Value="#E3F2FD"/>
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </Setter>
+            </Style>
+
+            <Style TargetType="Button">
+                <Setter Property="CornerRadius" Value="8"/>
+                <Setter Property="HeightRequest" Value="44"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <Setter Property="FontSize" Value="14"/>
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="20">
+
+            <!-- Loading indicator -->
+            <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                               IsVisible="{Binding IsLoading}" 
+                               Color="#1976D2"
+                               HorizontalOptions="Center" />
+
+            <!-- Form tạo khu vực -->
+            <Frame Padding="16"
+                   CornerRadius="12"
+                   BorderColor="#E0E0E0"
+                   BackgroundColor="White"
+                   HasShadow="True">
+
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="➕ Tạo khu vực bàn mới"
+                           FontAttributes="Bold"
+                           FontSize="18"
+                           TextColor="#1976D2"
+                           HorizontalOptions="Center" />
+
+                    <Entry Placeholder="Tên khu vực (VD: Tầng trệt, Khu VIP...)"
+                           Text="{Binding NewAreaName}" />
+
+                    <Entry Placeholder="Mô tả chi tiết về khu vực (tùy chọn)"
+                           Text="{Binding NewAreaDescription}" />
+
+                    <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+                        <Label Text="Thứ tự:" 
+                               VerticalOptions="Center"
+                               FontAttributes="Bold"
+                               FontSize="14"/>
+                        <Entry Text="{Binding NewOrder}"
+                               Keyboard="Numeric"
+                               WidthRequest="100"/>
+                    </HorizontalStackLayout>
+
+                    <Button Text="{Binding IsCreating, Converter={StaticResource BoolToTextConverter}, ConverterParameter='⏳ Đang tạo...|✅ Tạo khu vực'}"
+                            Command="{Binding CreateTableAreaCommand}"
+                            IsEnabled="{Binding IsCreating, Converter={StaticResource InverseBoolConverter}}"
+                            BackgroundColor="#4CAF50"
+                            TextColor="White" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Danh sách khu vực -->
+            <Label Text="📋 Danh sách khu vực"
+                   FontAttributes="Bold"
+                   FontSize="18"
+                   TextColor="#212121" />
+
+            <CollectionView ItemsSource="{Binding Items}"
+                            SelectionMode="None">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="12"/>
+                </CollectionView.ItemsLayout>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Padding="16"
+                               CornerRadius="12"
+                               BorderColor="#E0E0E0"
+                               BackgroundColor="White"
+                               HasShadow="True">
+                            <VerticalStackLayout Spacing="6">
+                                <!-- Display mode -->
+                                <VerticalStackLayout IsVisible="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CurrentEditingItemId, Converter={StaticResource InverseStringToBoolConverter}, ConverterParameter={Binding TableAreaId}}">
+                                    <Label Text="{Binding AreaName}"
+                                           FontAttributes="Bold"
+                                           FontSize="16"
+                                           TextColor="#333" />
+                                    <Label Text="{Binding AreaDescription}"
+                                           FontSize="14"
+                                           TextColor="#666" />
+                                    <Label Text="{Binding Order, StringFormat='Thứ tự: {0}'}"
+                                           FontSize="13"
+                                           TextColor="#777"/>
+
+                                    <HorizontalStackLayout Spacing="10" Margin="0,10,0,0">
+                                        <Button Text="✏️ Sửa"
+                                                BackgroundColor="#FF9800"
+                                                TextColor="White"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.StartEditCommand}"
+                                                CommandParameter="{Binding}" />
+
+                                        <Button Text="👁️ Xem bàn"
+                                                BackgroundColor="#2196F3"
+                                                TextColor="White"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ViewTablesCommand}"
+                                                CommandParameter="{Binding}" />
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+                                
+                                <!-- Edit mode -->
+                                <VerticalStackLayout>
+                                    <VerticalStackLayout.IsVisible>
+                                        <MultiBinding Converter="{StaticResource EditVisibilityConverter}">
+                                            <Binding Path="TableAreaId" />
+                                            <Binding Source="{RelativeSource AncestorType={x:Type ContentPage}}" Path="BindingContext.CurrentEditingItemId" />
+                                        </MultiBinding>
+                                    </VerticalStackLayout.IsVisible>
+                                    
+                                    <Label Text="✏️ Chỉnh sửa khu vực" FontAttributes="Bold" FontSize="16" TextColor="#FF9800" Margin="0,0,0,8" />
+                                    
+                                    <Entry Placeholder="Tên khu vực" 
+                                           Text="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EditingAreaName}" 
+                                           BackgroundColor="White" 
+                                           TextColor="#333" />
+                                    
+                                    <Entry Placeholder="Mô tả (tùy chọn)" 
+                                           Text="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EditingAreaDescription}" 
+                                           BackgroundColor="White" 
+                                           TextColor="#333" />
+                                    
+                                    <Entry Placeholder="Thứ tự" 
+                                           Text="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EditingOrder}" 
+                                           BackgroundColor="White" 
+                                           TextColor="#333" 
+                                           Keyboard="Numeric" />
+                                    
+                                    <HorizontalStackLayout Spacing="8" Margin="0,8,0,0">
+                                        <Button Text="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.IsUpdating, Converter={StaticResource BoolToTextConverter}, ConverterParameter='⏳ Đang cập nhật...|💾 Lưu'}" 
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.UpdateTableAreaCommand}"
+                                                IsEnabled="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.IsUpdating, Converter={StaticResource InverseBoolConverter}}"
+                                                BackgroundColor="#4CAF50"
+                                                TextColor="White"
+                                                FontSize="12"
+                                                CornerRadius="4"
+                                                HeightRequest="35" />
+                                        <Button Text="❌ Hủy" 
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CancelEditCommand}"
+                                                BackgroundColor="#F44336"
+                                                TextColor="White"
+                                                FontSize="12"
+                                                CornerRadius="4"
+                                                HeightRequest="35" />
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

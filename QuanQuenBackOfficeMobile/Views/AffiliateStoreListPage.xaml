@@ -94,6 +94,18 @@
                                    FontAttributes="Bold"/>
                         </HorizontalStackLayout>
                     </Border>
+                    
+                    <!-- Scan QR Button -->
+                    <Button Text="📱 Scan QR"
+                            Command="{Binding NavigateToScanQRCommand}"
+                            BackgroundColor="White"
+                            TextColor="#E67E22"
+                            FontSize="14"
+                            FontAttributes="Bold"
+                            Padding="16,8"
+                            CornerRadius="20"
+                            BorderWidth="1"
+                            BorderColor="#E67E22"/>
                 </HorizontalStackLayout>
             </VerticalStackLayout>
         </Frame>

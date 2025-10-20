@@ -84,6 +84,16 @@
                             FontAttributes="Bold"
                             CornerRadius="8"
                             HeightRequest="50" />
+
+                    <!-- Button khu vực bàn -->
+                    <Button Text="🪑 Khu vực bàn" 
+                            Clicked="ViewTableArea_Clicked"
+                            BackgroundColor="#2196F3"
+                            TextColor="White"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            CornerRadius="8"
+                            HeightRequest="50" />
                 </VerticalStackLayout>
             </Frame>
 

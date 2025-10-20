@@ -78,6 +78,22 @@ public static class MauiProgram
 
         });
 
+        builder.Services.AddHttpClient<ITableAreaService, TableAreaService>((sp, client) =>
+        {
+            var configService = sp.GetRequiredService<IConfigurationService>();
+            var baseUrl = configService.GetApiUrl("Store");
+            client.BaseAddress = new Uri(baseUrl);
+            client.Timeout = TimeSpan.FromMinutes(2);
+        });
+
+        builder.Services.AddHttpClient<ITableService, TableService>((sp, client) =>
+        {
+            var configService = sp.GetRequiredService<IConfigurationService>();
+            var baseUrl = configService.GetApiUrl("Store");
+            client.BaseAddress = new Uri(baseUrl);
+            client.Timeout = TimeSpan.FromMinutes(2);
+        });
+
         builder.Services.AddHttpClient<IStoreUserService, StoreUserService>((sp, client) =>
         {
             var configService = sp.GetRequiredService<IConfigurationService>();
@@ -235,6 +251,10 @@ public static class MauiProgram
 		builder.Services.AddTransient<StoreMapViewModel>();
         builder.Services.AddTransient<StoreMapPage>();
         builder.Services.AddTransient<StoreStatisticPage>();
+        builder.Services.AddTransient<StoreTableAreaViewModel>();
+        builder.Services.AddTransient<StoreTableAreaPage>();
+        builder.Services.AddTransient<StoreTableListViewModel>();
+        builder.Services.AddTransient<StoreTableListPage>();
 
         builder.Services.AddSingleton<ITokenService, TokenService>();
         builder.Services.AddHttpClient<IServicePackagesService, ServicePackagesService>((sp, client) =>

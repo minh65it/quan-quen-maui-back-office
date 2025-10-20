@@ -122,4 +122,29 @@ public partial class StoreDetailPage : ContentPage
             await DisplayAlert("Lỗi", $"Không thể mở trang thống kê: {ex.Message}", "OK");
         }
     }
+
+    private async void ViewTableArea_Clicked(object sender, EventArgs e)
+    {
+        try
+        {
+            if (_viewModel.StoreDetail?.StoreId == null)
+            {
+                await DisplayAlert("Lỗi", "Không tìm thấy thông tin nhà hàng", "OK");
+                return;
+            }
+
+            var vm = App.Services.GetService<StoreTableAreaViewModel>();
+            if (vm == null)
+            {
+                await DisplayAlert("Lỗi", "Không thể khởi tạo ViewModel khu vực bàn", "OK");
+                return;
+            }
+            var page = new StoreTableAreaPage(vm, _viewModel.StoreDetail.StoreId);
+            await Navigation.PushAsync(page);
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Lỗi", $"Không thể mở trang khu vực bàn: {ex.Message}", "OK");
+        }
+    }
 } 

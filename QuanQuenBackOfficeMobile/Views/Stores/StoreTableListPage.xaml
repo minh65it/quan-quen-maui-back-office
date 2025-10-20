@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:QuanQuenBackOfficeMobile.Converters"
+             x:Class="QuanQuenBackOfficeMobile.Views.Stores.StoreTableListPage"
+             Title="{Binding AreaName}"
+             BackgroundColor="#FAFAFA">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:BoolToTextConverter x:Key="BoolToTextConverter" />
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+            <converters:StringToBoolConverter x:Key="StringToBoolConverter" />
+            <converters:InverseStringToBoolConverter x:Key="InverseStringToBoolConverter" />
+            <converters:EditVisibilityConverter x:Key="EditVisibilityConverter" />
+
+            <!-- Style chung -->
+            <Style TargetType="Entry">
+                <Setter Property="BackgroundColor" Value="White"/>
+                <Setter Property="TextColor" Value="#333"/>
+                <Setter Property="Margin" Value="0,4,0,0"/>
+                <Setter Property="HeightRequest" Value="44"/>
+                <Setter Property="PlaceholderColor" Value="#999"/>
+                <Setter Property="VisualStateManager.VisualStateGroups">
+                    <VisualStateGroupList>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Focused">
+                                <VisualState.Setters>
+                                    <Setter Property="BackgroundColor" Value="#E3F2FD"/>
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </Setter>
+            </Style>
+
+            <Style TargetType="Button">
+                <Setter Property="CornerRadius" Value="8"/>
+                <Setter Property="HeightRequest" Value="44"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <Setter Property="FontSize" Value="14"/>
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="20">
+
+            <!-- Loading indicator -->
+            <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                               IsVisible="{Binding IsLoading}" 
+                               Color="#1976D2"
+                               HorizontalOptions="Center" />
+
+            <!-- Form tạo bàn -->
+            <Frame Padding="16"
+                   CornerRadius="12"
+                   BorderColor="#E0E0E0"
+                   BackgroundColor="White"
+                   HasShadow="True">
+
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="➕ Tạo bàn mới"
+                           FontAttributes="Bold"
+                           FontSize="18"
+                           TextColor="#1976D2"
+                           HorizontalOptions="Center" />
+
+                    <Entry Placeholder="Tên bàn (VD: Bàn 1, Bàn VIP, Bàn góc...)"
+                           Text="{Binding NewTableName}" />
+
+                    <Entry Placeholder="Mô tả chi tiết về bàn (tùy chọn)"
+                           Text="{Binding NewTableDescription}" />
+
+                    <!-- Nhóm các trường nhỏ -->
+                    <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="Auto" ColumnSpacing="12">
+                        <VerticalStackLayout Grid.Column="0">
+                            <Label Text="Số bàn" FontAttributes="Bold" FontSize="13"/>
+                            <Entry Text="{Binding NewTableNumber}"
+                                   Keyboard="Numeric"
+                                   Placeholder="VD: 1" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Grid.Column="1">
+                            <Label Text="Sức chứa" FontAttributes="Bold" FontSize="13"/>
+                            <Entry Text="{Binding NewCapacity}"
+                                   Keyboard="Numeric"
+                                   Placeholder="VD: 4" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Grid.Column="2" Grid.ColumnSpan="2">
+                            <Label Text="Trạng thái" FontAttributes="Bold" FontSize="13"/>
+                            <Entry Text="{Binding NewTableStatus}"
+                                   Keyboard="Numeric"
+                                   Placeholder="0=Trống, 1=Đang dùng" />
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <Button Text="{Binding IsCreating, Converter={StaticResource BoolToTextConverter}, ConverterParameter='⏳ Đang tạo...|✅ Tạo bàn'}" 
+                            Command="{Binding CreateTableCommand}"
+                            IsEnabled="{Binding IsCreating, Converter={StaticResource InverseBoolConverter}}"
+                            BackgroundColor="#4CAF50"
+                            TextColor="White" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Danh sách bàn -->
+            <Label Text="📋 Danh sách bàn"
+                   FontAttributes="Bold"
+                   FontSize="18"
+                   TextColor="#212121" />
+
+            <CollectionView ItemsSource="{Binding Items}"
+                            SelectionMode="None">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="12"/>
+                </CollectionView.ItemsLayout>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Padding="16"
+                               CornerRadius="12"
+                               BorderColor="#E0E0E0"
+                               BackgroundColor="White"
+                               HasShadow="True">
+                            <VerticalStackLayout Spacing="6">
+                                <!-- Display mode -->
+                                <VerticalStackLayout IsVisible="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CurrentEditingItemId, Converter={StaticResource InverseStringToBoolConverter}, ConverterParameter={Binding TableId}}">
+                                    <Label Text="{Binding TableName}"
+                                           FontAttributes="Bold"
+                                           FontSize="16"
+                                           TextColor="#333" />
+                                    <Label Text="{Binding TableDescription}"
+                                           FontSize="14"
+                                           TextColor="#666" />
+
+                                    <HorizontalStackLayout Spacing="12">
+                                        <Label Text="{Binding TableNumber, StringFormat='Số bàn: {0}'}"
+                                               FontSize="13"
+                                               TextColor="#555"/>
+                                        <Label Text="{Binding Capacity, StringFormat='Sức chứa: {0}'}"
+                                               FontSize="13"
+                                               TextColor="#555"/>
+                                    </HorizontalStackLayout>
+
+                                    <Label Text="{Binding TableStatus, StringFormat='Trạng thái: {0}'}"
+                                           FontSize="13"
+                                           TextColor="#777"/>
+
+                                    <Button Text="✏️ Sửa"
+                                            BackgroundColor="#FF9800"
+                                            TextColor="White"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.StartEditCommand}"
+                                            CommandParameter="{Binding}" />
+                                </VerticalStackLayout>
+                                
+                                <!-- Edit mode -->
+                                <VerticalStackLayout>
+                                    <VerticalStackLayout.IsVisible>
+                                        <MultiBinding Converter="{StaticResource EditVisibilityConverter}">
+                                            <Binding Path="TableId" />
+                                            <Binding Source="{RelativeSource AncestorType={x:Type ContentPage}}" Path="BindingContext.CurrentEditingItemId" />
+                                        </MultiBinding>
+                                    </VerticalStackLayout.IsVisible>
+                                    
+                                    <Label Text="✏️ Chỉnh sửa bàn" FontAttributes="Bold" FontSize="16" TextColor="#FF9800" Margin="0,0,0,8" />
+                                    
+                                    <Entry Placeholder="Tên bàn" 
+                                           Text="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EditingTableName}" 
+                                           BackgroundColor="White" 
+                                           TextColor="#333" />
+                                    
+                                    <Entry Placeholder="Mô tả (tùy chọn)" 
+                                           Text="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EditingTableDescription}" 
+                                           BackgroundColor="White" 
+                                           TextColor="#333" />
+                                    
+                                    <HorizontalStackLayout Spacing="12">
+                                        <Entry Placeholder="Số bàn" 
+                                               Text="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EditingTableNumber}" 
+                                               BackgroundColor="White" 
+                                               TextColor="#333" 
+                                               Keyboard="Numeric"
+                                               WidthRequest="120" />
+                                        
+                                        <Entry Placeholder="Sức chứa" 
+                                               Text="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EditingCapacity}" 
+                                               BackgroundColor="White" 
+                                               TextColor="#333" 
+                                               Keyboard="Numeric"
+                                               WidthRequest="120" />
+                                        
+                                        <Entry Placeholder="Trạng thái" 
+                                               Text="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EditingTableStatus}" 
+                                               BackgroundColor="White" 
+                                               TextColor="#333" 
+                                               Keyboard="Numeric"
+                                               WidthRequest="120" />
+                                    </HorizontalStackLayout>
+                                    
+                                    <HorizontalStackLayout Spacing="8" Margin="0,8,0,0">
+                                        <Button Text="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.IsUpdating, Converter={StaticResource BoolToTextConverter}, ConverterParameter='⏳ Đang cập nhật...|💾 Lưu'}" 
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.UpdateTableCommand}"
+                                                IsEnabled="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.IsUpdating, Converter={StaticResource InverseBoolConverter}}"
+                                                BackgroundColor="#4CAF50"
+                                                TextColor="White"
+                                                FontSize="12"
+                                                CornerRadius="4"
+                                                HeightRequest="35" />
+                                        <Button Text="❌ Hủy" 
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CancelEditCommand}"
+                                                BackgroundColor="#F44336"
+                                                TextColor="White"
+                                                FontSize="12"
+                                                CornerRadius="4"
+                                                HeightRequest="35" />
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

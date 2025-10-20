@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace QuanQuenBackOfficeMobile.ViewModels;
 
-public class DataAffiliateSignatureViewModel : BaseViewModel
+public partial class DataAffiliateSignatureViewModel : BaseViewModel
 {
     private readonly IAffiliateService _affiliateService;
     private readonly ILogger<DataAffiliateSignatureViewModel> _logger;
@@ -26,8 +26,6 @@ public class DataAffiliateSignatureViewModel : BaseViewModel
         _logger = logger;
         _serviceProvider = serviceProvider;
 
-        ClearAffiliateSignatureCommand = new Command(async () => await ClearAffiliateSignatureAsync());
-        ClearStoreOwnerSignatureCommand = new Command(async () => await ClearStoreOwnerSignatureAsync());
         CompleteSignatureCommand = new Command(async () => await CompleteSignatureAsync());
         GoBackCommand = new Command(async () => await GoBackAsync());
     }
@@ -151,26 +149,16 @@ public class DataAffiliateSignatureViewModel : BaseViewModel
     }
 
     // Lines collections for DrawingView bindings (like DrawingExamplePage)
-    private ObservableCollection<IDrawingLine> _affiliateLines = new();
-    public ObservableCollection<IDrawingLine> AffiliateLines
-    {
-        get => _affiliateLines;
-        set => SetProperty(ref _affiliateLines, value);
-    }
+    [ObservableProperty]
+    public ObservableCollection<IDrawingLine> affiliateLines = new();
 
-    private ObservableCollection<IDrawingLine> _storeOwnerLines = new();
-    public ObservableCollection<IDrawingLine> StoreOwnerLines
-    {
-        get => _storeOwnerLines;
-        set => SetProperty(ref _storeOwnerLines, value);
-    }
+    [ObservableProperty]
+    public ObservableCollection<IDrawingLine> storeOwnerLines = new();
 
     #endregion
 
     #region Commands
 
-    public ICommand ClearAffiliateSignatureCommand { get; }
-    public ICommand ClearStoreOwnerSignatureCommand { get; }
     public ICommand CompleteSignatureCommand { get; }
     public ICommand GoBackCommand { get; }
 
@@ -246,38 +234,22 @@ public class DataAffiliateSignatureViewModel : BaseViewModel
         }
     }
 
-    private async Task ClearAffiliateSignatureAsync()
+    [RelayCommand]
+    public void ClearAffiliateSignature()
     {
-        try
-        {
-            AffiliateSignatureBytes = null;
-            HasAffiliateSignature = false;
-            AffiliateSignatureDate = string.Empty;
-            
-            _logger.LogInformation("Affiliate signature cleared");
-            await Application.Current.MainPage.DisplayAlert("Thông báo", "Chữ ký Cộng tác viên đã được xóa", "OK");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error clearing affiliate signature");
-        }
+        AffiliateLines?.Clear();
+        AffiliateSignatureBytes = null;
+        HasAffiliateSignature = false;
+        AffiliateSignatureDate = string.Empty;
     }
 
-    private async Task ClearStoreOwnerSignatureAsync()
+    [RelayCommand]
+    public void ClearStoreOwnerSignature()
     {
-        try
-        {
-            StoreOwnerSignatureBytes = null;
-            HasStoreOwnerSignature = false;
-            StoreOwnerSignatureDate = string.Empty;
-            
-            _logger.LogInformation("Store owner signature cleared");
-            await Application.Current.MainPage.DisplayAlert("Thông báo", "Chữ ký Chủ nhà hàng đã được xóa", "OK");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error clearing store owner signature");
-        }
+        StoreOwnerLines?.Clear();
+        StoreOwnerSignatureBytes = null;
+        HasStoreOwnerSignature = false;
+        StoreOwnerSignatureDate = string.Empty;
     }
 
     private async Task CompleteSignatureAsync()
