@@ -94,6 +94,16 @@
                             FontAttributes="Bold"
                             CornerRadius="8"
                             HeightRequest="50" />
+
+                    <!-- Button bộ lọc món ăn -->
+                    <Button Text="🍽️ Bộ lọc món ăn" 
+                            Clicked="ViewFoodFilter_Clicked"
+                            BackgroundColor="#FF9800"
+                            TextColor="White"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            CornerRadius="8"
+                            HeightRequest="50" />
                 </VerticalStackLayout>
             </Frame>
 

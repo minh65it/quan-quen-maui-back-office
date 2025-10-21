@@ -147,4 +147,24 @@ public partial class StoreDetailPage : ContentPage
             await DisplayAlert("Lỗi", $"Không thể mở trang khu vực bàn: {ex.Message}", "OK");
         }
     }
+
+    private async void ViewFoodFilter_Clicked(object sender, EventArgs e)
+    {
+        try
+        {
+            if (_viewModel.StoreDetail?.StoreId == null)
+            {
+                await DisplayAlert("Lỗi", "Không tìm thấy thông tin nhà hàng", "OK");
+                return;
+            }
+
+            System.Diagnostics.Debug.WriteLine($"[StoreDetailPage] Navigating to StoreFilterFoodPage with StoreId: {_viewModel.StoreDetail.StoreId}");
+            
+            await Shell.Current.GoToAsync($"StoreFilterFoodPage?storeId={_viewModel.StoreDetail.StoreId}&storeName={Uri.EscapeDataString(_viewModel.StoreDetail.StoreName ?? "")}");
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Lỗi", $"Không thể mở trang bộ lọc món ăn: {ex.Message}", "OK");
+        }
+    }
 } 

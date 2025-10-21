@@ -94,6 +94,14 @@ public static class MauiProgram
             client.Timeout = TimeSpan.FromMinutes(2);
         });
 
+        builder.Services.AddHttpClient<IFoodFilterService, FoodFilterService>((sp, client) =>
+        {
+            var configService = sp.GetRequiredService<IConfigurationService>();
+            var baseUrl = configService.GetApiUrl("Store");
+            client.BaseAddress = new Uri(baseUrl);
+            client.Timeout = TimeSpan.FromMinutes(2);
+        });
+
         builder.Services.AddHttpClient<IStoreUserService, StoreUserService>((sp, client) =>
         {
             var configService = sp.GetRequiredService<IConfigurationService>();
@@ -255,6 +263,10 @@ public static class MauiProgram
         builder.Services.AddTransient<StoreTableAreaPage>();
         builder.Services.AddTransient<StoreTableListViewModel>();
         builder.Services.AddTransient<StoreTableListPage>();
+        builder.Services.AddTransient<StoreFilterFoodViewModel>();
+        builder.Services.AddTransient<StoreFilterFoodPage>();
+        builder.Services.AddTransient<CreateFoodViewModel>();
+        builder.Services.AddTransient<CreateFoodPage>();
 
         builder.Services.AddSingleton<ITokenService, TokenService>();
         builder.Services.AddHttpClient<IServicePackagesService, ServicePackagesService>((sp, client) =>
@@ -304,6 +316,10 @@ public static class MauiProgram
         Routing.RegisterRoute("DataAffiliatePreviewPage", typeof(QuanQuenBackOfficeMobile.Views.DataAffiliatePreviewPage));
         Routing.RegisterRoute("DataAffiliateSignaturePage", typeof(QuanQuenBackOfficeMobile.Views.DataAffiliateSignaturePage));
         Routing.RegisterRoute("DataAffiliateFinalPage", typeof(QuanQuenBackOfficeMobile.Views.DataAffiliateFinalPage));
+        
+        // Store routes
+        Routing.RegisterRoute("StoreFilterFoodPage", typeof(QuanQuenBackOfficeMobile.Views.Stores.StoreFilterFoodPage));
+        Routing.RegisterRoute("CreateFoodPage", typeof(QuanQuenBackOfficeMobile.Views.Stores.CreateFoodPage));
 
 #if DEBUG
 		builder.Logging.AddDebug();
