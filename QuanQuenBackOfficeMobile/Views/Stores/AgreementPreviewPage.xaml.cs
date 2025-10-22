@@ -16,6 +16,7 @@ namespace QuanQuenBackOfficeMobile.Views.Stores
             
             // Get services from DI container
             var contractService = App.Services.GetService<IContractService>();
+            var configuration = App.Services.GetService<IConfiguration>();
             
             if (contractService != null)
             {

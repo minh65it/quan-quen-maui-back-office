@@ -30,4 +30,10 @@ public class ConfigurationService : IConfigurationService
         return _configuration["API:Asset:ImageUrl"] 
             ?? throw new InvalidOperationException("Configuration key 'API:Asset:ImageUrl' is missing.");
     }
+
+    public string GetGoogleMapsApiKey()
+    {
+        return _configuration["API:GoogleMaps:ApiKey"] 
+            ?? throw new InvalidOperationException("Configuration key 'API:GoogleMaps:ApiKey' is missing.");
+    }
 } 

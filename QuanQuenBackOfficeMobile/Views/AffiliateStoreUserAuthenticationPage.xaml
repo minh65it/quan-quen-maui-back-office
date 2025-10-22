@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:QuanQuenBackOfficeMobile.ViewModels"
+             x:Class="QuanQuenBackOfficeMobile.Views.AffiliateStoreUserAuthenticationPage"
+             x:DataType="viewmodels:AffiliateStoreUserAuthenticationViewModel"
+             Title="Xác thực OTP">
+    <ScrollView>
+        <VerticalStackLayout Padding="30" Spacing="20" VerticalOptions="Start">
+            <!-- Logo -->
+            <Image Source="logo_qq_new.png"
+                   HeightRequest="120"
+                   HorizontalOptions="Center"/>
+
+            <!-- Title -->
+            <Label Text="Xác thực OTP"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   TextColor="Black"
+                   Margin="0,20,0,0"/>
+            <Label Text="Nhập mã 6 số được gửi đến Email"
+                   FontSize="15"
+                   TextColor="Black"
+                   Margin="0,0,0,10"/>
+
+            <!-- OTP Entry -->
+            <Frame BorderColor="#FF9900" CornerRadius="8" Padding="0" Margin="0,0,0,10">
+                <Entry Placeholder="Nhập mã"
+                       Text="{Binding OtpCode}" 
+                       Keyboard="Numeric"
+                       MaxLength="6"
+                       FontSize="16"
+                       BackgroundColor="Transparent"
+                       Margin="10,0"/>
+            </Frame>
+
+            <!-- Resend OTP -->
+            <Button Text="{Binding CountdownText}"
+                    Command="{Binding ResendOtpCommand}"
+                    IsEnabled="{Binding CanResend}"
+                    FontSize="16"
+                    HeightRequest="40"
+                    CornerRadius="20"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"/>    
+
+            <!-- Next Button -->
+            <Button Text="Xác thực"
+                    Command="{Binding VerifyOtpCommand}"
+                    BackgroundColor="#4CAF50"
+                    TextColor="White"
+                    FontAttributes="Bold"
+                    HeightRequest="50"
+                    CornerRadius="25"
+                    FontSize="18"
+                    Margin="0,20,0,0"/>
+
+            <!-- Loading indicator -->
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                             IsVisible="{Binding IsBusy}"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

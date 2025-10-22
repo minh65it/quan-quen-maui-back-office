@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+			 xmlns:vm="clr-namespace:QuanQuenBackOfficeMobile.ViewModels"
+			 xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+			 x:Class="QuanQuenBackOfficeMobile.Views.SupportCenterPage"
+			 x:DataType="vm:SupportCenterViewModel"
+			 Title="Trung Tâm Hỗ Trợ"
+			 BackgroundColor="#FFF9F5">
+
+	<ContentPage.Resources>
+		<Style TargetType="Frame">
+			<Setter Property="CornerRadius" Value="12" />
+			<Setter Property="Padding" Value="12" />
+			<Setter Property="HasShadow" Value="True" />
+			<Setter Property="Margin" Value="10,6" />
+		</Style>
+	</ContentPage.Resources>
+
+	<ScrollView>
+		<VerticalStackLayout Padding="10,12">
+			<Label Text="Hướng dẫn sử dụng app Agent và các câu hỏi thường gặp"
+				   FontSize="20" FontAttributes="Bold" TextColor="#F58220" />
+
+				<CollectionView ItemsSource="{Binding Items}">
+				<CollectionView.ItemTemplate>
+					<DataTemplate x:DataType="vm:QAItem">
+							<Frame BackgroundColor="#FFF3E0">
+								<toolkit:Expander IsExpanded="{Binding IsExpanded}">
+									<toolkit:Expander.Header>
+										<Label Text="{Binding Question}" FontAttributes="Bold" TextColor="#333" />
+									</toolkit:Expander.Header>
+									<Label Text="{Binding Answer}" FontSize="13" TextColor="#333" />
+								</toolkit:Expander>
+							</Frame>
+					</DataTemplate>
+				</CollectionView.ItemTemplate>
+			</CollectionView>
+		</VerticalStackLayout>
+	</ScrollView>
+</ContentPage>
+
+

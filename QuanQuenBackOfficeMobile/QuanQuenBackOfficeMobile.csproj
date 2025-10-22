@@ -9,7 +9,7 @@
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<MauiVersion>9.0.0</MauiVersion>
+		<MauiVersion>9.0.40</MauiVersion>
 		<!-- Display name -->
 		<ApplicationTitle>QuanQuenBackOfficeMobile</ApplicationTitle>
 
@@ -25,7 +25,7 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
-	</PropertyGroup>
+	</PropertyGroup>  
 
 		<!-- Note for MacCatalyst:
 		The default runtime is maccatalyst-x64, except in Release config, in which case the default is maccatalyst-x64;maccatalyst-arm64.
@@ -90,25 +90,24 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Camera.MAUI" Version="1.5.1" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="9.1.1" />
-		<PackageReference Include="CommunityToolkit.Maui.Camera" Version="1.0.5" />
-		<PackageReference Include="CommunityToolkit.Maui.Maps" Version="2.0.4" />
+		<PackageReference Include="CommunityToolkit.Maui.Maps" Version="3.0.0" />
 		<PackageReference Include="CommunityToolkit.Maui.MediaElement" Version="4.1.2" />
 		<PackageReference Include="CommunityToolkit.MVVM" Version="8.4.0" />
 		<PackageReference Include="Goldie.MauiPlugins.PageResolver" Version="2.5.4" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="9.0.40" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
-		<PackageReference Include="Microsoft.Maui.Controls.Maps" Version="8.0.93" />
-		<PackageReference Include="Microsoft.Maui.Essentials" Version="$(MauiVersion)" />
+		<PackageReference Include="Microsoft.Maui.Controls.Maps" Version="9.0.40" />
+		<PackageReference Include="Microsoft.Maui.Essentials" Version="9.0.40" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.6" />
 		<PackageReference Include="Plugin.Maui.Audio" Version="3.0.1" />
-		<PackageReference Include="SkiaSharp.Extended.UI.Maui" Version="2.0.0" />
-		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.0.0-preview.5.4" />
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.12.1" />
+		<PackageReference Include="ZXing.Net.Maui.Controls" Version="0.5.2" />
 	</ItemGroup>
 
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
@@ -122,16 +121,6 @@
 
 	<ItemGroup>
 	  <MauiSplashScreen Include="Resources\Splash\logo_qq_new.png" Color="Transparent" />
-	</ItemGroup>
-
-
-	<ItemGroup>
-	  <MauiXaml Update="Views\Stores\StoreAgreementInformationPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\Stores\StoreInformationContractPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
 	</ItemGroup>
 
 
@@ -152,12 +141,9 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-ios|AnyCPU'">
-	  <MtouchDebug>True</MtouchDebug>
+	  <MtouchDebug>False</MtouchDebug>
+	  <MtouchLink>SdkOnly</MtouchLink>
 	  <CodesignEntitlements>Platforms\iOS\Entitlements.plist</CodesignEntitlements>
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-ios'">
-		<CodesignKey></CodesignKey>
-		<CodesignProvision></CodesignProvision>
-		<CodesignRequireProvisioningProfile>false</CodesignRequireProvisioningProfile>
-	</PropertyGroup>
+
 </Project>

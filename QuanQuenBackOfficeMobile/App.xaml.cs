@@ -6,6 +6,7 @@ using Microsoft.Maui;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.PlatformConfiguration;
 using Microsoft.Maui.Hosting;
+using Microsoft.Maui.ApplicationModel;
 #if ANDROID
 using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
@@ -23,23 +24,25 @@ public partial class App : Application
 		InitializeComponent();
 		Application.Current.UserAppTheme = AppTheme.Light;
         MainPage = new ContentPage { Content = new ActivityIndicator { IsRunning = true, VerticalOptions = LayoutOptions.Center, HorizontalOptions = LayoutOptions.Center } };
-		CheckTokenAndNavigate();
-	}
+		
+		Dispatcher.Dispatch(async () => CheckTokenAndNavigateAsync());
+    }
 
-	private async void CheckTokenAndNavigate()
+	private async Task CheckTokenAndNavigateAsync()
 	{
-        var sp = IPlatformApplication.Current.Services;
+		var sp = IPlatformApplication.Current.Services;
 		Services = sp;
-		var tokenService = sp.GetService<ITokenService>();
-		if (tokenService != null && await tokenService.IsTokenValidAsync())
+        var tokenService = sp.GetService<ITokenService>();
+        if (tokenService != null && await tokenService.IsTokenValidAsync())
 		{
-			var mainViewModel = sp.GetService<MainViewModel>();
-			MainPage = new MainPage(mainViewModel);
-		}
+			var mainViewmodel = sp.GetService<MainViewModel>();
+			MainPage = new MainPage(mainViewmodel!);
+        }
 		else
 		{
-			var loginViewModel = sp.GetService<LoginViewModel>();
-			MainPage = new LoginPage(loginViewModel);
-		}
+			// Set AppShell as MainPage to enable Shell navigation
+			MainPage = new AppShell();
+        }
+           
 	}
 }

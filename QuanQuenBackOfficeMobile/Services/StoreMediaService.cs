@@ -116,6 +116,7 @@ public class StoreMediaService : IStoreMediaService
 
             foreach (var bytes in imageBytesList)
             {
+                // Sử dụng tên file đơn giản để tránh lỗi Azure Storage
                 var fileName = $"{Guid.NewGuid()}.jpg";
                 Debug.WriteLine($"[StoreMediaService] UploadStoreImagesAsync - Adding image: {fileName}, Size: {bytes.Length} bytes");
                 content.Add(new ByteArrayContent(bytes), "FileMedia", fileName);
@@ -164,6 +165,106 @@ public class StoreMediaService : IStoreMediaService
         {
             Debug.WriteLine($"[StoreMediaService] UploadStoreImagesAsync - Exception: {ex}");
             return new ApiResponse { IsSuccess = false, Message = $"Có lỗi khi upload ảnh: {ex.Message}" };
+        }
+    }
+
+    public async Task<ApiResponse> UploadInvoiceImageAsync(string storeId, int month, byte[] imageBytes, string fileName)
+    {
+        try
+        {
+            var token = await SecureStorage.GetAsync("auth_token");
+            if (string.IsNullOrEmpty(token))
+            {
+                Debug.WriteLine("[StoreMediaService] UploadInvoiceImageAsync - No auth token found");
+                return new ApiResponse { IsSuccess = false, Message = "Không tìm thấy token xác thực" };
+            }
+
+            Debug.WriteLine($"[StoreMediaService] UploadInvoiceImageAsync - Token found: {token?.Substring(0, Math.Min(20, token?.Length ?? 0))}...");
+
+            var url = $"/private/InvoiceImage/{month}/{storeId}.png";
+            var baseUrl = _configuration["API:Asset:ImageUrl"];
+            var uploadPath = _configuration["API:Asset:UploadFile"];
+            var apiUrl = $"{baseUrl}/api/{uploadPath}?Url={Uri.EscapeDataString(url)}";
+            
+            Debug.WriteLine($"[StoreMediaService] UploadInvoiceImageAsync - Base URL from config: {baseUrl}");
+            Debug.WriteLine($"[StoreMediaService] UploadInvoiceImageAsync - Upload path from config: {uploadPath}");
+
+            Debug.WriteLine($"[StoreMediaService] UploadInvoiceImageAsync - API URL: {apiUrl}");
+            Debug.WriteLine($"[StoreMediaService] UploadInvoiceImageAsync - StoreId: {storeId}");
+            Debug.WriteLine($"[StoreMediaService] UploadInvoiceImageAsync - Month: {month}");
+            Debug.WriteLine($"[StoreMediaService] UploadInvoiceImageAsync - Image size: {imageBytes.Length} bytes");
+
+            using var content = new MultipartFormDataContent();
+            content.Add(new ByteArrayContent(imageBytes), "File", fileName);
+
+            using var assetHttpClient = new HttpClient();
+            assetHttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            
+            var request = new HttpRequestMessage(HttpMethod.Post, apiUrl)
+            {
+                Content = content
+            };
+
+            Debug.WriteLine("[StoreMediaService] UploadInvoiceImageAsync - Sending request...");
+            var response = await assetHttpClient.SendAsync(request);
+            var result = await response.Content.ReadAsStringAsync();
+
+            Debug.WriteLine($"[StoreMediaService] UploadInvoiceImageAsync - Response Status Code: {(int)response.StatusCode} {response.StatusCode}");
+            Debug.WriteLine($"[StoreMediaService] UploadInvoiceImageAsync - Response Content: {result}");
+
+            string message = "Không rõ kết quả!";
+            bool isSuccess = false;
+
+            // Kiểm tra status code trước
+            if (response.IsSuccessStatusCode)
+            {
+                // Nếu thành công, thử parse JSON
+                try
+                {
+                    if (!string.IsNullOrEmpty(result) && result.Trim().StartsWith("{"))
+                    {
+                        using var doc = JsonDocument.Parse(result);
+                        var root = doc.RootElement;
+                        if (root.TryGetProperty("message", out var msgProp))
+                        {
+                            message = msgProp.GetString() ?? message;
+                            Debug.WriteLine($"[StoreMediaService] UploadInvoiceImageAsync - Response Message: {message}");
+                        }
+                        if (root.TryGetProperty("success", out var successProp))
+                        {
+                            isSuccess = successProp.GetBoolean();
+                            Debug.WriteLine($"[StoreMediaService] UploadInvoiceImageAsync - Success: {isSuccess}");
+                        }
+                    }
+                    else
+                    {
+                        // Nếu không phải JSON, coi như thành công
+                        isSuccess = true;
+                        message = "Upload thành công";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[StoreMediaService] UploadInvoiceImageAsync - Parse Response Error: {ex}");
+                    // Nếu parse lỗi nhưng status code thành công, coi như thành công
+                    isSuccess = true;
+                    message = "Upload thành công";
+                }
+            }
+            else
+            {
+                // Nếu status code không thành công, sử dụng response content làm message
+                isSuccess = false;
+                message = string.IsNullOrEmpty(result) ? $"HTTP {(int)response.StatusCode} {response.StatusCode}" : result;
+                Debug.WriteLine($"[StoreMediaService] UploadInvoiceImageAsync - Error Response: {message}");
+            }
+
+            return new ApiResponse { IsSuccess = isSuccess, Message = message };
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[StoreMediaService] UploadInvoiceImageAsync - Exception: {ex}");
+            return new ApiResponse { IsSuccess = false, Message = $"Có lỗi khi upload ảnh hóa đơn: {ex.Message}" };
         }
     }
 } 

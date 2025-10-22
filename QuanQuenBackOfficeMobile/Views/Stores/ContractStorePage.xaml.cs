@@ -62,8 +62,11 @@ public partial class ContractStorePage : ContentPage
     {
         try
         {
-            // Navigate to PhotoStoreUser page
-            await Application.Current.MainPage.Navigation.PushAsync(new QuanQuenBackOfficeMobile.Views.PhotoStoreUser());
+            // Navigate to PhotoStoreUser page without animation để giảm CPU/GPU load
+            await Application.Current.MainPage.Navigation.PushAsync(
+                new QuanQuenBackOfficeMobile.Views.PhotoStoreUser(), 
+                animated: false);
+            System.Diagnostics.Debug.WriteLine("[ContractStorePage] Navigated to PhotoStoreUser without animation");
         }
         catch (Exception ex)
         {

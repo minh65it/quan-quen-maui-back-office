@@ -43,7 +43,7 @@
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app needs access to photos gallery for picking photos and videos.</string>
 	<key>CFBundleIdentifier</key>
-	<string>$(CFBundleIdentifier)</string>
+	<string>com.quanquen.boapp</string>
 	<key>CFBundleDisplayName</key>
 	<string>Quan Quen Back Office</string>
 </dict>

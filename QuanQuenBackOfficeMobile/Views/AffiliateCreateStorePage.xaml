@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:viewmodels="clr-namespace:QuanQuenBackOfficeMobile.ViewModels"
+    xmlns:controls="clr-namespace:QuanQuenBackOfficeMobile.Controls"
+    xmlns:converters="clr-namespace:QuanQuenBackOfficeMobile.Converters"
+    xmlns:models="clr-namespace:QuanQuenBackOfficeMobile.Models"
+    x:Class="QuanQuenBackOfficeMobile.Views.AffiliateCreateStorePage"
+    x:DataType="viewmodels:AffiliateCreateStoreViewModel"
+    Title="Tạo Store Affiliate"
+    BackgroundColor="White">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:StringToBoolConverter x:Key="StringToBoolConverter" />
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="30"
+            Spacing="10">
+
+            <!-- Logo -->
+            <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
+                <Image Source="logo_qq_new.png" HeightRequest="80" WidthRequest="80" />
+            </VerticalStackLayout>
+
+            <!-- Tên Nhà hàng/Quán ăn -->
+            <Label Text="Tên Nhà hàng *"
+                   FontSize="14"
+                   TextColor="Black" />
+            <Entry Placeholder="Tên Nhà hàng/Quán ăn"
+                   Text="{Binding StoreName}"
+                   HeightRequest="44"
+                   FontSize="16"
+                   BackgroundColor="White" />
+            <Label Text="{Binding StoreNameError}"
+                   FontSize="12"
+                   TextColor="Red"
+                   IsVisible="{Binding StoreNameError, Converter={StaticResource StringToBoolConverter}}"
+                   Margin="0,2,0,0"/>
+
+            <!-- Tên người đại diện -->
+            <Label Text="Người đại diện *"
+                   FontSize="14"
+                   TextColor="Black" />
+            <Entry Placeholder="Nhập tên người đại diện"
+                   Text="{Binding RepresentativeName}"
+                   HeightRequest="44"
+                   FontSize="16"
+                   BackgroundColor="White" />
+            <Label Text="{Binding RepresentativeNameError}"
+                   FontSize="12"
+                   TextColor="Red"
+                   IsVisible="{Binding RepresentativeNameError, Converter={StaticResource StringToBoolConverter}}"
+                   Margin="0,2,0,0"/>
+
+            <!-- Thành phố -->
+            <Label Text="Thành phố"
+                   FontSize="14"
+                   TextColor="Black" />
+            <controls:CustomDropdownPicker Title="Chọn Thành Phố ..."
+                    ItemsSource="{Binding ProvinceList}"
+                    ItemDisplayBinding="{Binding Name}"
+                    SelectedItem="{Binding SelectedProvince}"
+                    HeightRequest="44"
+                    FontSize="14"
+                    BackgroundColor="White" />
+
+            <!-- Quận -->
+            <Label Text="Quận"
+                   FontSize="14"
+                   TextColor="Black" />
+            <controls:CustomDropdownPicker Title="Chọn Quận ..."
+                    ItemsSource="{Binding DistrictList}"
+                    ItemDisplayBinding="{Binding Name}"
+                    SelectedItem="{Binding SelectedDistrict}"
+                    HeightRequest="44"
+                    FontSize="14"
+                    BackgroundColor="White" />
+
+            <!-- Phường -->
+            <Label Text="Phường"
+                   FontSize="14"
+                   TextColor="Black" />
+            <controls:CustomDropdownPicker Title="Chọn Phường ..."
+                    ItemsSource="{Binding WardList}"
+                    ItemDisplayBinding="{Binding Name}"
+                    SelectedItem="{Binding SelectedWard}"
+                    HeightRequest="44"
+                    FontSize="14"
+                    BackgroundColor="White" />
+
+            <!-- Địa chỉ kinh doanh -->
+            <Label Text="Địa Chỉ *"
+                   FontSize="14"
+                   TextColor="Black" />
+            <Entry Placeholder="Địa chỉ kinh doanh"
+                   Text="{Binding Address}"
+                   HeightRequest="44"
+                   FontSize="16"
+                   BackgroundColor="White" />
+            <Label Text="{Binding AddressError}"
+                   FontSize="12"
+                   TextColor="Red"
+                   IsVisible="{Binding AddressError, Converter={StaticResource StringToBoolConverter}}"
+                   Margin="0,2,0,0"/>
+
+            <!-- Số điện thoại đăng ký -->
+            <Label Text="Số điện thoại đăng ký *"
+                   FontSize="14"
+                   TextColor="Black" />
+            <Entry Placeholder="Nhập số điện thoại"
+                   Text="{Binding PhoneNumber}"
+                   HeightRequest="44"
+                   FontSize="16"
+                   Keyboard="Telephone"
+                   BackgroundColor="White" />
+            <Label Text="{Binding PhoneError}"
+                   FontSize="12"
+                   TextColor="Red"
+                   IsVisible="{Binding PhoneError, Converter={StaticResource StringToBoolConverter}}"
+                   Margin="0,2,0,0"/>
+
+            <!-- Email đăng ký -->
+            <Label Text="Email đăng ký *"
+                   FontSize="14"
+                   TextColor="Black" />
+            <Entry Placeholder="Nhập email"
+                   Text="{Binding Email}"
+                   HeightRequest="44"
+                   FontSize="16"
+                   Keyboard="Email"
+                   BackgroundColor="White" />
+            <Label Text="{Binding EmailError}"
+                   FontSize="12"
+                   TextColor="Red"
+                   IsVisible="{Binding EmailError, Converter={StaticResource StringToBoolConverter}}"
+                   Margin="0,2,0,0"/>
+
+            <!-- Loại hình kinh doanh -->
+            <Label Text="Loại hình kinh doanh *"
+                   FontSize="14"
+                   TextColor="Black" />
+            <controls:CustomDropdownPicker ItemsSource="{Binding BusinessTypeList}" Title="Chọn loại hình kinh doanh"
+                    SelectedItem="{Binding SelectedBusinessType}"
+                    HeightRequest="44"
+                    FontSize="14"
+                    BackgroundColor="White" />
+            <Label Text="{Binding BusinessTypeError}"
+                   FontSize="12"
+                   TextColor="Red"
+                   IsVisible="{Binding BusinessTypeError, Converter={StaticResource StringToBoolConverter}}"
+                   Margin="0,2,0,0"/>
+
+            <!-- Điều kiện nhà hàng -->
+            <VerticalStackLayout Spacing="10" Margin="0,20,0,0">
+                <HorizontalStackLayout Spacing="10">
+                    <CheckBox IsChecked="{Binding HasMinimumTables}" />
+                    <Label Text="Nhà hàng có từ 05 bàn trở lên" 
+                           FontSize="14" 
+                           TextColor="Black" 
+                           VerticalOptions="Center" />
+                </HorizontalStackLayout>
+                
+                <HorizontalStackLayout Spacing="10">
+                    <CheckBox IsChecked="{Binding IsFAndB}" />
+                    <Label Text="Hoạt động trong lĩnh vực F&amp;B" 
+                           FontSize="14" 
+                           TextColor="Black" 
+                           VerticalOptions="Center" />
+                </HorizontalStackLayout>
+                
+                <HorizontalStackLayout Spacing="10">
+                    <CheckBox IsChecked="{Binding CanLinkWithApps}" />
+                    <Label Text="Có khả năng liên kết với ứng dụng tương tự" 
+                           FontSize="14" 
+                           TextColor="Black" 
+                           VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+
+            <!-- Nút Tạo Store -->
+            <Button Text="Tạo Store"
+                    Command="{Binding CreateStoreCommand}"
+                    IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+                    HeightRequest="50"
+                    FontSize="18"
+                    FontAttributes="Bold"
+                    TextColor="White"
+                    CornerRadius="25"
+                    BackgroundColor="#4CAF50"
+                    Margin="0,20,0,0"/>
+
+            <!-- Loading indicator -->
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                             IsVisible="{Binding IsBusy}"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

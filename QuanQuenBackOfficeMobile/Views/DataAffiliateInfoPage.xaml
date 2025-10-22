@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="QuanQuenBackOfficeMobile.Views.DataAffiliateInfoPage"
+             Title="Nhập thông tin hợp đồng">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="16" Padding="20">
+            <Label Text="Thông tin tạo hợp đồng" FontSize="20" FontAttributes="Bold" />
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Tên nhà hàng *" />
+                    <Entry Text="{Binding StoreName}" Placeholder="Nhập tên nhà hàng" />
+
+                    <Label Text="Địa chỉ *" />
+                    <Entry Text="{Binding Address}" Placeholder="Nhập địa chỉ" />
+
+                    <Label Text="SĐT nhà hàng *" />
+                    <Entry Text="{Binding PhoneNumber}" Keyboard="Telephone" Placeholder="Nhập SĐT" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Grid.Column="1" Spacing="10">
+                    <Label Text="Người đại diện *" />
+                    <Entry Text="{Binding RepresentativeName}" Placeholder="Nhập tên người đại diện" />
+
+                    <Label Text="Tên CTV *" />
+                    <Entry Text="{Binding AffiliateName}" Placeholder="Nhập tên CTV" />
+
+                    <Label Text="SĐT CTV *" />
+                    <Entry Text="{Binding AffiliatePhoneNumber}" Keyboard="Telephone" Placeholder="Nhập SĐT CTV" />
+                </VerticalStackLayout>
+            </Grid>
+
+            <Label Text="{Binding ErrorMessage}" TextColor="#F84135" />
+
+            <HorizontalStackLayout Spacing="12" HorizontalOptions="Center">
+                <Button Text="Hủy" Command="{Binding CancelCommand}" />
+                <Button Text="Tạo hợp đồng" Command="{Binding SubmitCommand}" BackgroundColor="#FC8312" TextColor="White" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
+
+

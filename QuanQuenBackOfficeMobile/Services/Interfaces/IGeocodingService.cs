@@ -1,0 +1,7 @@
+namespace QuanQuenBackOfficeMobile.Services.Interfaces
+{
+    public interface IGeocodingService
+    {
+        Task<(double Latitude, double Longitude)?> GetCoordinatesAsync(string address);
+    }
+}

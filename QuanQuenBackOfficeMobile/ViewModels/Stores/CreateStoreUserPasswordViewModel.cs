@@ -63,6 +63,23 @@ public partial class CreateStoreUserPasswordViewModel : ObservableObject
         ShowTermsCommand = new AsyncRelayCommand(() => ShowCsrDetailAsync("terms-of-service"));
         // Set email from previous page
         Email = StoreRegistrationData.Email;
+        
+        // Debug log để kiểm tra dữ liệu nhận được
+        System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Constructor - Email: {StoreRegistrationData.Email}");
+        System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Constructor - StoreName: {StoreRegistrationData.StoreName}");
+        System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Constructor - LicenseImagePaths count: {StoreRegistrationData.LicenseImagePaths.Count}");
+        foreach (var path in StoreRegistrationData.LicenseImagePaths)
+        {
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Constructor - LicenseImagePath: {path}");
+        }
+        
+        // Kiểm tra xem dữ liệu có bị mất không
+        if (string.IsNullOrEmpty(StoreRegistrationData.StoreName) || StoreRegistrationData.LicenseImagePaths.Count == 0)
+        {
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Constructor - DỮ LIỆU BỊ MẤT!");
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Constructor - StoreName empty: {string.IsNullOrEmpty(StoreRegistrationData.StoreName)}");
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Constructor - LicenseImagePaths empty: {StoreRegistrationData.LicenseImagePaths.Count == 0}");
+        }
     }
 
     private void TogglePasswordVisibility()
@@ -91,6 +108,17 @@ public partial class CreateStoreUserPasswordViewModel : ObservableObject
             IsBusy = true;
             IsLoading = true;
             PasswordError = string.Empty;
+            
+            // Debug log để kiểm tra dữ liệu khi bắt đầu đăng ký
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][Register] Bắt đầu đăng ký");
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][Register] StoreName: {StoreRegistrationData.StoreName}");
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][Register] Email: {StoreRegistrationData.Email}");
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][Register] LicenseImagePaths count: {StoreRegistrationData.LicenseImagePaths.Count}");
+            foreach (var path in StoreRegistrationData.LicenseImagePaths)
+            {
+                System.Diagnostics.Debug.WriteLine($"[DEBUG][Register] LicenseImagePath: {path}");
+                System.Diagnostics.Debug.WriteLine($"[DEBUG][Register] File exists: {File.Exists(path)}");
+            }
 
             // Validate required fields
             if (string.IsNullOrWhiteSpace(Password))
@@ -153,24 +181,31 @@ public partial class CreateStoreUserPasswordViewModel : ObservableObject
                 return;
             }
 
-            // 2. Lấy storeId từ response
-            if (string.IsNullOrEmpty(response.StoreId))
+            // Lấy token từ response của RegisterUser
+            var userToken = response.StoreId; // StoreId field chứa token từ data
+            if (string.IsNullOrEmpty(userToken))
             {
-                PasswordError = "StoreId bắt buộc có";
+                PasswordError = "Token bắt buộc có";
                 return;
             }
             
-            // Lưu StoreUserId (response.StoreId là UserId thực tế)
-            var storeUserId = response.StoreId;
-            StoreRegistrationData.StoreUserId = storeUserId;
-            
-            // Convert UserId thành StoreId (U -> S)
-            var storeId = response.StoreId.StartsWith("U") ? ("S" + response.StoreId.Substring(1)) : response.StoreId;
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Token từ RegisterUser: {userToken}");
 
-            // 3. Gọi API tạo cửa hàng với file giấy phép kinh doanh
+            // Lưu token vào StoreRegistrationData để sử dụng sau này
+            StoreRegistrationData.UserToken = userToken;
+
+            // Lấy userId từ SecureStorage để làm CreatedBy
+            var userId = await SecureStorage.GetAsync("userId");
+            
+            // Debug để kiểm tra giá trị
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] UserId từ SecureStorage: {userId}");
+            
+            var storePIC = userId ?? "Unknown";
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Final storePIC: {storePIC}");
+
+            // 2. Gọi API tạo cửa hàng với token từ RegisterUser và không cần StoreId
             var storeRequest = new StoreCreateRequest
             {
-                StoreId = storeId,
                 StoreName = StoreRegistrationData.StoreName,
                 StorePhone = StoreRegistrationData.PhoneNumber,
                 StoreEmail = StoreRegistrationData.Email,
@@ -182,43 +217,73 @@ public partial class CreateStoreUserPasswordViewModel : ObservableObject
                 Address = StoreRegistrationData.Address,
                 RepresentativeName = StoreRegistrationData.RepresentativeName,
                 ProvinceId = StoreRegistrationData.ProvinceId,
-                BusinessType = StoreRegistrationData.BusinessType
+                BusinessType = StoreRegistrationData.BusinessType,
+                CreatedBy = storePIC
             };
 
-           
-
-            var storeResponse = await _storeService.CreateStoreAsync(storeRequest);
+            var storeResponse = await _storeService.CreateStoreAsync(storeRequest, userToken);
             if (storeResponse == null || !storeResponse.IsSuccess)
             {
                 PasswordError = storeResponse?.Message ?? "Tạo cửa hàng thất bại";
                 return;
             }
-            var nameMedia = "Hồ sơ nhà hàng";
-            var categoryMediaId = await _storeMediaService.GetThumbnailCategoryMediaIdAsync(nameMedia);
-            
-            if (string.IsNullOrEmpty(categoryMediaId))
+
+            // Lấy StoreId từ response của CreateStore
+            var storeId = storeResponse.Data;
+            if (string.IsNullOrEmpty(storeId))
             {
-                PasswordError = "Không tìm thấy categoryMediaId cho hồ sơ nhà hàng!";
+                PasswordError = "StoreId bắt buộc có từ response CreateStore";
                 return;
             }
-
-            // Lấy userName để truyền vào createdBy
-            var createdBy = await SecureStorage.GetAsync("userName");
+            
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] StoreId từ CreateStore: {storeId}");
 
             // Lấy danh sách file ảnh từ StoreRegistrationData
             List<string> licenseImagePaths = StoreRegistrationData.LicenseImagePaths ?? new List<string>();
+            
+            // Debug log để kiểm tra dữ liệu ảnh
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] LicenseImagePaths count: {licenseImagePaths.Count}");
+            foreach (var path in licenseImagePaths)
+            {
+                System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] LicenseImagePath: {path}");
+                System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] File exists: {File.Exists(path)}");
+            }
 
             // Kiểm tra xem có ảnh nào để upload không
             if (licenseImagePaths.Count > 0)
             {
+                System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Có {licenseImagePaths.Count} ảnh để upload");
+                
+                // Lấy categoryMediaId chỉ khi cần upload ảnh
+                var nameMedia = "Hồ sơ nhà hàng";
+                var categoryMediaId = await _storeMediaService.GetThumbnailCategoryMediaIdAsync(nameMedia);
+                
+                if (string.IsNullOrEmpty(categoryMediaId))
+                {
+                    PasswordError = "Không tìm thấy categoryMediaId cho hồ sơ nhà hàng!";
+                    return;
+                }
+
+                // Lấy userName để truyền vào createdBy
+                var createdBy = await SecureStorage.GetAsync("userName");
+                
                 // Đọc file thành mảng byte[]
                 var imageBytesList = new List<byte[]>();
                 foreach (var path in licenseImagePaths)
                 {
+                    System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Đang xử lý file: {path}");
                     if (File.Exists(path))
                     {
-                        var bytes = await File.ReadAllBytesAsync(path);
-                        imageBytesList.Add(bytes);
+                        try
+                        {
+                            var bytes = await File.ReadAllBytesAsync(path);
+                            imageBytesList.Add(bytes);
+                            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Đọc file thành công: {path}, size: {bytes.Length} bytes");
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Lỗi đọc file {path}: {ex.Message}");
+                        }
                     }
                     else
                     {
@@ -229,14 +294,24 @@ public partial class CreateStoreUserPasswordViewModel : ObservableObject
                 // Chỉ upload khi có ảnh thực sự
                 if (imageBytesList.Count > 0)
                 {
+                    System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Bắt đầu upload {imageBytesList.Count} ảnh");
+                    System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] StoreId: {storeId}");
+                    System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] CategoryMediaId: {categoryMediaId}");
+                    System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] CreatedBy: {createdBy}");
+                    
                     // Gọi upload ảnh
                     var licenseResponse = await _storeMediaService.UploadMediasAsync(storeId, categoryMediaId, createdBy!, imageBytesList, false, false);
 
                     // Xử lý kết quả upload
                     if (!licenseResponse.IsSuccess)
                     {
+                        System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Upload thất bại: {licenseResponse.Message}");
                         PasswordError = licenseResponse.Message ?? "Upload ảnh giấy phép kinh doanh thất bại";
                         return;
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Upload thành công: {licenseResponse.Message}");
                     }
                 }
                 else
@@ -247,11 +322,13 @@ public partial class CreateStoreUserPasswordViewModel : ObservableObject
             else
             {
                 System.Diagnostics.Debug.WriteLine("[LOG][INFO] Không có ảnh giấy phép kinh doanh để upload");
+                System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] KHÔNG CÓ ẢNH NÀO ĐỂ UPLOAD!");
+                System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] StoreRegistrationData.LicenseImagePaths: {StoreRegistrationData.LicenseImagePaths?.Count ?? 0}");
             }
             // --- Chỉ khi cả hai API đều thành công mới chuyển trang ---
             if (response.IsSuccess && storeResponse.IsSuccess)
             {
-                // Lưu StoreId thực tế để dùng cho upload media
+                // Lưu StoreId từ response của CreateStore endpoint để sử dụng cho các API khác
                 StoreRegistrationData.StoreId = storeId;
                 // 4. Thành công cả hai, chuyển sang trang xác thực OTP
                 await Application.Current.MainPage.Navigation.PushAsync(new QuanQuenBackOfficeMobile.Views.Stores.StoreUserAuthentication(Email));

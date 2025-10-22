@@ -392,9 +392,8 @@ namespace QuanQuenBackOfficeMobile.Services
                 // Tạo multipart/form-data content
                 using var formContent = new MultipartFormDataContent();
                 
-                // Thêm các trường cơ bản
+                // Thêm các trường cơ bản (không cần UserId)
                 formContent.Add(new StringContent(request.StoreId), "StoreId");
-                formContent.Add(new StringContent(request.UserId), "UserId");
                 formContent.Add(new StringContent(request.SignatureFile), "SignatureFile");
                 formContent.Add(new StringContent(request.StoreName), "StoreName");
                 formContent.Add(new StringContent(request.RepresentativeName), "RepresentativeName");
@@ -443,19 +442,17 @@ namespace QuanQuenBackOfficeMobile.Services
 
         public async Task<PreviewAgreementRequest> ConvertToPreviewAgreementRequestAsync(AgreementInfoDto agreementInfo)
         {
-            // Lấy StoreId và UserId từ StoreRegistrationData
+            // Lấy StoreId từ StoreRegistrationData (không bắt buộc UserId)
             var storeId = StoreRegistrationData.StoreId;
-            var userId = StoreRegistrationData.StoreUserId;
-            
-            if (string.IsNullOrEmpty(storeId) || string.IsNullOrEmpty(userId))
+            if (string.IsNullOrEmpty(storeId))
             {
-                throw new Exception("Thiếu thông tin StoreId hoặc UserId. Vui lòng hoàn tất đăng ký trước.");
+                throw new Exception("Thiếu thông tin StoreId. Vui lòng hoàn tất đăng ký trước.");
             }
             
             return await Task.FromResult(new PreviewAgreementRequest
             {
                 StoreId = storeId,
-                UserId = userId,
+                UserId = string.Empty,
                 SignatureFile = string.Empty,
                 StoreName = agreementInfo.StoreName,
                 RepresentativeName = agreementInfo.RepresentativeName,
@@ -466,7 +463,7 @@ namespace QuanQuenBackOfficeMobile.Services
             });
         }
 
-        public async Task<PreviewAgreementResponse> CallPreviewAgreementApiWithSignatureAsync(PreviewAgreementRequest request, byte[] signatureFile)
+        public async Task<PreviewAgreementResponse> CallPreviewAgreementApiWithSignatureAsync(PreviewAgreementRequest request, byte[] signatureFile, byte[]? qrCodeFile = null)
         {
             try
             {
@@ -492,9 +489,8 @@ namespace QuanQuenBackOfficeMobile.Services
 
                 using var formContent = new MultipartFormDataContent();
                 
-                // Add basic fields
+                // Add basic fields (không cần UserId)
                 formContent.Add(new StringContent(request.StoreId), "StoreId");
-                formContent.Add(new StringContent(request.UserId), "UserId");
                 formContent.Add(new StringContent(request.StoreName), "StoreName");
                 formContent.Add(new StringContent(request.RepresentativeName), "RepresentativeName");
                 formContent.Add(new StringContent(request.RepresentativePosition), "RepresentativePosition");
@@ -514,6 +510,28 @@ namespace QuanQuenBackOfficeMobile.Services
                 {
                     formContent.Add(new StringContent(""), "SignatureFile");
                 }
+
+                // Add QR code file
+                if (qrCodeFile != null && qrCodeFile.Length > 0)
+                {
+                    var qrCodeImageContent = new ByteArrayContent(qrCodeFile);
+                    qrCodeImageContent.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+                    
+                    // Sử dụng field name đúng theo curl example
+                    formContent.Add(qrCodeImageContent, "SignatureQrFile", "agreement_qr_code.png");
+                    System.Diagnostics.Debug.WriteLine($"[ContractService] Added QR code file: {qrCodeFile.Length} bytes with field 'SignatureQrFile'");
+                }
+                else
+                {
+                    formContent.Add(new StringContent(""), "SignatureQrFile");
+                }
+
+                // Debug: Log tất cả fields được gửi
+                System.Diagnostics.Debug.WriteLine($"[ContractService] Sending form data:");
+                System.Diagnostics.Debug.WriteLine($"[ContractService] - StoreId: {request.StoreId}");
+                System.Diagnostics.Debug.WriteLine($"[ContractService] - StoreName: {request.StoreName}");
+                System.Diagnostics.Debug.WriteLine($"[ContractService] - SignatureFile: {(signatureFile?.Length ?? 0)} bytes");
+                System.Diagnostics.Debug.WriteLine($"[ContractService] - QRCodeFile: {(qrCodeFile?.Length ?? 0)} bytes");
 
                 var response = await _httpClient.PostAsync(url, formContent);
                 

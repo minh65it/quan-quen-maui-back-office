@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:QuanQuenBackOfficeMobile.ViewModels.Affiliates"
+             xmlns:converters="clr-namespace:QuanQuenBackOfficeMobile.Converters"
+             x:Class="QuanQuenBackOfficeMobile.Views.Affiliates.AffiliateAgreementInformationPage"
+             x:DataType="vm:AffiliateAgreementInformationViewModel"
+             Title="">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:StringToBoolConverter x:Key="StringToBoolConverter" />
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Padding="20">
+            <Label Text="BẢN THỎA THUẬN (AFFILIATE)"
+                   FontSize="24" FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   TextColor="{StaticResource Primary}"
+                   Margin="0,0,0,20" />
+
+            <!-- Form đơn giản với 8 trường -->
+            <Frame BorderColor="{StaticResource Primary}" CornerRadius="10" Padding="20">
+                <VerticalStackLayout Spacing="20">
+                    
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="20">
+                        <VerticalStackLayout Grid.Column="0" Spacing="15">
+                            <Label Text="Tên cửa hàng:" FontSize="16" FontAttributes="Bold"/>
+                            <Entry x:Name="StoreName" 
+                                   Placeholder="Nhập tên cửa hàng"
+                                   Text="{Binding StoreName}"/>
+                            
+                            <Label Text="Họ và tên đại diện:" FontSize="16" FontAttributes="Bold"/>
+                            <Entry x:Name="RepresentativeName" 
+                                   Placeholder="Nhập họ và tên đại diện"
+                                   Text="{Binding RepresentativeName}"/>
+                            
+                            <Label Text="Chức vụ đại diện:" FontSize="16" FontAttributes="Bold"/>
+                            <Entry x:Name="RepresentativePosition" 
+                                   Placeholder="Nhập chức vụ"
+                                   Text="{Binding RepresentativePosition}"/>
+                            
+                            <Label Text="Số CMND/CCCD:" FontSize="16" FontAttributes="Bold"/>
+                            <Entry x:Name="RepresentativeIdNumber" 
+                                   Placeholder="Nhập số CMND/CCCD"
+                                   Text="{Binding RepresentativeIdNumber}"/>
+                        </VerticalStackLayout>
+                        
+                        <VerticalStackLayout Grid.Column="1" Spacing="15">
+                            <Label Text="Địa chỉ cửa hàng:" FontSize="16" FontAttributes="Bold"/>
+                            <Entry x:Name="StoreHeadOfficeAddress" 
+                                   Placeholder="Nhập địa chỉ cửa hàng"
+                                   Text="{Binding StoreHeadOfficeAddress}"/>
+                            
+                            <Label Text="Số điện thoại:" FontSize="16" FontAttributes="Bold"/>
+                            <Entry x:Name="PhoneNumber" 
+                                   Placeholder="Nhập số điện thoại"
+                                   Text="{Binding PhoneNumber}"
+                                   Keyboard="Telephone"/>
+                        </VerticalStackLayout>
+                    </Grid>
+                    
+                    <!-- Loading indicator -->
+                    <ActivityIndicator IsVisible="{Binding IsBusy}" 
+                                     IsRunning="{Binding IsBusy}"
+                                     Color="{StaticResource Primary}"
+                                     HeightRequest="50"
+                                     VerticalOptions="Center"
+                                     HorizontalOptions="Center"/>
+                    
+                    <!-- Buttons -->
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="20">
+                        <Button Text="Tiếp tục" 
+                                BackgroundColor="{StaticResource Primary}"
+                                TextColor="White"
+                                CornerRadius="25"
+                                Padding="30,15"
+                                Command="{Binding ContinueCommand}"
+                                IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"/>
+                    </HorizontalStackLayout>
+                    
+                </VerticalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
+
+

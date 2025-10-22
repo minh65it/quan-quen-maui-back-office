@@ -9,6 +9,7 @@ using Microsoft.Maui.Controls;
 using Microsoft.Maui.Storage;
 using System.IO;
 using System.Text.RegularExpressions;
+using Microsoft.Maui.ApplicationModel;
 
 namespace QuanQuenBackOfficeMobile.ViewModels;
 
@@ -85,6 +86,10 @@ public partial class CreateStoreViewModel : ObservableObject
         PickLicenseImagesCommand = new AsyncRelayCommand(PickLicenseImagesAsync, () => CanAddMoreLicenseImages);
         CaptureLicenseImageCommand = new AsyncRelayCommand(CaptureLicenseImageAsync, () => CanAddMoreLicenseImages);
         RemoveLicenseImageCommand = new RelayCommand<ImageSource>(RemoveLicenseImage);
+        
+        // Debug log để kiểm tra trạng thái ban đầu
+        System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] Constructor - LicenseImages count: {LicenseImages.Count}");
+        System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] Constructor - StoreRegistrationData.LicenseImagePaths count: {StoreRegistrationData.LicenseImagePaths.Count}");
     }
 
     partial void OnSelectedProvinceChanged(ProvinceDto value)
@@ -348,6 +353,22 @@ public partial class CreateStoreViewModel : ObservableObject
             StoreRegistrationData.DistrictId = SelectedDistrict.territoryId;
             StoreRegistrationData.WardId = SelectedWard.stateId;
             StoreRegistrationData.LicenseImagePaths = LicenseImages.Select(img => img.LocalPath).ToList();
+            
+            // Debug log để kiểm tra dữ liệu ảnh
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] Số lượng ảnh đã chọn: {LicenseImages.Count}");
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] LicenseImagePaths count: {StoreRegistrationData.LicenseImagePaths.Count}");
+            foreach (var path in StoreRegistrationData.LicenseImagePaths)
+            {
+                System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] LicenseImagePath: {path}");
+                System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] File exists: {File.Exists(path)}");
+            }
+            
+            // Debug log để kiểm tra dữ liệu cuối cùng trước khi chuyển trang
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][OnNextClicked] Dữ liệu cuối cùng:");
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][OnNextClicked] StoreName: {StoreRegistrationData.StoreName}");
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][OnNextClicked] Email: {StoreRegistrationData.Email}");
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][OnNextClicked] LicenseImagePaths count: {StoreRegistrationData.LicenseImagePaths.Count}");
+            
             await App.Current.MainPage.Navigation.PushAsync(new CreateStoreUserPasswordPage(Email));
         }
         catch (Exception ex)
@@ -373,105 +394,193 @@ public partial class CreateStoreViewModel : ObservableObject
     private async Task PickLicenseImagesAsync()
     {
         System.Diagnostics.Debug.WriteLine("[LOG] Bắt đầu chọn ảnh từ thư viện...");
-        if (!CanAddMoreLicenseImages)
+        
+        try
         {
-            System.Diagnostics.Debug.WriteLine("[LOG] Không thể thêm ảnh mới, đã đủ 4 ảnh.");
-            return;
-        }
-        var result = await MediaPicker.Default.PickPhotoAsync(new MediaPickerOptions { Title = "Chọn ảnh giấy phép kinh doanh" });
-        if (result != null)
-        {
-            if (LicenseImageFiles.Count >= 4)
+            if (!CanAddMoreLicenseImages)
             {
-                System.Diagnostics.Debug.WriteLine("[LOG] Đã đủ 4 ảnh, dừng thêm.");
+                System.Diagnostics.Debug.WriteLine("[LOG] Không thể thêm ảnh mới, đã đủ 4 ảnh.");
                 return;
             }
-            if (LicenseImageFiles.Any(f => f.FullPath == result.FullPath))
+
+            var result = await MediaPicker.Default.PickPhotoAsync(new MediaPickerOptions { Title = "Chọn ảnh giấy phép" });
+            
+            if (result != null)
             {
-                System.Diagnostics.Debug.WriteLine($"[LOG] Ảnh đã tồn tại: {result.FullPath}");
-                return;
+                if (LicenseImageFiles.Count >= 4)
+                {
+                    System.Diagnostics.Debug.WriteLine("[LOG] Đã đủ 4 ảnh, dừng thêm.");
+                    return;
+                }
+                if (LicenseImageFiles.Any(f => f.FullPath == result.FullPath))
+                {
+                    System.Diagnostics.Debug.WriteLine($"[LOG] Ảnh đã tồn tại: {result.FullPath}");
+                    return;
+                }
+
+                // Xử lý file trên background thread
+                await Task.Run(async () =>
+                {
+                    try
+                    {
+                        var copiedPath = await CopyFileToAppDirectoryAsync(result);
+                        
+                        await MainThread.InvokeOnMainThreadAsync(() =>
+                        {
+                            LicenseImageFiles.Add(result);
+                            System.Diagnostics.Debug.WriteLine($"[LOG] Đã thêm file vào LicenseImageFiles: {result.FullPath}");
+                            
+                            var imgSource = ImageSource.FromFile(copiedPath);
+                            LicenseImages.Add(new MyImageModel { Images = imgSource, LocalPath = copiedPath });
+                            System.Diagnostics.Debug.WriteLine($"[LOG] Đã thêm vào LicenseImages (FromFile): {copiedPath}");
+                            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] PickLicenseImagesAsync - LicenseImages count sau khi thêm: {LicenseImages.Count}");
+                            
+                            OnPropertyChanged(nameof(CanAddMoreLicenseImages));
+                            OnPropertyChanged(nameof(LicenseButtonBackgroundColor));
+                            OnPropertyChanged(nameof(LicenseButtonTextColor));
+                            
+                            PickLicenseImagesCommand.NotifyCanExecuteChanged();
+                            CaptureLicenseImageCommand.NotifyCanExecuteChanged();
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[LOG][ERROR] Không thể copy hoặc tạo ImageSource từ file: {result.FullPath} - {ex.Message}");
+                        await MainThread.InvokeOnMainThreadAsync(async () =>
+                        {
+                            await App.Current.MainPage.DisplayAlert("Lỗi", $"Không thể xử lý ảnh: {ex.Message}", "OK");
+                        });
+                    }
+                });
             }
-            LicenseImageFiles.Add(result);
-            System.Diagnostics.Debug.WriteLine($"[LOG] Đã thêm file vào LicenseImageFiles: {result.FullPath}");
-            try
+            else
             {
-                var copiedPath = await CopyFileToAppDirectoryAsync(result);
-                var imgSource = ImageSource.FromFile(copiedPath);
-                LicenseImages.Add(new MyImageModel { Images = imgSource, LocalPath = copiedPath });
-                System.Diagnostics.Debug.WriteLine($"[LOG] Đã thêm vào LicenseImages (FromFile): {copiedPath}");
-                OnPropertyChanged(nameof(CanAddMoreLicenseImages));
-                OnPropertyChanged(nameof(LicenseButtonBackgroundColor));
-                OnPropertyChanged(nameof(LicenseButtonTextColor));
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"[LOG][ERROR] Không thể copy hoặc tạo ImageSource từ file: {result.FullPath} - {ex.Message}");
+                System.Diagnostics.Debug.WriteLine("[LOG] Không chọn được ảnh từ thư viện!");
             }
         }
-        else
+        catch (UnauthorizedAccessException ex)
         {
-            System.Diagnostics.Debug.WriteLine("[LOG] Không chọn được ảnh từ thư viện!");
+            System.Diagnostics.Debug.WriteLine($"[LOG][PERMISSION] Permission denied: {ex.Message}");
+            await App.Current.MainPage.DisplayAlert("Lỗi", "Ứng dụng cần quyền truy cập thư viện ảnh!", "OK");
         }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[LOG][ERROR] Lỗi trong PickLicenseImagesAsync: {ex.Message}");
+            await App.Current.MainPage.DisplayAlert("Lỗi", $"Có lỗi xảy ra khi chọn ảnh: {ex.Message}", "OK");
+        }
+        
         System.Diagnostics.Debug.WriteLine($"[LOG] Tổng số ảnh hiện tại: {LicenseImages.Count}");
-        PickLicenseImagesCommand.NotifyCanExecuteChanged();
-        CaptureLicenseImageCommand.NotifyCanExecuteChanged();
     }
 
     private async Task CaptureLicenseImageAsync()
     {
         System.Diagnostics.Debug.WriteLine("[LOG] Bắt đầu chụp ảnh...");
-        if (!CanAddMoreLicenseImages)
+        
+        try
         {
-            System.Diagnostics.Debug.WriteLine("[LOG] Không thể thêm ảnh mới, đã đủ 4 ảnh.");
-            return;
+            if (!CanAddMoreLicenseImages)
+            {
+                System.Diagnostics.Debug.WriteLine("[LOG] Không thể thêm ảnh mới, đã đủ 4 ảnh.");
+                return;
+            }
+            
+            if (!MediaPicker.Default.IsCaptureSupported)
+            {
+                System.Diagnostics.Debug.WriteLine("[LOG] Thiết bị không hỗ trợ chụp ảnh!");
+                await App.Current.MainPage.DisplayAlert("Lỗi", "Thiết bị không hỗ trợ chụp ảnh!", "OK");
+                return;
+            }
+
+            var file = await MediaPicker.Default.CapturePhotoAsync();
+            if (file != null)
+            {
+                System.Diagnostics.Debug.WriteLine($"[LOG] Đã chụp ảnh: {file.FullPath}");
+                
+                // Xử lý file trên background thread
+                await Task.Run(async () =>
+                {
+                    try
+                    {
+                        var copiedPath = await CopyFileToAppDirectoryAsync(file);
+                        
+                        await MainThread.InvokeOnMainThreadAsync(() =>
+                        {
+                            LicenseImageFiles.Add(file);
+                            var imgSource = ImageSource.FromFile(copiedPath);
+                            LicenseImages.Add(new MyImageModel { Images = imgSource, LocalPath = copiedPath });
+                            System.Diagnostics.Debug.WriteLine($"[LOG] Đã thêm vào LicenseImages (FromFile): {copiedPath}");
+                            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] CaptureLicenseImageAsync - LicenseImages count sau khi thêm: {LicenseImages.Count}");
+                            
+                            OnPropertyChanged(nameof(CanAddMoreLicenseImages));
+                            OnPropertyChanged(nameof(LicenseButtonBackgroundColor));
+                            OnPropertyChanged(nameof(LicenseButtonTextColor));
+                            
+                            PickLicenseImagesCommand.NotifyCanExecuteChanged();
+                            CaptureLicenseImageCommand.NotifyCanExecuteChanged();
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[LOG][ERROR] Không thể copy hoặc tạo ImageSource từ file: {file.FullPath} - {ex.Message}");
+                        await MainThread.InvokeOnMainThreadAsync(async () =>
+                        {
+                            await App.Current.MainPage.DisplayAlert("Lỗi", $"Không thể xử lý ảnh: {ex.Message}", "OK");
+                        });
+                    }
+                });
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("[LOG] Không lấy được file ảnh từ camera!");
+            }
         }
-        if (!MediaPicker.Default.IsCaptureSupported)
+        catch (UnauthorizedAccessException ex)
         {
-            System.Diagnostics.Debug.WriteLine("[LOG] Thiết bị không hỗ trợ chụp ảnh!");
+            System.Diagnostics.Debug.WriteLine($"[LOG][PERMISSION] Permission denied: {ex.Message}");
+            await App.Current.MainPage.DisplayAlert("Lỗi", "Ứng dụng cần quyền truy cập camera để chụp ảnh!", "OK");
+        }
+        catch (NotSupportedException ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[LOG][NOT_SUPPORTED] Camera not supported: {ex.Message}");
             await App.Current.MainPage.DisplayAlert("Lỗi", "Thiết bị không hỗ trợ chụp ảnh!", "OK");
-            return;
         }
-        var file = await MediaPicker.Default.CapturePhotoAsync();
-        if (file != null)
+        catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[LOG] Đã chụp ảnh: {file.FullPath}");
-            LicenseImageFiles.Add(file);
-            try
-            {
-                var copiedPath = await CopyFileToAppDirectoryAsync(file);
-                var imgSource = ImageSource.FromFile(copiedPath);
-                LicenseImages.Add(new MyImageModel { Images = imgSource, LocalPath = copiedPath });
-                System.Diagnostics.Debug.WriteLine($"[LOG] Đã thêm vào LicenseImages (FromFile): {copiedPath}");
-                OnPropertyChanged(nameof(CanAddMoreLicenseImages));
-                OnPropertyChanged(nameof(LicenseButtonBackgroundColor));
-                OnPropertyChanged(nameof(LicenseButtonTextColor));
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"[LOG][ERROR] Không thể copy hoặc tạo ImageSource từ file: {file.FullPath} - {ex.Message}");
-            }
+            System.Diagnostics.Debug.WriteLine($"[LOG][ERROR] Lỗi trong CaptureLicenseImageAsync: {ex.Message}");
+            await App.Current.MainPage.DisplayAlert("Lỗi", $"Có lỗi xảy ra khi chụp ảnh: {ex.Message}", "OK");
         }
-        else
-        {
-            System.Diagnostics.Debug.WriteLine("[LOG] Không lấy được file ảnh từ camera!");
-        }
+        
         System.Diagnostics.Debug.WriteLine($"[LOG] Tổng số ảnh hiện tại: {LicenseImages.Count}");
-        PickLicenseImagesCommand.NotifyCanExecuteChanged();
-        CaptureLicenseImageCommand.NotifyCanExecuteChanged();
     }
 
     private void RemoveLicenseImage(ImageSource img)
     {
+        System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] RemoveLicenseImage - Bắt đầu xóa ảnh");
+        System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] RemoveLicenseImage - LicenseImages count trước khi xóa: {LicenseImages.Count}");
+        
         int idx = LicenseImages.IndexOf(LicenseImages.FirstOrDefault(i => i.Images == img));
+        System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] RemoveLicenseImage - Index cần xóa: {idx}");
+        
         if (idx >= 0)
         {
+            var removedImage = LicenseImages[idx];
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] RemoveLicenseImage - Xóa ảnh: {removedImage.LocalPath}");
+            
             LicenseImages.RemoveAt(idx);
             if (LicenseImageFiles.Count > idx)
                 LicenseImageFiles.RemoveAt(idx);
+                
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] RemoveLicenseImage - LicenseImages count sau khi xóa: {LicenseImages.Count}");
+            
             OnPropertyChanged(nameof(CanAddMoreLicenseImages));
             OnPropertyChanged(nameof(LicenseButtonBackgroundColor));
             OnPropertyChanged(nameof(LicenseButtonTextColor));
         }
+        else
+        {
+            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] RemoveLicenseImage - Không tìm thấy ảnh để xóa");
+        }
+        
         PickLicenseImagesCommand.NotifyCanExecuteChanged();
         CaptureLicenseImageCommand.NotifyCanExecuteChanged();
     }

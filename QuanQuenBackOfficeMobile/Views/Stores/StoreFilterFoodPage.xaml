@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:QuanQuenBackOfficeMobile.ViewModels.Stores"
+             xmlns:models="clr-namespace:QuanQuenBackOfficeMobile.Models"
+             xmlns:converters="clr-namespace:QuanQuenBackOfficeMobile.Converters"
+             x:Class="QuanQuenBackOfficeMobile.Views.Stores.StoreFilterFoodPage"
+             x:DataType="viewModels:StoreFilterFoodViewModel"
+             Title="Bộ lọc món ăn"
+             BackgroundColor="#FAFAFA">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:StringToBoolConverter x:Key="StringToBoolConverter" />
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+            <converters:NullToBoolConverter x:Key="NullToBoolConverter" />
+            <converters:CountToBoolConverter x:Key="CountToBoolConverter" />
+            <converters:EditVisibilityConverter x:Key="EditVisibilityConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*">
+        <!-- Header -->
+        <Frame Grid.Row="0" 
+               Padding="16" 
+               BackgroundColor="White" 
+               CornerRadius="0"
+               HasShadow="True"
+               Margin="0,0,0,8">
+            <VerticalStackLayout Spacing="8">
+                <Label Text="{Binding StoreName}" 
+                       FontSize="18" 
+                       FontAttributes="Bold" 
+                       TextColor="#333" />
+                <Label Text="Danh sách bộ lọc món ăn" 
+                       FontSize="14" 
+                       TextColor="#666" />
+            </VerticalStackLayout>
+        </Frame>
+
+        <!-- Content -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="16" Spacing="12">
+                    
+                    <!-- Loading Indicator -->
+                    <ActivityIndicator IsRunning="{Binding IsLoading}"
+                                     IsVisible="{Binding IsLoading}"
+                                     Color="#FF9800"
+                                     HeightRequest="50" />
+
+                    <!-- Form tạo mới -->
+                    <Frame Padding="16"
+                           Margin="0,0,0,12"
+                           CornerRadius="12"
+                           BorderColor="#4CAF50"
+                           BackgroundColor="White"
+                           HasShadow="True"
+                           IsVisible="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}">
+                        <VerticalStackLayout Spacing="12">
+                            <Label Text="➕ Thêm bộ lọc món ăn mới" 
+                                   FontAttributes="Bold" 
+                                   FontSize="16" 
+                                   TextColor="#4CAF50" />
+
+                            <Entry Placeholder="Tên bộ lọc * (ví dụ: cơm gà, trà sữa...)" 
+                                   Text="{Binding NewFilterName, Mode=TwoWay}" 
+                                   BackgroundColor="White" 
+                                   TextColor="#333" />
+
+                            <Button Text="➕ Thêm mới"
+                                    BackgroundColor="#4CAF50"
+                                    TextColor="White"
+                                    CornerRadius="8"
+                                    HeightRequest="45"
+                                    Command="{Binding CreateFoodFilterCommand}" />
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <!-- Food Filter List -->
+                    <CollectionView ItemsSource="{Binding Items}"
+                                  IsVisible="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:FoodFilterItem">
+                                <Frame Padding="16"
+                                       Margin="0,0,0,12"
+                                       CornerRadius="12"
+                                       BorderColor="#E0E0E0"
+                                       BackgroundColor="White"
+                                       HasShadow="True">
+                                    <VerticalStackLayout Spacing="12">
+                                        
+                                        <!-- Display Mode -->
+                                        <VerticalStackLayout Spacing="8">
+                                            <VerticalStackLayout.Triggers>
+                                                <DataTrigger TargetType="VerticalStackLayout" 
+                                                           Value="True">
+                                                    <DataTrigger.Binding>
+                                                        <MultiBinding Converter="{StaticResource EditVisibilityConverter}">
+                                                            <Binding Path="FilterFoodId" />
+                                                            <Binding Source="{RelativeSource AncestorType={x:Type ContentPage}}" Path="BindingContext.CurrentEditingItemId" />
+                                                        </MultiBinding>
+                                                    </DataTrigger.Binding>
+                                                    <Setter Property="IsVisible" Value="False" />
+                                                </DataTrigger>
+                                            </VerticalStackLayout.Triggers>
+
+
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <!-- Filter Name -->
+                                                <Label Grid.Column="0"
+                                                       Text="{Binding Name}"
+                                                       FontAttributes="Bold"
+                                                       FontSize="18"
+                                                       TextColor="#333" />
+
+                                                <!-- Position Badge -->
+                                                <Frame Grid.Column="1"
+                                                       Padding="8,4"
+                                                       CornerRadius="12"
+                                                       BorderColor="Transparent"
+                                                       BackgroundColor="#2196F3"
+                                                       HasShadow="False"
+                                                       IsVisible="{Binding Position, Converter={StaticResource NullToBoolConverter}}">
+                                                    <Label Text="{Binding Position, StringFormat='#{0}'}"
+                                                           TextColor="White"
+                                                           FontSize="12"
+                                                           FontAttributes="Bold" />
+                                                </Frame>
+                                            </Grid>
+
+                                            <!-- Value -->
+                                            <Label Text="{Binding Value}"
+                                                   FontSize="14"
+                                                   TextColor="#666" />
+
+                                            <!-- State -->
+                                            <Label Text="{Binding State, StringFormat='Trạng thái: {0}'}"
+                                                   FontSize="12"
+                                                   TextColor="#999"
+                                                   IsVisible="{Binding State, Converter={StaticResource StringToBoolConverter}}" />
+
+                                            <!-- Action Buttons -->
+                                            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                                                <Button Grid.Column="0"
+                                                        Text="✏️ Sửa"
+                                                        BackgroundColor="#2196F3"
+                                                        TextColor="White"
+                                                        CornerRadius="8"
+                                                        HeightRequest="40"
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.StartEditCommand}"
+                                                        CommandParameter="{Binding .}" />
+                                                
+                                                <Button Grid.Column="1"
+                                                        Text="🍽️ Thêm món"
+                                                        BackgroundColor="#FF9800"
+                                                        TextColor="White"
+                                                        CornerRadius="8"
+                                                        HeightRequest="40"
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CreateFoodForFilterCommand}"
+                                                        CommandParameter="{Binding .}" />
+                                            </Grid>
+                                        </VerticalStackLayout>
+
+                                        <!-- Edit Mode -->
+                                        <VerticalStackLayout Spacing="12">
+                                            <VerticalStackLayout.IsVisible>
+                                                <MultiBinding Converter="{StaticResource EditVisibilityConverter}">
+                                                    <Binding Path="FilterFoodId" />
+                                                    <Binding Source="{RelativeSource AncestorType={x:Type ContentPage}}" Path="BindingContext.CurrentEditingItemId" />
+                                                </MultiBinding>
+                                            </VerticalStackLayout.IsVisible>
+
+                                            <Label Text="✏️ Chỉnh sửa bộ lọc món ăn" 
+                                                   FontAttributes="Bold" 
+                                                   FontSize="16" 
+                                                   TextColor="#FF9800" />
+
+                                            <Entry Placeholder="Tên bộ lọc * (ví dụ: cơm gà, trà sữa...)" 
+                                                   Text="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EditingNameValue, Mode=TwoWay}" 
+                                                   BackgroundColor="White" 
+                                                   TextColor="#333" />
+
+                                            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                                                <Button Grid.Column="0"
+                                                        Text="💾 Lưu"
+                                                        BackgroundColor="#4CAF50"
+                                                        TextColor="White"
+                                                        CornerRadius="8"
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.UpdateFoodFilterCommand}" />
+                                                
+                                                <Button Grid.Column="1"
+                                                        Text="❌ Hủy"
+                                                        BackgroundColor="#F44336"
+                                                        TextColor="White"
+                                                        CornerRadius="8"
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CancelEditCommand}" />
+                                            </Grid>
+                                        </VerticalStackLayout>
+
+                                    </VerticalStackLayout>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <!-- Empty State -->
+                    <VerticalStackLayout IsVisible="{Binding HasNoItems}"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"
+                                       Spacing="16"
+                                       Padding="32">
+                        <Label Text="📋"
+                               FontSize="64"
+                               HorizontalOptions="Center" />
+                        <Label Text="Chưa có bộ lọc món ăn nào"
+                               FontSize="16"
+                               TextColor="#999"
+                               HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+
+</ContentPage>
+

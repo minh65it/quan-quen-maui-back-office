@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="QuanQuenBackOfficeMobile.Views.AffiliateListingAgentPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:QuanQuenBackOfficeMobile.Converters"
+             xmlns:models="clr-namespace:QuanQuenBackOfficeMobile.Models"
+             x:Name="ListingPage"
+             Title="Danh sách nhà hàng gần bạn"
+             BackgroundColor="#FAFAFA">
+
+    <ContentPage.Resources>
+        <converters:ImageUrlConverter x:Key="ImageUrlConverter" />
+        <converters:StringNotNullOrEmptyConverter x:Key="StringNotNullOrEmptyConverter" />
+        <converters:CountToBoolConverter x:Key="CountToBoolConverter" />
+        <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+    </ContentPage.Resources>
+
+    <Grid>
+        <!-- Main Content -->
+        <ScrollView>
+            <StackLayout Padding="16" Spacing="16">
+                
+                <!-- Header -->
+                <StackLayout Spacing="8">
+                    <Label Text="Chào mừng Data Affiliate!"
+                           FontSize="24"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"
+                           TextColor="#000000" />
+                    
+                    <Label Text="Danh sách nhà hàng gần vị trí của bạn"
+                           FontSize="16"
+                           HorizontalOptions="Center"
+                           TextColor="#666666" />
+                </StackLayout>
+
+                <!-- Store Count -->
+                <Frame BackgroundColor="White"
+                       Padding="16"
+                       HasShadow="True"
+                       CornerRadius="8">
+                    <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
+                        <Label Text="{Binding Stores.Count}"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="#FC8312" />
+                        <Label Text=" nhà hàng gần bạn"
+                               FontSize="16"
+                               TextColor="#666666" />
+                    </StackLayout>
+                </Frame>
+
+                <!-- Stores List -->
+                <CollectionView ItemsSource="{Binding Stores}"
+                                 BackgroundColor="Transparent"
+                                 SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:StoreRecommendation">
+                            <Frame BackgroundColor="White"
+                                   Padding="16"
+                                   Margin="0,0,0,12"
+                                   HasShadow="True"
+                                   CornerRadius="8">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding BindingContext.SelectStoreCommand, Source={x:Reference ListingPage}}"
+                                                         CommandParameter="{Binding .}" />
+                                </Frame.GestureRecognizers>
+                                <Grid ColumnDefinitions="80,*" ColumnSpacing="12">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding BindingContext.SelectStoreCommand, Source={x:Reference ListingPage}}"
+                                                              CommandParameter="{Binding .}" />
+                                    </Grid.GestureRecognizers>
+                                    
+                                    <!-- Store Avatar -->
+                                    <Frame Grid.Column="0"
+                                           BackgroundColor="#F0F0F0"
+                                           Padding="0"
+                                           HasShadow="False"
+                                           CornerRadius="8"
+                                           HeightRequest="80"
+                                           WidthRequest="80">
+                                        <Image Source="{Binding Avatar, Converter={StaticResource ImageUrlConverter}}"
+                                               Aspect="AspectFill"
+                                               BackgroundColor="#F0F0F0" />
+                                    </Frame>
+
+                                    <!-- Store Info -->
+                                    <StackLayout Grid.Column="1" Spacing="4">
+                                        <Label Text="{Binding StoreName}"
+                                               FontSize="16"
+                                               FontAttributes="Bold"
+                                               TextColor="#000000"
+                                               LineBreakMode="TailTruncation" />
+                                        
+                                        <Label Text="{Binding Address}"
+                                               FontSize="14"
+                                               TextColor="#666666"
+                                               LineBreakMode="TailTruncation" />
+                                        
+                                        <StackLayout Orientation="Horizontal" Spacing="8">
+                                            <Label Text="{Binding Ward}"
+                                                   FontSize="12"
+                                                   TextColor="#999999" />
+                                            <Label Text="{Binding District}"
+                                                   FontSize="12"
+                                                   TextColor="#999999" />
+                                            <Label Text="{Binding City}"
+                                                   FontSize="12"
+                                                   TextColor="#999999" />
+                                        </StackLayout>
+                                        
+                                        <StackLayout Orientation="Horizontal" Spacing="8">
+                                            <Label Text="{Binding Distance}"
+                                                   FontSize="12"
+                                                   FontAttributes="Bold"
+                                                   TextColor="#FC8312" />
+                                            
+                                            <StackLayout Orientation="Horizontal" Spacing="4">
+                                                <Label Text="⭐"
+                                                       FontSize="12"
+                                                       TextColor="#FFD700" />
+                                                <Label Text="{Binding ReviewPoint}"
+                                                       FontSize="12"
+                                                       TextColor="#666666" />
+                                            </StackLayout>
+                                        </StackLayout>
+                                    </StackLayout>
+
+                                    <!-- Bỏ nút Xem, dùng TapGesture trên card để điều hướng -->
+                                </Grid>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <!-- Empty State -->
+                <StackLayout IsVisible="{Binding Stores.Count, Converter={StaticResource CountToBoolConverter}, ConverterParameter=Inverse}"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"
+                             Spacing="16">
+                    <Label Text="Chưa có nhà hàng nào gần bạn"
+                           FontSize="16"
+                           HorizontalOptions="Center"
+                           TextColor="#666666" />
+                    <Button Text="Làm mới"
+                            Command="{Binding RefreshCommand}"
+                            BackgroundColor="#FC8312"
+                            TextColor="White"
+                            Padding="24,12"
+                            CornerRadius="8" />
+                </StackLayout>
+                
+                <!-- Pagination Info -->
+                <Frame BackgroundColor="White"
+                       Padding="16"
+                       HasShadow="True"
+                       CornerRadius="8"
+                       IsVisible="{Binding Stores.Count, Converter={StaticResource CountToBoolConverter}}">
+                    <StackLayout Spacing="8">
+                        <Label Text="{Binding Pagination.TotalCount, StringFormat='Tổng cộng: {0} nhà hàng'}"
+                               FontSize="14"
+                               HorizontalOptions="Center"
+                               TextColor="#666666" />
+                        
+                        <Label Text="{Binding PageInfo}"
+                               FontSize="14"
+                               HorizontalOptions="Center"
+                               TextColor="#666666" />
+                        
+                        <!-- Load More Button -->
+                        <Button Text="Tải thêm nhà hàng"
+                                Command="{Binding LoadMoreCommand}"
+                                BackgroundColor="#FC8312"
+                                TextColor="White"
+                                FontSize="14"
+                                Padding="0,12"
+                                CornerRadius="6"
+                                IsVisible="{Binding CanLoadMore}" />
+                        
+                        <!-- No More Data -->
+                        <Label Text="Đã hiển thị tất cả nhà hàng"
+                               FontSize="14"
+                               HorizontalOptions="Center"
+                               TextColor="#999999"
+                               IsVisible="{Binding CanLoadMore, Converter={StaticResource InverseBoolConverter}}" />
+                    </StackLayout>
+                </Frame>
+            </StackLayout>
+        </ScrollView>
+
+        <!-- Location Popup -->
+        <Frame IsVisible="{Binding ShowLocationPopup}"
+               BackgroundColor="White"
+               Padding="24"
+               Margin="16"
+               HasShadow="True"
+               CornerRadius="12"
+               VerticalOptions="Center"
+               HorizontalOptions="Fill">
+            <StackLayout Spacing="16">
+                <Label Text="📍"
+                       FontSize="32"
+                       HorizontalOptions="Center" />
+                
+                <Label Text="Lấy vị trí hiện tại"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center"
+                       TextColor="#000000" />
+                
+                <Label Text="Chúng tôi cần truy cập vị trí của bạn để tìm các nhà hàng gần nhất"
+                       FontSize="14"
+                       HorizontalOptions="Center"
+                       TextColor="#666666"
+                       HorizontalTextAlignment="Center" />
+                
+                <Label Text="📍 Vị trí sẽ được lấy tự động từ GPS của điện thoại"
+                       FontSize="14"
+                       HorizontalOptions="Center"
+                       TextColor="#666666"
+                       HorizontalTextAlignment="Center" />
+                
+                <Label Text="{Binding ErrorMessage}"
+                       FontSize="14"
+                       HorizontalOptions="Center"
+                       TextColor="#F84135"
+                       IsVisible="{Binding ErrorMessage, Converter={StaticResource StringNotNullOrEmptyConverter}}" />
+                
+                <Button Text="Lấy vị trí"
+                        Command="{Binding ConfirmLocationCommand}"
+                        BackgroundColor="#FC8312"
+                        TextColor="White"
+                        FontSize="16"
+                        FontAttributes="Bold"
+                        Padding="0,16"
+                        CornerRadius="8" />
+            </StackLayout>
+        </Frame>
+
+        
+
+        <!-- Loading Overlay -->
+        <Grid IsVisible="{Binding IsBusy}"
+              BackgroundColor="#80000000">
+            <StackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="16">
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   Color="#FC8312"
+                                   WidthRequest="50"
+                                   HeightRequest="50" />
+                <Label Text="Đang tải..."
+                       FontSize="16"
+                       TextColor="White"
+                       HorizontalOptions="Center" />
+            </StackLayout>
+        </Grid>
+    </Grid>
+</ContentPage>

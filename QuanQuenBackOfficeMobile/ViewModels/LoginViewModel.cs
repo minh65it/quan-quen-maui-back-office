@@ -5,6 +5,7 @@ using Microsoft.Maui.Controls;
 using QuanQuenBackOfficeMobile.Models;
 using QuanQuenBackOfficeMobile.Services;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
+using QuanQuenBackOfficeMobile.Views;
 
 namespace QuanQuenBackOfficeMobile.ViewModels
 {
@@ -26,6 +27,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels
             _authService = authService;
             LoginCommand = new Command(async () => await LoginAsync());
             TogglePasswordVisibilityCommand = new Command(TogglePasswordVisibility);
+            GoToAffiliateLoginCommand = new Command(async () => await GoToAffiliateLoginAsync());
         }
         public string AuthError
         {
@@ -97,11 +99,35 @@ namespace QuanQuenBackOfficeMobile.ViewModels
 
         public ICommand LoginCommand { get; }
         public ICommand TogglePasswordVisibilityCommand { get; }
+        public ICommand GoToAffiliateLoginCommand { get; }
 
         private void TogglePasswordVisibility()
         {
             IsPasswordHidden = !IsPasswordHidden;
             PasswordVisibilityIcon = IsPasswordHidden ? "🙈" : "🐵";
+        }
+
+        private async Task GoToAffiliateLoginAsync()
+        {
+            try
+            {
+                if (Shell.Current != null)
+                {
+                    await Shell.Current.GoToAsync("//AffiliateLogin");
+                }
+                else
+                {
+                    // Fallback: Navigate using Application.Current.MainPage
+                    var affiliateLoginViewModel = IPlatformApplication.Current.Services.GetService<AffiliateLoginViewModel>();
+                    Application.Current.MainPage = new AffiliateLoginPage(affiliateLoginViewModel);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Fallback navigation
+                var affiliateLoginViewModel = IPlatformApplication.Current.Services.GetService<AffiliateLoginViewModel>();
+                Application.Current.MainPage = new AffiliateLoginPage(affiliateLoginViewModel);
+            }
         }
 
         
@@ -144,12 +170,16 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                     {
                         await SecureStorage.SetAsync("auth_token", response.Token);
                         await SecureStorage.SetAsync("userName", response.VsiriusUserDto.UserName);
+                        await SecureStorage.SetAsync("email", response.VsiriusUserDto.Email);
+                        await SecureStorage.SetAsync("userId", response.VsiriusUserDto.UserId);
                     }
                     catch (Exception ex)
                     {
 #if DEBUG
                         Preferences.Set("auth_token", response.Token);
                         Preferences.Set("userName", response.VsiriusUserDto.UserName);
+                        Preferences.Set("email", response.VsiriusUserDto.Email);
+                        Preferences.Set("userId", response.VsiriusUserDto.UserId);
 #endif
                     }
                     var mainViewModel = IPlatformApplication.Current.Services.GetService<MainViewModel>();

@@ -8,6 +8,9 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <converters:NullOrEmptyToNAConverter x:Key="NullOrEmptyToNAConverter" />
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+            <converters:BoolToColorConverter x:Key="BoolToColorConverter" />
+            <converters:BoolToTextConverter x:Key="BoolToTextConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
     <ScrollView>
@@ -40,7 +43,144 @@
                     <Label Text="Địa chỉ:" 
                            FontAttributes="Bold" 
                            TextColor="{StaticResource Primary}"/>
-                    <Label Text="{Binding StoreDetail.FullAdrress, Converter={StaticResource NullOrEmptyToNAConverter}}" />
+                    <Label Text="{Binding StoreDetail.address, Converter={StaticResource NullOrEmptyToNAConverter}}" />
+                    
+                    <!-- Button xem trên bản đồ -->
+                    <Button Text="🗺️ Xem trên bản đồ" 
+                            Clicked="ViewOnMap_Clicked"
+                            BackgroundColor="#007AFF"
+                            TextColor="White"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            CornerRadius="8"
+                            HeightRequest="50" />
+                    
+                    <!-- Button scan QR Code -->
+                    <Button Text="📱 Scan QR Code" 
+                            Clicked="ScanQRCode_Clicked"
+                            BackgroundColor="#28A745"
+                            TextColor="White"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            CornerRadius="8"
+                            HeightRequest="50" />
+                    
+                    <!-- Button thêm ảnh menu món ăn -->
+                    <Button Text="🍽️ Thêm ảnh menu món ăn" 
+                            Clicked="AddMenuImages_Clicked"
+                            BackgroundColor="#FF6B35"
+                            TextColor="White"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            CornerRadius="8"
+                            HeightRequest="50" />
+
+                    <!-- Button xem thống kê hóa đơn -->
+                    <Button Text="📊 Thống kê hóa đơn" 
+                            Clicked="ViewStatistic_Clicked"
+                            BackgroundColor="#9C27B0"
+                            TextColor="White"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            CornerRadius="8"
+                            HeightRequest="50" />
+
+                    <!-- Button khu vực bàn -->
+                    <Button Text="🪑 Khu vực bàn" 
+                            Clicked="ViewTableArea_Clicked"
+                            BackgroundColor="#2196F3"
+                            TextColor="White"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            CornerRadius="8"
+                            HeightRequest="50" />
+
+                    <!-- Button bộ lọc món ăn -->
+                    <Button Text="🍽️ Bộ lọc món ăn" 
+                            Clicked="ViewFoodFilter_Clicked"
+                            BackgroundColor="#FF9800"
+                            TextColor="White"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            CornerRadius="8"
+                            HeightRequest="50" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Phần quản lý và cập nhật -->
+            <Frame BorderColor="{StaticResource Gray200}"
+                   CornerRadius="8"
+                   Padding="12"
+                   Margin="0,8">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Quản lý và cập nhật" 
+                           FontSize="18" 
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource Primary}"/>
+
+                    <!-- Upload ảnh hóa đơn -->
+                    <Frame BorderColor="#E3F2FD"
+                           BackgroundColor="#F8F9FA"
+                           CornerRadius="12"
+                           Padding="16"
+                           Margin="0,8">
+                        <VerticalStackLayout Spacing="12">
+                            <Label Text="📄 Upload ảnh hóa đơn" 
+                                   FontSize="16" 
+                                   FontAttributes="Bold"
+                                   TextColor="#1976D2"
+                                   HorizontalOptions="Center" />
+                            
+                            <Label Text="Chọn tháng để upload ảnh hóa đơn:" 
+                                   FontSize="14" 
+                                   TextColor="#666"
+                                   HorizontalOptions="Center" />
+                            
+                            <Frame BorderColor="#BBDEFB"
+                                   BackgroundColor="White"
+                                   CornerRadius="8"
+                                   Padding="12">
+                                <Picker ItemsSource="{Binding MonthOptions}"
+                                        SelectedIndex="{Binding SelectedMonthIndex}"
+                                        Title="Chọn tháng"
+                                        TextColor="#1976D2"
+                                        FontSize="16"
+                                        FontAttributes="Bold" />
+                            </Frame>
+
+                            <Button Text="{Binding IsUploadingInvoice, Converter={StaticResource BoolToTextConverter}, ConverterParameter='📤 Đang upload...|📄 Chọn ảnh hóa đơn'}" 
+                                    Command="{Binding UploadInvoiceImageCommand}"
+                                    IsEnabled="{Binding IsUploadingInvoice, Converter={StaticResource InverseBoolConverter}}"
+                                    BackgroundColor="#1976D2"
+                                    TextColor="White"
+                                    FontSize="16"
+                                    FontAttributes="Bold"
+                                    CornerRadius="10"
+                                    HeightRequest="55"
+                                    Margin="0,8,0,0">
+                                <Button.Triggers>
+                                    <DataTrigger TargetType="Button" Binding="{Binding IsUploadingInvoice}" Value="True">
+                                        <Setter Property="BackgroundColor" Value="#FFC107" />
+                                    </DataTrigger>
+                                </Button.Triggers>
+                            </Button>
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <!-- Chọn gói dịch vụ và cập nhật -->
+                    <Label Text="Gói dịch vụ" 
+                           FontAttributes="Bold" 
+                           TextColor="{StaticResource Primary}" />
+                    <Picker ItemsSource="{Binding StorePackageOptions}"
+                            SelectedIndex="{Binding SelectedStorePackageIndex}" />
+                    <Button Text="🔄 Cập nhật gói"
+                            Command="{Binding UpdateStorePackageCommand}"
+                            BackgroundColor="#6C63FF"
+                            TextColor="White"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            CornerRadius="8"
+                            HeightRequest="50" />
                 </VerticalStackLayout>
             </Frame>
 

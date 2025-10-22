@@ -131,4 +131,21 @@ public partial class DrawingExamplePage : ContentPage
 			return null;
 		}
 	}
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        try
+        {
+            // Xóa dữ liệu vẽ để giảm memory footprint khi rời trang
+            ContractDrawingView?.Lines?.Clear();
+            AppendixDrawingView?.Lines?.Clear();
+        }
+        catch { }
+        finally
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+        }
+    }
 }

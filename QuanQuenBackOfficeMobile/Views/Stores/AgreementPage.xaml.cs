@@ -1,6 +1,7 @@
 using QuanQuenBackOfficeMobile.ViewModels.Stores;
 using QuanQuenBackOfficeMobile.Models;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace QuanQuenBackOfficeMobile.Views.Stores
 {
@@ -14,11 +15,12 @@ namespace QuanQuenBackOfficeMobile.Views.Stores
             
             // Get services from DI container
             var contractService = App.Services.GetService<IContractService>();
+            var configuration = App.Services.GetService<IConfiguration>();
             
-            if (contractService != null)
+            if (contractService != null && configuration != null)
             {
                 // Create and set ViewModel
-                _viewModel = new AgreementPageViewModel(contractService, agreementInfo);
+                _viewModel = new AgreementPageViewModel(contractService, agreementInfo, configuration);
                 BindingContext = _viewModel;
                 
                 // Load PDF với chữ ký từ URL
@@ -35,8 +37,11 @@ namespace QuanQuenBackOfficeMobile.Views.Stores
         {
             try
             {
-                // Navigate to PhotoStoreUser page
-                await Application.Current.MainPage.Navigation.PushAsync(new QuanQuenBackOfficeMobile.Views.PhotoStoreUser());
+                // Navigate to PhotoStoreUser page without animation để giảm CPU/GPU load
+                await Application.Current.MainPage.Navigation.PushAsync(
+                    new QuanQuenBackOfficeMobile.Views.PhotoStoreUser(), 
+                    animated: false);
+                System.Diagnostics.Debug.WriteLine("[AgreementPage] Navigated to PhotoStoreUser without animation");
             }
             catch (Exception ex)
             {

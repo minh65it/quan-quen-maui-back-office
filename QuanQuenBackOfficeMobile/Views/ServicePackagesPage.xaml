@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="QuanQuenBackOfficeMobile.Views.ServicePackagesPage"
+             Title="Gói dịch vụ">
+    <ContentPage.Content>
+        <ScrollView>
+            <VerticalStackLayout Padding="16" Spacing="16">
+                <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"/>
+                <Label TextColor="Red" Text="{Binding Error}" IsVisible="{Binding Error, Converter={StaticResource StringNotNullOrEmptyConverter}}"/>
+
+                <Frame>
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Quán Mới" FontAttributes="Bold" FontSize="18"/>
+                        <CollectionView ItemsSource="{Binding QuanMoiItems}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Padding="0,4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Text="•" Grid.Column="0"/>
+                                        <Label Text="{Binding .}" Grid.Column="1"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame>
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Quán Quen" FontAttributes="Bold" FontSize="18"/>
+                        <CollectionView ItemsSource="{Binding QuanQuenItems}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Padding="0,4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Text="•" Grid.Column="0"/>
+                                        <Label Text="{Binding .}" Grid.Column="1"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Frame>
+            </VerticalStackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>
+
+

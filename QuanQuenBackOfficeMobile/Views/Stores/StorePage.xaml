@@ -13,6 +13,7 @@
         <ResourceDictionary>
             <converters:NullOrEmptyToNAConverter x:Key="NullOrEmptyToNAConverter" />
             <converters:AvatarUrlConverter x:Key="AvatarUrlConverter" />
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
     <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="8" RowSpacing="8">
@@ -144,12 +145,125 @@
             </CollectionView>
 
             <!-- Loading Overlay -->
-            <Grid IsVisible="{Binding IsLoading}" 
+            <Grid IsVisible="{Binding IsLoading}"
                   BackgroundColor="{AppThemeBinding Light={StaticResource Black50Color}, Dark={StaticResource Black20Color}}">
-                <ActivityIndicator IsRunning="True" 
-                                 HorizontalOptions="Center" 
-                                 VerticalOptions="Center" 
-                                 Color="White"/>
+                <ActivityIndicator IsRunning="True"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center"
+                                   Color="White"/>
+            </Grid>
+
+            <!-- AI Chatbot Floating Button - Simple Version -->
+            <Button x:Name="ChatbotButton" Text="💬" WidthRequest="56" HeightRequest="56" CornerRadius="28"
+                    BackgroundColor="{StaticResource Orange70Color}" TextColor="White"
+                    Command="{Binding ToggleChatbotCommand}"
+                    HorizontalOptions="End" VerticalOptions="End" Margin="16">
+            </Button>
+
+            <!-- AI Chatbot Overlay (khung chat + icon bot) -->
+            <Grid IsVisible="{Binding IsChatbotVisible}" BackgroundColor="#80000000">
+                <Frame CornerRadius="20" Padding="0" HasShadow="True"
+           HorizontalOptions="End" VerticalOptions="End"
+           Margin="16" WidthRequest="340" HeightRequest="480">
+
+                    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="0">
+
+                        <!-- Header (Trắng) -->
+                        <Grid Grid.Row="0" Padding="14" BackgroundColor="White">
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                    <Label Text="Qui Qui AI" FontAttributes="Bold" FontSize="16" TextColor="Black"/>
+                                    <Label Text="Đang hoạt động" FontSize="12" TextColor="#888888"/>
+                                </VerticalStackLayout>
+                                <Button Grid.Column="2" Text="✕" Command="{Binding ToggleChatbotCommand}"
+                            BackgroundColor="Transparent" TextColor="Black" FontSize="18"/>
+                            </Grid>
+                        </Grid>
+
+                        <!-- Messages (Body với Gradient) -->
+                        <Grid Grid.Row="1">
+                            <Grid.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                    <GradientStop Color="#FFE9B0" Offset="0.0"/>
+                                    <!-- vàng nhạt -->
+                                    <GradientStop Color="#FFA733" Offset="1.0"/>
+                                    <!-- cam -->
+                                </LinearGradientBrush>
+                            </Grid.Background>
+
+                            <ScrollView>
+                                <VerticalStackLayout Spacing="10" Padding="12">
+                                    <CollectionView ItemsSource="{Binding ChatMessages}" VerticalOptions="Start">
+                                        <CollectionView.ItemsLayout>
+                                            <LinearItemsLayout Orientation="Vertical" ItemSpacing="8"/>
+                                        </CollectionView.ItemsLayout>
+                                        <CollectionView.ItemTemplate>
+                                            <DataTemplate x:DataType="models:ChatMessage">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!-- User Message -->
+                                                    <Frame Grid.Column="1" Padding="10,6" CornerRadius="16"
+                                               BackgroundColor="#F0F0F0"
+                                               HorizontalOptions="End"
+                                               IsVisible="{Binding IsFromUser}">
+                                                        <Label Text="{Binding Content}" TextColor="Black"
+                                                   LineBreakMode="WordWrap" FontSize="14"/>
+                                                    </Frame>
+
+                                                    <!-- Bot Message -->
+                                                    <Frame Grid.Column="0" Padding="10,6" CornerRadius="16"
+                                               BackgroundColor="#F0F0F0"
+                                               HorizontalOptions="Start"
+                                               IsVisible="{Binding IsFromUser, Converter={StaticResource InverseBoolConverter}}">
+                                                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="6">
+                                                            <Image Source="chatbot_ai.png" HeightRequest="20" WidthRequest="20" VerticalOptions="Start"/>
+                                                            <Label Grid.Column="1" Text="{Binding Content}" TextColor="Black" LineBreakMode="WordWrap" FontSize="14"/>
+                                                        </Grid>
+                                                    </Frame>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </CollectionView.ItemTemplate>
+                                    </CollectionView>
+                                </VerticalStackLayout>
+                            </ScrollView>
+                        </Grid>
+
+                        <!-- Input Area (Footer trắng với Entry bo tròn + nút send nhỏ) -->
+                        <Grid Grid.Row="2" Padding="10" BackgroundColor="White">
+                            <Frame CornerRadius="20" Padding="8,0" BackgroundColor="White"
+           BorderColor="#DDDDDD" HasShadow="False">
+                                <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                                    <!-- Entry -->
+                                    <Entry Placeholder="Message Qui Qui"
+                   Text="{Binding ChatbotInput}"
+                   Grid.Column="0"
+                   FontSize="14"
+                   TextColor="Black"
+                   PlaceholderColor="#999999"
+                   BackgroundColor="Transparent"
+                   Margin="0,0,8,0"
+                   ReturnCommand="{Binding SendChatbotCommand}"/>
+
+                                    <!-- Send Button -->
+                                    <ImageButton Source="email_sender.png"
+             Grid.Column="1"
+             Command="{Binding SendChatbotCommand}"
+             BackgroundColor="Transparent"
+             Padding="0"
+             Aspect="AspectFit"
+             WidthRequest="20"
+             HeightRequest="20"
+             HorizontalOptions="Center"
+             VerticalOptions="Center"/>
+                                </Grid>
+                            </Frame>
+                        </Grid>
+                    </Grid>
+                </Frame>
             </Grid>
         </Grid>
     </Grid>
