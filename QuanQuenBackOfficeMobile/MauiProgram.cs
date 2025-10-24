@@ -169,6 +169,7 @@ public static class MauiProgram
         builder.Services.AddTransient<AffiliateStoreUserPasswordViewModel>();
         builder.Services.AddTransient<AffiliateStoreUserAuthenticationViewModel>();
         builder.Services.AddTransient<AffiliateStoreListViewModel>();
+        builder.Services.AddTransient<AffiliateStatisticsViewModel>();
         builder.Services.AddTransient<AffiliateListingAgentViewModel>();
         builder.Services.AddTransient<DataAffiliatePreviewViewModel>();
         builder.Services.AddTransient<DataAffiliateInfoViewModel>();
@@ -198,6 +199,7 @@ public static class MauiProgram
         builder.Services.AddTransient<AffiliateStoreUserPasswordPage>();
         builder.Services.AddTransient<AffiliateStoreUserAuthenticationPage>();
         builder.Services.AddTransient<AffiliateStoreListPage>();
+        builder.Services.AddTransient<QuanQuenBackOfficeMobile.Views.AffiliateStatisticsPage>();
         builder.Services.AddTransient<AffiliateListingAgentPage>();
         builder.Services.AddTransient<DataAffiliatePreviewPage>();
         builder.Services.AddTransient<DataAffiliateInfoPage>();
@@ -265,8 +267,8 @@ public static class MauiProgram
         builder.Services.AddTransient<StoreTableListPage>();
         builder.Services.AddTransient<StoreFilterFoodViewModel>();
         builder.Services.AddTransient<StoreFilterFoodPage>();
-        builder.Services.AddTransient<CreateFoodViewModel>();
-        builder.Services.AddTransient<CreateFoodPage>();
+        builder.Services.AddTransient<StoreCreateFoodViewModel>();
+        builder.Services.AddTransient<StoreCreateFood>();
 
         builder.Services.AddSingleton<ITokenService, TokenService>();
         builder.Services.AddHttpClient<IServicePackagesService, ServicePackagesService>((sp, client) =>
@@ -319,7 +321,7 @@ public static class MauiProgram
         
         // Store routes
         Routing.RegisterRoute("StoreFilterFoodPage", typeof(QuanQuenBackOfficeMobile.Views.Stores.StoreFilterFoodPage));
-        Routing.RegisterRoute("CreateFoodPage", typeof(QuanQuenBackOfficeMobile.Views.Stores.CreateFoodPage));
+        Routing.RegisterRoute("StoreCreateFood", typeof(QuanQuenBackOfficeMobile.Views.Stores.StoreCreateFood));
 
 #if DEBUG
 		builder.Logging.AddDebug();

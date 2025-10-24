@@ -81,8 +81,8 @@
                     </VerticalStackLayout>
                 </HorizontalStackLayout>
 
-                <!-- Stats + Buttons -->
-                <HorizontalStackLayout Spacing="20" HorizontalOptions="Center">
+                <!-- Stats -->
+                <HorizontalStackLayout Spacing="15" HorizontalOptions="Center">
                     <Border BackgroundColor="White"
                             Padding="14,8"
                             StrokeShape="RoundRectangle;CornerRadius=20">
@@ -94,18 +94,23 @@
                                    FontAttributes="Bold"/>
                         </HorizontalStackLayout>
                     </Border>
-                    
-                    <!-- Scan QR Button -->
-                    <Button Text="📱 Scan QR"
-                            Command="{Binding NavigateToScanQRCommand}"
-                            BackgroundColor="White"
-                            TextColor="#E67E22"
-                            FontSize="14"
-                            FontAttributes="Bold"
-                            Padding="16,8"
-                            CornerRadius="20"
-                            BorderWidth="1"
-                            BorderColor="#E67E22"/>
+
+                    <!-- Statistics Button -->
+                    <Border BackgroundColor="White"
+                            Padding="12,8"
+                            StrokeShape="RoundRectangle;CornerRadius=20">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding NavigateToStatisticsCommand}"/>
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="6">
+                            <Label Text="📊" FontSize="16"/>
+                            <Label Text="Thống kê"
+                                   FontSize="14"
+                                   TextColor="#2C3E50"
+                                   FontAttributes="Bold"
+                                   VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+                    </Border>
                 </HorizontalStackLayout>
             </VerticalStackLayout>
         </Frame>
@@ -163,6 +168,18 @@
                                                    Style="{StaticResource InfoStyle}" TextColor="#E67E22"/>
                                         </HorizontalStackLayout>
                                     </VerticalStackLayout>
+
+                                    <!-- Scan QR Button -->
+                                    <Button Text="📱 Scan QR cho nhà hàng này"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AffiliateStoreListViewModel}}, Path=NavigateToScanQRCommand}"
+                                            CommandParameter="{Binding StoreId}"
+                                            BackgroundColor="#E67E22"
+                                            TextColor="White"
+                                            FontSize="14"
+                                            FontAttributes="Bold"
+                                            Padding="12,8"
+                                            CornerRadius="8"
+                                            Margin="0,8,0,0"/>
 
                                 </VerticalStackLayout>
                             </Border>

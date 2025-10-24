@@ -647,5 +647,56 @@ namespace QuanQuenBackOfficeMobile.Services
                 return new PreviewCrawlDataAgreementResponse { Success = false };
             }
         }
+
+        public async Task<AffiliateStatisticsResponse> GetReferralStatisticsAsync(string referralId, string token)
+        {
+            try
+            {
+                var baseUrl = _configuration["API:Affiliate:BaseUrl"];
+                var path = _configuration["API:Affiliate:GetReferralStatistics"];
+                var endpoint = $"{baseUrl}{path}?id={referralId}";
+
+                _logger.LogInformation("Calling GetReferralStatistics API: {Endpoint}", endpoint);
+                
+                // Add Authorization header
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+                var response = await _httpClient.GetAsync(endpoint);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                _logger.LogInformation("Get referral statistics response status: {Status}", response.StatusCode);
+                _logger.LogInformation("Get referral statistics response content: {Content}", responseContent);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = JsonSerializer.Deserialize<AffiliateStatisticsResponse>(responseContent, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+                    return result ?? new AffiliateStatisticsResponse { Success = false, Message = "Invalid response format" };
+                }
+                else
+                {
+                    _logger.LogError("Get referral statistics failed. Status: {Status}, Content: {Content}", response.StatusCode, responseContent);
+                    return new AffiliateStatisticsResponse { Success = false, Message = $"API call failed: {response.StatusCode}" };
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "Network error during get referral statistics");
+                return new AffiliateStatisticsResponse { Success = false, Message = "Lỗi kết nối mạng" };
+            }
+            catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException)
+            {
+                _logger.LogError(ex, "Timeout during get referral statistics");
+                return new AffiliateStatisticsResponse { Success = false, Message = "Hết thời gian chờ" };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error during get referral statistics");
+                return new AffiliateStatisticsResponse { Success = false, Message = "Có lỗi xảy ra" };
+            }
+        }
     }
 }
