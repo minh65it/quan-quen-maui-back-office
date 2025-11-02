@@ -13,5 +13,7 @@ namespace QuanQuenBackOfficeMobile.Services.Interfaces
         Task<StoreRecommendationsResponse> GetStoreRecommendationsByLocationAsync(StoreRecommendationsRequest request, string token);
         Task<PreviewCrawlDataAgreementResponse> PreviewCrawlDataAgreementAsync(PreviewCrawlDataAgreementRequest request, string token);
         Task<AffiliateStatisticsResponse> GetReferralStatisticsAsync(string referralId, string token);
+        Task<AssignStoreResponse> AssignStoreForReferralUserDataAsync(AssignStoreRequest request, string token);
+        Task<ReportStoreResponse> ReportStoreToQQAsync(ReportStoreRequest request, string token);
     }
 }

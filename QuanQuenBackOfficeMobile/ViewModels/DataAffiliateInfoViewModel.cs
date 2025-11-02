@@ -20,6 +20,10 @@ public class DataAffiliateInfoViewModel : BaseViewModel
 
         SubmitCommand = new Command(async () => await SubmitAsync());
         CancelCommand = new Command(async () => await CancelAsync());
+        BackCommand = new Command(async () => await BackAsync());
+        ShowReportPopupCommand = new Command(() => ShowReportPopup = true);
+        HideReportPopupCommand = new Command(() => ShowReportPopup = false);
+        SubmitReportCommand = new Command(async () => await SubmitReportAsync());
     }
 
     // Prefilled from navigation
@@ -48,8 +52,22 @@ public class DataAffiliateInfoViewModel : BaseViewModel
     private string _errorMessage = string.Empty;
     public string ErrorMessage { get => _errorMessage; set => SetProperty(ref _errorMessage, value); }
 
+    // Report popup properties
+    private bool _showReportPopup = false;
+    public bool ShowReportPopup { get => _showReportPopup; set => SetProperty(ref _showReportPopup, value); }
+
+    private string _reportDescription = string.Empty;
+    public string ReportDescription { get => _reportDescription; set => SetProperty(ref _reportDescription, value); }
+
+    private string _reportErrorMessage = string.Empty;
+    public string ReportErrorMessage { get => _reportErrorMessage; set => SetProperty(ref _reportErrorMessage, value); }
+
     public ICommand SubmitCommand { get; }
     public ICommand CancelCommand { get; }
+    public ICommand BackCommand { get; }
+    public ICommand ShowReportPopupCommand { get; }
+    public ICommand HideReportPopupCommand { get; }
+    public ICommand SubmitReportCommand { get; }
 
     public void InitializeFromParams(string? storeId, string? storeName, string? address)
     {
@@ -121,27 +139,11 @@ public class DataAffiliateInfoViewModel : BaseViewModel
             Preferences.Set("data_affiliate_signature_store_id", StoreId);
             Preferences.Set("data_affiliate_signature_store_address", Address);
 
-            // Điều hướng bằng Navigation.PushAsync để chắc chắn hiển thị
+            // Điều hướng bằng Navigation.PushAsync
             var page = _serviceProvider.GetRequiredService<DataAffiliatePreviewPage>();
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
-                try
-                {
-                    await App.Current.MainPage.Navigation.PushAsync(page);
-                }
-                catch (Exception exPush)
-                {
-                    _logger.LogWarning(exPush, "PushAsync failed, trying PushModalAsync");
-                    try
-                    {
-                        await App.Current.MainPage.Navigation.PushModalAsync(page);
-                    }
-                    catch (Exception exModal)
-                    {
-                        _logger.LogError(exModal, "Navigation to preview failed");
-                        await Application.Current.MainPage.DisplayAlert("Lỗi", "Không thể điều hướng sang trang xem trước.", "OK");
-                    }
-                }
+                await App.Current.MainPage.Navigation.PushAsync(page);
             });
         }
         catch (Exception ex)
@@ -170,6 +172,100 @@ public class DataAffiliateInfoViewModel : BaseViewModel
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error cancelling info page");
+        }
+    }
+
+    private async Task BackAsync()
+    {
+        try
+        {
+            await MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                if (Shell.Current != null)
+                {
+                    await Shell.Current.GoToAsync("..");
+                }
+                else if (App.Current.MainPage.Navigation != null)
+                {
+                    await App.Current.MainPage.Navigation.PopAsync();
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error navigating back from info page");
+        }
+    }
+
+    private async Task SubmitReportAsync()
+    {
+        if (IsBusy) return;
+        try
+        {
+            IsBusy = true;
+            ReportErrorMessage = string.Empty;
+
+            if (string.IsNullOrWhiteSpace(ReportDescription))
+            {
+                ReportErrorMessage = "Vui lòng nhập nội dung báo cáo";
+                return;
+            }
+
+            var token = await SecureStorage.GetAsync("affiliate_token");
+            if (string.IsNullOrEmpty(token))
+            {
+                ReportErrorMessage = "Phiên đăng nhập đã hết hạn";
+                return;
+            }
+
+            // Lấy referralUserId từ SecureStorage
+            var referralUserId = await SecureStorage.GetAsync("affiliate_referral_id");
+            if (string.IsNullOrEmpty(referralUserId))
+            {
+                referralUserId = Preferences.Get("affiliate_referral_id", "");
+            }
+
+            if (string.IsNullOrEmpty(referralUserId))
+            {
+                ReportErrorMessage = "Không tìm thấy thông tin người dùng";
+                return;
+            }
+
+            var request = new ReportStoreRequest
+            {
+                UserId = referralUserId,
+                StoreId = StoreId,
+                ObjectId = StoreId,
+                ReportType = "2", // Type 2 for data affiliate report
+                Title = string.Empty,
+                Description = ReportDescription,
+                Files = null,
+                CreateBy = referralUserId,
+                UrlContent = string.Empty
+            };
+
+            _logger.LogInformation("Submitting report for store: {StoreId}", StoreId);
+            var response = await _affiliateService.ReportStoreToQQAsync(request, token);
+
+            if (response?.Success == true)
+            {
+                await Application.Current.MainPage.DisplayAlert("Thành công", "Báo cáo đã được gửi thành công", "OK");
+                ShowReportPopup = false;
+                ReportDescription = string.Empty;
+            }
+            else
+            {
+                ReportErrorMessage = response?.Message ?? "Không thể gửi báo cáo. Vui lòng thử lại.";
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error submitting report");
+            ReportErrorMessage = "Có lỗi xảy ra khi gửi báo cáo";
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
 }

@@ -10,7 +10,6 @@
     </ContentPage.Resources>
 
     <Grid RowDefinitions="Auto, * , Auto">
-        <!-- Header (optional empty) -->
         <Grid Grid.Row="0" />
 
         <WebView Grid.Row="1" Source="{Binding PdfHtmlSource}" IsVisible="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}" />

@@ -166,7 +166,7 @@ public partial class DataAffiliateSignatureViewModel : BaseViewModel
 
     #region Methods
 
-    public async Task InitializeAsync(string pdfBase64, string storeName, string affiliateName, string affiliatePhone, string representativeName, string storePhone)
+    public async Task InitializeAsync(string pdfBase64, string storeName, string affiliateName, string affiliatePhone, string representativeName, string storePhone, string storeId, string storeAddress)
     {
         try
         {
@@ -176,13 +176,11 @@ public partial class DataAffiliateSignatureViewModel : BaseViewModel
             AffiliatePhoneNumber = affiliatePhone;
             RepresentativeName = representativeName;
             StorePhoneNumber = storePhone;
+            StoreId = storeId;
+            StoreAddress = storeAddress;
             ContractDate = DateTime.Now.ToString("dd/MM/yyyy");
 
-            // TODO: Get actual store data from parameters
-            StoreId = "90888e5c-89ab-49cf-9525-bc554c06d11b"; // Placeholder
-            StoreAddress = "Địa chỉ nhà hàng"; // Placeholder
-
-            _logger.LogInformation("DataAffiliateSignatureViewModel initialized for store: {StoreName}", storeName);
+            _logger.LogInformation("DataAffiliateSignatureViewModel initialized for store: {StoreName}, StoreId: {StoreId}", storeName, storeId);
         }
         catch (Exception ex)
         {
@@ -330,23 +328,7 @@ public partial class DataAffiliateSignatureViewModel : BaseViewModel
             var page = _serviceProvider.GetRequiredService<DataAffiliateFinalPage>();
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
-                try
-                {
-                    await App.Current.MainPage.Navigation.PushAsync(page);
-                }
-                catch (Exception exPush)
-                {
-                    _logger.LogWarning(exPush, "PushAsync to final failed, trying PushModalAsync");
-                    try
-                    {
-                        await App.Current.MainPage.Navigation.PushModalAsync(page);
-                    }
-                    catch (Exception exModal)
-                    {
-                        _logger.LogError(exModal, "Navigation to final failed");
-                        await Application.Current.MainPage.DisplayAlert("Lỗi", "Không thể điều hướng sang trang biên bản đã ký.", "OK");
-                    }
-                }
+                await App.Current.MainPage.Navigation.PushAsync(page);
             });
 
             _logger.LogInformation("Signature process completed successfully for store: {StoreName}", StoreName);

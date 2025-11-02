@@ -295,4 +295,47 @@ namespace QuanQuenBackOfficeMobile.Models
         public DateTime? LastStoreReferralDate { get; set; }
         public DateTime? LastTransactionDate { get; set; }
     }
+
+    // Assign Store Models
+    public class AssignStoreRequest
+    {
+        public string? ReferralUserId { get; set; }
+        public string? StoreId { get; set; }
+        public string? AssignedDate { get; set; }
+        public string? AssignedBy { get; set; }
+    }
+
+    public class AssignStoreResponse
+    {
+        public string? Message { get; set; }
+        public bool Success { get; set; }
+        public object? Data { get; set; }
+        public string? Caption { get; set; }
+        public object? ValidateData { get; set; }
+        public object? NoSMS { get; set; }
+    }
+
+    // Report Store Models
+    public class ReportStoreRequest
+    {
+        public string? UserId { get; set; }
+        public string? StoreId { get; set; }
+        public string? ObjectId { get; set; }
+        public string? ReportType { get; set; }
+        public string? Title { get; set; }
+        public string? Description { get; set; }
+        public byte[]? Files { get; set; }
+        public string? CreateBy { get; set; }
+        public string? UrlContent { get; set; }
+    }
+
+    public class ReportStoreResponse
+    {
+        public string? Message { get; set; }
+        public bool Success { get; set; }
+        public object? Data { get; set; }
+        public string? Caption { get; set; }
+        public object? ValidateData { get; set; }
+        public object? NoSMS { get; set; }
+    }
 }

@@ -296,27 +296,11 @@ public class DataAffiliatePreviewViewModel : BaseViewModel
             Preferences.Set("data_affiliate_preview_pdf_base64_for_sign", PdfBase64);
             Preferences.Set("data_affiliate_preview_store_name_for_sign", StoreName);
 
-            // Resolve page và điều hướng bằng Navigation
+            // Điều hướng bằng Navigation
             var page = _serviceProvider.GetRequiredService<DataAffiliateSignaturePage>();
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
-                try
-                {
-                    await App.Current.MainPage.Navigation.PushAsync(page);
-                }
-                catch (Exception exPush)
-                {
-                    _logger.LogWarning(exPush, "PushAsync to signature failed, trying PushModalAsync");
-                    try
-                    {
-                        await App.Current.MainPage.Navigation.PushModalAsync(page);
-                    }
-                    catch (Exception exModal)
-                    {
-                        _logger.LogError(exModal, "Navigation to signature failed");
-                        await Application.Current.MainPage.DisplayAlert("Lỗi", "Không thể điều hướng sang trang ký hợp đồng.", "OK");
-                    }
-                }
+                await App.Current.MainPage.Navigation.PushAsync(page);
             });
 
             _logger.LogInformation("Successfully navigated to signature page for store: {StoreName}", StoreName);

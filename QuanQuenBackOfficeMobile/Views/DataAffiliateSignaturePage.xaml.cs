@@ -33,8 +33,10 @@ public partial class DataAffiliateSignaturePage : ContentPage
             var affiliatePhone = Preferences.Get("data_affiliate_signature_affiliate_phone", string.Empty);
             var representativeName = Preferences.Get("data_affiliate_signature_representative_name", string.Empty);
             var storePhone = Preferences.Get("data_affiliate_signature_store_phone", string.Empty);
+            var storeId = Preferences.Get("data_affiliate_signature_store_id", string.Empty);
+            var storeAddress = Preferences.Get("data_affiliate_signature_store_address", string.Empty);
 
-            await _viewModel.InitializeAsync(pdfBase64, storeName, affiliateName, affiliatePhone, representativeName, storePhone);
+            await _viewModel.InitializeAsync(pdfBase64, storeName, affiliateName, affiliatePhone, representativeName, storePhone, storeId, storeAddress);
 
             // Xóa để tránh dữ liệu cũ
             Preferences.Remove("data_affiliate_preview_pdf_base64_for_sign");

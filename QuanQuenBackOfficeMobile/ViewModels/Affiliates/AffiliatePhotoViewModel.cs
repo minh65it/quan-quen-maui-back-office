@@ -27,6 +27,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Affiliates
     public partial class AffiliatePhotoViewModel : ObservableObject
     {
         private readonly IStoreMediaService _storeMediaService;
+        private readonly IStoreService _storeService;
         
         // Khu 1: Ảnh Nhà hàng (tối đa 3)
         public ObservableCollection<MyImageModel> RestaurantImages { get; } = new();
@@ -53,9 +54,10 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Affiliates
 
         public IRelayCommand<ImageSource> RemoveImageCommand { get; }
 
-        public AffiliatePhotoViewModel(IStoreMediaService storeMediaService)
+        public AffiliatePhotoViewModel(IStoreMediaService storeMediaService, IStoreService storeService)
         {
             _storeMediaService = storeMediaService;
+            _storeService = storeService;
             PickImageCommand = new AsyncRelayCommand(DeprecatedPickImagesAsync, () => CanAddMoreImages);
             CaptureImageCommand = new AsyncRelayCommand(DeprecatedCaptureImageAsync, () => CanAddMoreImages);
             RemoveImageCommand = new RelayCommand<ImageSource>(RemoveImage);
@@ -255,7 +257,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Affiliates
                 var successCount = 0;
                 var totalTasks = 0;
 
-                // 1. Lưu ảnh nhà hàng
+                // 1. Lưu ảnh nhà hàng (vẫn qua StoreMediaService)
                 if (RestaurantImages.Count > 0)
                 {
                     totalTasks++;
@@ -279,59 +281,47 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Affiliates
                     }
                 }
 
-                // 2. Lưu CCCD mặt trước
+                // 2, 3, 4. Lưu CCCD và menu qua API UpdateStore
+                byte[]? frontIdentityBytes = null;
+                byte[]? backIdentityBytes = null;
+                byte[]? menuBytes = null;
+
+                // Lấy CCCD mặt trước
                 if (IdentityFront?.Images != null)
                 {
                     totalTasks++;
-                    var identityCategoryId = await _storeMediaService.GetThumbnailCategoryMediaIdAsync("Hồ sơ nhà hàng");
-                    if (!string.IsNullOrEmpty(identityCategoryId))
-                    {
-                        var identityBytes = await ImageSourceToBytesAsync(IdentityFront.Images);
-                        if (identityBytes != null)
-                        {
-                            var result = await _storeMediaService.UploadMediasAsync(storeId, identityCategoryId, createdBy, new List<byte[]> { identityBytes }, true, false);
-                            if (result.IsSuccess) successCount++;
-                        }
-                    }
+                    frontIdentityBytes = await ImageSourceToBytesAsync(IdentityFront.Images);
                 }
 
-                // 3. Lưu CCCD mặt sau
+                // Lấy CCCD mặt sau
                 if (IdentityBack?.Images != null)
                 {
                     totalTasks++;
-                    var identityCategoryId = await _storeMediaService.GetThumbnailCategoryMediaIdAsync("Hồ sơ nhà hàng");
-                    if (!string.IsNullOrEmpty(identityCategoryId))
-                    {
-                        var identityBytes = await ImageSourceToBytesAsync(IdentityBack.Images);
-                        if (identityBytes != null)
-                        {
-                            var result = await _storeMediaService.UploadMediasAsync(storeId, identityCategoryId, createdBy, new List<byte[]> { identityBytes }, true, false);
-                            if (result.IsSuccess) successCount++;
-                        }
-                    }
+                    backIdentityBytes = await ImageSourceToBytesAsync(IdentityBack.Images);
                 }
 
-                // 4. Lưu ảnh menu
-                if (MenuImages.Count > 0)
+                // Lấy ảnh menu (chỉ lấy ảnh đầu tiên)
+                if (MenuImages.Count > 0 && MenuImages[0]?.Images != null)
                 {
                     totalTasks++;
-                    var menuCategoryId = await _storeMediaService.GetThumbnailCategoryMediaIdAsync("Ảnh nhà hàng");
-                    if (!string.IsNullOrEmpty(menuCategoryId))
+                    menuBytes = await ImageSourceToBytesAsync(MenuImages[0].Images);
+                }
+
+                // Gửi CCCD và menu qua API UpdateStore
+                if (frontIdentityBytes != null || backIdentityBytes != null || menuBytes != null)
+                {
+                    var updateResult = await _storeService.UpdateStoreWithImagesAsync(
+                        storeId,
+                        frontIdentityBytes,
+                        backIdentityBytes,
+                        menuBytes);
+                    
+                    if (updateResult.IsSuccess)
                     {
-                        var menuBytes = new List<byte[]>();
-                        foreach (var img in MenuImages)
-                        {
-                            if (img?.Images != null)
-                            {
-                                var bytes = await ImageSourceToBytesAsync(img.Images);
-                                if (bytes != null) menuBytes.Add(bytes);
-                            }
-                        }
-                        if (menuBytes.Count > 0)
-                        {
-                            var result = await _storeMediaService.UploadMediasAsync(storeId, menuCategoryId, createdBy, menuBytes, false, true);
-                            if (result.IsSuccess) successCount++;
-                        }
+                        // Đếm số lượng ảnh đã gửi thành công
+                        if (frontIdentityBytes != null) successCount++;
+                        if (backIdentityBytes != null) successCount++;
+                        if (menuBytes != null) successCount++;
                     }
                 }
 
