@@ -148,6 +148,10 @@ namespace QuanQuenBackOfficeMobile.Models
         public string ProvinceId { get; set; }
         public string BusinessType { get; set; }
         public string CreatedBy { get; set; } = string.Empty;
+        // Optional local file paths for multipart fields
+        public string? FileFrontPicIdentityCardPath { get; set; }
+        public string? FileBackPicIdentityCardPath { get; set; }
+        public string? FileImageBusinessRegistrationPath { get; set; }
     }
 
     public class ApiResponse
@@ -192,6 +196,10 @@ namespace QuanQuenBackOfficeMobile.Models
         public static string UserToken { get; set; } = string.Empty; // Token từ RegisterUser endpoint
         public static List<FileResult> LicenseImageFiles { get; set; } = new();
         public static List<string> LicenseImagePaths { get; set; } = new();
+        // New: single-image paths for API multipart fields
+        public static string FileFrontPicIdentityCardPath { get; set; } = string.Empty;
+        public static string FileBackPicIdentityCardPath { get; set; } = string.Empty;
+        public static string FileImageBusinessRegistrationPath { get; set; } = string.Empty;
     }
 
     public class MyImageModel

@@ -107,6 +107,36 @@ namespace QuanQuenBackOfficeMobile.Services
                 
                 System.Diagnostics.Debug.WriteLine($"[StoreService] CreatedBy gửi lên: '{request.CreatedBy}'");
 
+                // Đính kèm 3 file ảnh đơn: CMND/CCCD mặt trước, mặt sau, và Giấy phép ĐKKD
+                // Đính kèm 3 file ảnh đơn dựa trên đường dẫn từ request
+                void AddFileIfExists(string? path, string fieldName)
+                {
+                    if (string.IsNullOrWhiteSpace(path)) return;
+                    if (!System.IO.File.Exists(path))
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[StoreService] File not found for {fieldName}: {path}");
+                        return;
+                    }
+                    var bytes = System.IO.File.ReadAllBytes(path);
+                    var byteContent = new ByteArrayContent(bytes);
+                    var ext = System.IO.Path.GetExtension(path).ToLowerInvariant();
+                    var mediaType = ext switch
+                    {
+                        ".png" => "image/png",
+                        ".jpg" => "image/jpeg",
+                        ".jpeg" => "image/jpeg",
+                        ".webp" => "image/webp",
+                        _ => "application/octet-stream"
+                    };
+                    byteContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(mediaType);
+                    form.Add(byteContent, fieldName, System.IO.Path.GetFileName(path));
+                    System.Diagnostics.Debug.WriteLine($"[StoreService] Attached {fieldName}: {path} ({bytes.Length} bytes, {mediaType})");
+                }
+
+                AddFileIfExists(request.FileFrontPicIdentityCardPath, "FileFrontPicIdentityCard");
+                AddFileIfExists(request.FileBackPicIdentityCardPath, "FileBackPicIdentityCard");
+                AddFileIfExists(request.FileImageBusinessRegistrationPath, "FileImageBusinessRegistration");
+
                 // Luôn ưu tiên token được truyền vào (userToken từ RegisterUser)
                 var authToken = token;
                 if (string.IsNullOrEmpty(authToken))
