@@ -104,7 +104,8 @@ namespace QuanQuenBackOfficeMobile.Services
                 form.Add(new StringContent(request.ProvinceId ?? ""), "ProvinceId");
                 form.Add(new StringContent(request.BusinessType ?? ""), "BusinessType");
                 form.Add(new StringContent(request.CreatedBy ?? ""), "CreatedBy");
-                
+                form.Add(new StringContent((request.CategoryMaster) ?? ""), "StoreTypeMasterId");
+
                 System.Diagnostics.Debug.WriteLine($"[StoreService] CreatedBy gửi lên: '{request.CreatedBy}'");
 
                 // Luôn ưu tiên token được truyền vào (userToken từ RegisterUser)

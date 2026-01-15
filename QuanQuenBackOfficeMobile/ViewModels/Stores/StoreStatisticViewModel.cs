@@ -34,6 +34,9 @@ public partial class StoreStatisticViewModel : ObservableObject
     private string selectedStoreTypeId;
 
     [ObservableProperty]
+    private string selectedCategoryMasterId;
+
+    [ObservableProperty]
     private DateTime fromDate;
 
     [ObservableProperty]
@@ -41,6 +44,7 @@ public partial class StoreStatisticViewModel : ObservableObject
 
     public ObservableCollection<CityItemModel> Cities { get; } = new();
     public ObservableCollection<StoreTypeItemModel> StoreTypes { get; } = new();
+    public ObservableCollection<CategoryMasterItemModel> CategoryMasters { get; } = new();
     public ObservableCollection<OrderItemModel> Orders { get; } = new();
     public ObservableCollection<OrderItemModel> UsersInOrders { get; } = new();
     public ObservableCollection<LoyalCustomerItemModel> LoyalCustomers { get; } = new();
@@ -57,6 +61,9 @@ public partial class StoreStatisticViewModel : ObservableObject
     [ObservableProperty]
     private StoreTypeItemModel selectedStoreType;
 
+    [ObservableProperty]
+    private CategoryMasterItemModel selectedCategoryMaster;
+
     partial void OnSelectedCityChanged(CityItemModel value)
     {
         SelectedCityId = value?.id;
@@ -65,6 +72,11 @@ public partial class StoreStatisticViewModel : ObservableObject
     partial void OnSelectedStoreTypeChanged(StoreTypeItemModel value)
     {
         SelectedStoreTypeId = value?.id;
+    }
+
+    partial void OnSelectedCategoryMasterChanged(CategoryMasterItemModel value)
+    {
+        SelectedCategoryMasterId = value?.id;
     }
 
     public StoreStatisticViewModel(IStoreStatisticService storeStatisticService, GeographicApiService geographicApiService, IStoreService storeService, string storeName, string storeId)

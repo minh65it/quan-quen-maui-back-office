@@ -16,6 +16,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels
     {
         private readonly IAffiliateService _affiliateService;
         private readonly GeographicApiService _geoService;
+        private readonly CatergoryMasterService _catergoryMasterService;
 
         public ObservableCollection<ProvinceDto> ProvinceList { get; } = new();
         public ObservableCollection<DistrictDto> DistrictList { get; } = new();
