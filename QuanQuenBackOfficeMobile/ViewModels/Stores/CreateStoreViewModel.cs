@@ -325,7 +325,7 @@ public partial class CreateStoreViewModel : ObservableObject
 
     private void ValidateCategoryMaster()
     {
-        if (SelectCategotyMaster != null)
+        if (SelectCategotyMaster == null)
         {
             CategoryMasterError = "Vui lòng chọn thể loại cửa hàng";
         }

@@ -140,6 +140,21 @@
                    TextColor="Red"
                    IsVisible="{Binding EmailError, Converter={StaticResource StringToBoolConverter}}"
                    Margin="0,2,0,0"/>
+            <!-- Thể loại nhà hàng -->
+            <Label Text="Thể loại cửa hàng *"
+               FontSize="14"
+               TextColor="Black" />
+                        <controls:CustomDropdownPicker ItemsSource="{Binding CategoryMasterList}" Title="Chọn thể loại cửa hàng"
+                    SelectedItem="{Binding SelectCategotyMaster}"
+                    ItemDisplayBinding="{Binding Name}"
+                    HeightRequest="44"
+                    FontSize="14"
+                    BackgroundColor="White" />
+                        <Label Text="{Binding CategoryMasterError}"
+               FontSize="12"
+               TextColor="Red"
+               IsVisible="{Binding CategoryMasterError, Converter={StaticResource StringToBoolConverter}}"
+               Margin="0,2,0,0"/>
 
             <!-- Loại hình kinh doanh -->
             <Label Text="Loại hình kinh doanh *"

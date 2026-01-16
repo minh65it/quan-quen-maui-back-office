@@ -23,6 +23,8 @@ namespace QuanQuenBackOfficeMobile.ViewModels
         public ObservableCollection<WardDto> WardList { get; } = new();
         public ObservableCollection<string> BusinessTypeList { get; } = new();
 
+        public ObservableCollection<CategoryMasterModel> CategoryMasterList { get; } = new();
+
         [ObservableProperty]
         private ProvinceDto selectedProvince;
         [ObservableProperty]
@@ -31,6 +33,8 @@ namespace QuanQuenBackOfficeMobile.ViewModels
         private WardDto selectedWard;
         [ObservableProperty]
         private string selectedBusinessType;
+        [ObservableProperty]
+        private CategoryMasterModel selectCategotyMaster;
 
         [ObservableProperty]
         private string storeName;
@@ -55,6 +59,8 @@ namespace QuanQuenBackOfficeMobile.ViewModels
         private string addressError = "";
         [ObservableProperty]
         private string businessTypeError = "";
+        [ObservableProperty]
+        private string categoryMasterError = "";
 
         [ObservableProperty]
         private bool isBusy;
@@ -70,12 +76,15 @@ namespace QuanQuenBackOfficeMobile.ViewModels
 
         public ICommand CreateStoreCommand { get; }
 
-        public AffiliateCreateStoreViewModel(IAffiliateService affiliateService, GeographicApiService geoService)
+        public AffiliateCreateStoreViewModel(IAffiliateService affiliateService,
+            GeographicApiService geoService, CatergoryMasterService catergoryMasterService)
         {
             _affiliateService = affiliateService;
             _geoService = geoService;
-            
+            _catergoryMasterService = catergoryMasterService;
+
             LoadProvincesAsync();
+            LoadCategoryMaster();
             BusinessTypeList.Add("Tư Nhân");
             BusinessTypeList.Add("Công Ty");
             BusinessTypeList.Add("Hộ Kinh Doanh");
@@ -91,6 +100,15 @@ namespace QuanQuenBackOfficeMobile.ViewModels
         partial void OnSelectedDistrictChanged(DistrictDto value)
         {
             LoadWardsAsync();
+        }
+
+        private async void LoadCategoryMaster()
+        {
+            var categories = await _catergoryMasterService.GetCategoryMastersAsync();
+            foreach (var c in categories)
+            {
+                CategoryMasterList.Add(c);
+            }
         }
 
         private async Task LoadProvincesAsync()
@@ -197,6 +215,11 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                     BusinessTypeError = "Vui lòng chọn loại hình kinh doanh";
                     hasError = true;
                 }
+                if (SelectCategotyMaster == null)
+                {
+                    CategoryMasterError = "Vui lòng chọn thể loại cửa hàng";
+                    hasError = true;
+                }
 
                 if (hasError)
                 {
@@ -228,7 +251,8 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                 StoreRegistrationData.DistrictId = SelectedDistrict?.territoryId ?? "";
                 StoreRegistrationData.WardId = SelectedWard?.stateId ?? "";
                 StoreRegistrationData.BusinessType = SelectedBusinessType;
-                
+                StoreRegistrationData.CatergoryMaster = SelectCategotyMaster?.Id ?? "";
+
                 // Get referrer ID from affiliate login data
                 try
                 {
