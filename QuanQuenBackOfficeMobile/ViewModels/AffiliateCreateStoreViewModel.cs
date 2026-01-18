@@ -237,6 +237,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                 AffiliateStoreData.DistrictId = SelectedDistrict?.territoryId ?? "";
                 AffiliateStoreData.WardId = SelectedWard?.stateId ?? "";
                 AffiliateStoreData.SelectedBusinessType = SelectedBusinessType;
+                AffiliateStoreData.StoreTypeMasterId = SelectCategotyMaster?.Id ?? "";
 
                 // Cũng lưu vào StoreRegistrationData để dùng cho agreement (giống user thường)
                 StoreRegistrationData.StoreName = StoreName;

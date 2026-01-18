@@ -362,7 +362,7 @@ public partial class CreateStoreViewModel : ObservableObject
                string.IsNullOrWhiteSpace(EmailError) &&
                string.IsNullOrWhiteSpace(AddressError) &&
                string.IsNullOrWhiteSpace(BusinessTypeError) &&
-               string.IsNullOrWhiteSpace(CategoryMasterError) &&
+               //string.IsNullOrWhiteSpace(CategoryMasterError) &&
                ValidateLocation();
     }
 

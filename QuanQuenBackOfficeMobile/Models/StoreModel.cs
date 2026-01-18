@@ -249,4 +249,4 @@ namespace QuanQuenBackOfficeMobile.Models
         [JsonPropertyName("result")]
         public List<CategoryMediaItem> Result { get; set; } = new();
     }
-} 
+}

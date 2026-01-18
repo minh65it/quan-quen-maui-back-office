@@ -88,6 +88,9 @@ namespace QuanQuenBackOfficeMobile.Models
         public string ReferralId { get; set; }
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
+
+        // Added missing field
+        public string StoreTypeMasterId { get; set; }
     }
 
     public class AffiliateCreateStoreResponse
@@ -125,6 +128,9 @@ namespace QuanQuenBackOfficeMobile.Models
         public static string ReferrerId { get; set; }
         public static string RegisterToken { get; set; }
         public static string StoreId { get; set; } = string.Empty;
+
+        // optional: keep StoreTypeMasterId in shared static data if needed by UI flow
+        public static string StoreTypeMasterId { get; set; }
     }
 
     public class AffiliateStoreListResponse
@@ -188,6 +194,9 @@ namespace QuanQuenBackOfficeMobile.Models
         public DateTime? CreatedDate { get; set; }
         public string CreatedBy { get; set; }
         public bool? IsDeleted { get; set; }
+
+        // Added missing field
+        public string StoreTypeMasterId { get; set; }
     }
 
     // Store Recommendations Models

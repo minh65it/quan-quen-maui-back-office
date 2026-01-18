@@ -211,7 +211,8 @@ namespace QuanQuenBackOfficeMobile.Services
                     RepresentativeName = request.RepresentativeName,
                     ProvinceId = request.ProvinceId ?? "",
                     BusinessType = request.BusinessType,
-                    CreatedBy = request.CreatedBy
+                    CreatedBy = request.CreatedBy,
+                    CategoryMaster = request.StoreTypeMasterId
                 };
 
                 // Use MultipartFormDataContent like user thường
@@ -231,7 +232,8 @@ namespace QuanQuenBackOfficeMobile.Services
                 form.Add(new StringContent(storeRequest.CreatedBy ?? ""), "CreatedBy");
                 form.Add(new StringContent(request.ReferralId ?? ""), "ReferralId");
                 form.Add(new StringContent(request.Latitude?.ToString() ?? ""), "Latitude");
-                form.Add(new StringContent(request.Longitude?.ToString() ?? ""), "Longitude");                
+                form.Add(new StringContent(request.Longitude?.ToString() ?? ""), "Longitude");     
+                form.Add(new StringContent(storeRequest.CategoryMaster?.ToString() ?? ""), "StoreTypeMasterId");
                 _logger.LogInformation($"Affiliate create store Request data:");
                 _logger.LogInformation($"  Token: {token?.Substring(0, Math.Min(20, token?.Length ?? 0))}...");
                 _logger.LogInformation($"  CreatedBy: '{request.CreatedBy}' (length: {request.CreatedBy?.Length ?? 0})");
