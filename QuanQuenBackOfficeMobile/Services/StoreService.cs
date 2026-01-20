@@ -107,6 +107,36 @@ namespace QuanQuenBackOfficeMobile.Services
                 
                 System.Diagnostics.Debug.WriteLine($"[StoreService] CreatedBy gửi lên: '{request.CreatedBy}'");
 
+                // Đính kèm 3 file ảnh đơn: CMND/CCCD mặt trước, mặt sau, và Giấy phép ĐKKD
+                // Đính kèm 3 file ảnh đơn dựa trên đường dẫn từ request
+                void AddFileIfExists(string? path, string fieldName)
+                {
+                    if (string.IsNullOrWhiteSpace(path)) return;
+                    if (!System.IO.File.Exists(path))
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[StoreService] File not found for {fieldName}: {path}");
+                        return;
+                    }
+                    var bytes = System.IO.File.ReadAllBytes(path);
+                    var byteContent = new ByteArrayContent(bytes);
+                    var ext = System.IO.Path.GetExtension(path).ToLowerInvariant();
+                    var mediaType = ext switch
+                    {
+                        ".png" => "image/png",
+                        ".jpg" => "image/jpeg",
+                        ".jpeg" => "image/jpeg",
+                        ".webp" => "image/webp",
+                        _ => "application/octet-stream"
+                    };
+                    byteContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(mediaType);
+                    form.Add(byteContent, fieldName, System.IO.Path.GetFileName(path));
+                    System.Diagnostics.Debug.WriteLine($"[StoreService] Attached {fieldName}: {path} ({bytes.Length} bytes, {mediaType})");
+                }
+
+                AddFileIfExists(request.FileFrontPicIdentityCardPath, "FileFrontPicIdentityCard");
+                AddFileIfExists(request.FileBackPicIdentityCardPath, "FileBackPicIdentityCard");
+                AddFileIfExists(request.FileImageBusinessRegistrationPath, "FileImageBusinessRegistration");
+
                 // Luôn ưu tiên token được truyền vào (userToken từ RegisterUser)
                 var authToken = token;
                 if (string.IsNullOrEmpty(authToken))
@@ -585,6 +615,93 @@ namespace QuanQuenBackOfficeMobile.Services
                 System.Diagnostics.Debug.WriteLine($"[StoreService] UpdateStoreLocationAsync error: {ex.Message}");
                 System.Diagnostics.Debug.WriteLine($"[StoreService] Exception type: {ex.GetType().Name}");
                 return false;
+            }
+        }
+
+        public async Task<ApiResponse> UpdateStoreWithImagesAsync(string storeId, byte[]? frontPicIdentityCard = null, byte[]? backPicIdentityCard = null, byte[]? imageMenu = null)
+        {
+            try
+            {
+                // Ưu tiên dùng auth_token, nếu không có thì dùng affiliate_token (cho role affiliate)
+                var token = await SecureStorage.GetAsync("auth_token");
+                if (string.IsNullOrEmpty(token))
+                {
+                    token = await SecureStorage.GetAsync("affiliate_token");
+                    System.Diagnostics.Debug.WriteLine("[StoreService] UpdateStoreWithImagesAsync - Using affiliate_token");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("[StoreService] UpdateStoreWithImagesAsync - Using auth_token");
+                }
+                
+                if (string.IsNullOrEmpty(token))
+                {
+                    System.Diagnostics.Debug.WriteLine("[StoreService] UpdateStoreWithImagesAsync - No authentication token found");
+                    return new ApiResponse { IsSuccess = false, Message = "No authentication token found" };
+                }
+
+                var baseUrl = _configuration["API:Store:BaseUrl"];
+                var path = _configuration["API:Store:UpdateStore"];
+                var url = $"{baseUrl}{path}";
+
+                System.Diagnostics.Debug.WriteLine($"[StoreService] UpdateStoreWithImagesAsync - API URL: {url}");
+                System.Diagnostics.Debug.WriteLine($"[StoreService] UpdateStoreWithImagesAsync - StoreId: {storeId}");
+
+                using var form = new MultipartFormDataContent();
+                form.Add(new StringContent(storeId), "StoreId");
+
+                // Thêm CCCD mặt trước
+                if (frontPicIdentityCard != null && frontPicIdentityCard.Length > 0)
+                {
+                    var frontContent = new ByteArrayContent(frontPicIdentityCard);
+                    frontContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
+                    form.Add(frontContent, "FileFrontPicIdentityCard", "front_identity.png");
+                    System.Diagnostics.Debug.WriteLine($"[StoreService] UpdateStoreWithImagesAsync - Added FileFrontPicIdentityCard: {frontPicIdentityCard.Length} bytes");
+                }
+
+                // Thêm CCCD mặt sau
+                if (backPicIdentityCard != null && backPicIdentityCard.Length > 0)
+                {
+                    var backContent = new ByteArrayContent(backPicIdentityCard);
+                    backContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
+                    form.Add(backContent, "FileBackPicIdentityCard", "back_identity.png");
+                    System.Diagnostics.Debug.WriteLine($"[StoreService] UpdateStoreWithImagesAsync - Added FileBackPicIdentityCard: {backPicIdentityCard.Length} bytes");
+                }
+
+                // Thêm ảnh menu
+                if (imageMenu != null && imageMenu.Length > 0)
+                {
+                    var menuContent = new ByteArrayContent(imageMenu);
+                    menuContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
+                    form.Add(menuContent, "FileImageMenu", "menu.png");
+                    System.Diagnostics.Debug.WriteLine($"[StoreService] UpdateStoreWithImagesAsync - Added FileImageMenu: {imageMenu.Length} bytes");
+                }
+
+                var request = new HttpRequestMessage(HttpMethod.Put, url)
+                {
+                    Content = form
+                };
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.SendAsync(request);
+                var content = await response.Content.ReadAsStringAsync();
+                System.Diagnostics.Debug.WriteLine($"[StoreService] UpdateStoreWithImagesAsync - Response status: {response.StatusCode}");
+                System.Diagnostics.Debug.WriteLine($"[StoreService] UpdateStoreWithImagesAsync - Response content: {content}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = JsonSerializer.Deserialize<ApiResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    return result ?? new ApiResponse { IsSuccess = true, Message = "Update store images successful" };
+                }
+                else
+                {
+                    return new ApiResponse { IsSuccess = false, Message = $"Update store images failed: {response.StatusCode}" };
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[StoreService] UpdateStoreWithImagesAsync error: {ex.Message}");
+                return new ApiResponse { IsSuccess = false, Message = $"Update store images failed: {ex.Message}" };
             }
         }
     }

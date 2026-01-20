@@ -235,7 +235,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
             if (filterItem == null || string.IsNullOrEmpty(filterItem.FilterFoodId))
                 return;
 
-            // Navigate đến trang CreateFoodPage
+            // Navigate đến trang StoreCreateFood
             var navigationParameter = new Dictionary<string, object>
             {
                 { "storeId", StoreId },
@@ -243,7 +243,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels.Stores
                 { "filterName", filterItem.Name ?? "Bộ lọc" }
             };
 
-            await Shell.Current.GoToAsync("CreateFoodPage", navigationParameter);
+            await Shell.Current.GoToAsync("StoreCreateFood", navigationParameter);
         }
     }
 }

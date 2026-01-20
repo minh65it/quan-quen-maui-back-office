@@ -647,5 +647,218 @@ namespace QuanQuenBackOfficeMobile.Services
                 return new PreviewCrawlDataAgreementResponse { Success = false };
             }
         }
+
+        public async Task<AffiliateStatisticsResponse> GetReferralStatisticsAsync(string referralId, string token)
+        {
+            try
+            {
+                var baseUrl = _configuration["API:Affiliate:BaseUrl"];
+                var path = _configuration["API:Affiliate:GetReferralStatistics"];
+                var endpoint = $"{baseUrl}{path}?id={referralId}";
+
+                _logger.LogInformation("Calling GetReferralStatistics API: {Endpoint}", endpoint);
+                
+                // Add Authorization header
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+                var response = await _httpClient.GetAsync(endpoint);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                _logger.LogInformation("Get referral statistics response status: {Status}", response.StatusCode);
+                _logger.LogInformation("Get referral statistics response content: {Content}", responseContent);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = JsonSerializer.Deserialize<AffiliateStatisticsResponse>(responseContent, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+                    return result ?? new AffiliateStatisticsResponse { Success = false, Message = "Invalid response format" };
+                }
+                else
+                {
+                    _logger.LogError("Get referral statistics failed. Status: {Status}, Content: {Content}", response.StatusCode, responseContent);
+                    return new AffiliateStatisticsResponse { Success = false, Message = $"API call failed: {response.StatusCode}" };
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "Network error during get referral statistics");
+                return new AffiliateStatisticsResponse { Success = false, Message = "Lỗi kết nối mạng" };
+            }
+            catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException)
+            {
+                _logger.LogError(ex, "Timeout during get referral statistics");
+                return new AffiliateStatisticsResponse { Success = false, Message = "Hết thời gian chờ" };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error during get referral statistics");
+                return new AffiliateStatisticsResponse { Success = false, Message = "Có lỗi xảy ra" };
+            }
+        }
+
+        public async Task<AssignStoreResponse> AssignStoreForReferralUserDataAsync(AssignStoreRequest request, string token)
+        {
+            try
+            {
+                var baseUrl = _configuration["API:Affiliate:BaseUrl"];
+                var path = _configuration["API:Affiliate:AssignStoreFlag"];
+                var endpoint = $"{baseUrl}{path}";
+
+                _logger.LogInformation("Calling AssignStoreForReferralUserData API: {Endpoint}", endpoint);
+                _logger.LogInformation("Request data: ReferralUserId={ReferralUserId}, StoreId={StoreId}", request.ReferralUserId, request.StoreId);
+
+                // Prepare JSON request
+                var json = JsonSerializer.Serialize(request, new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    WriteIndented = false,
+                    DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+                });
+
+                _logger.LogInformation("Request JSON: {Json}", json);
+
+                var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+                // Add Authorization header
+                using var requestMessage = new HttpRequestMessage(HttpMethod.Post, endpoint)
+                {
+                    Content = content
+                };
+                requestMessage.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.SendAsync(requestMessage);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                _logger.LogInformation("Assign store response status: {Status}", response.StatusCode);
+                _logger.LogInformation("Assign store response content: {Content}", responseContent);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = JsonSerializer.Deserialize<AssignStoreResponse>(responseContent, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+                    return result ?? new AssignStoreResponse { Success = false, Message = "Invalid response format" };
+                }
+                else
+                {
+                    _logger.LogError("Assign store failed. Status: {Status}, Content: {Content}", response.StatusCode, responseContent);
+                    return new AssignStoreResponse { Success = false, Message = $"API call failed: {response.StatusCode}" };
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "Network error during assign store");
+                return new AssignStoreResponse { Success = false, Message = "Lỗi kết nối mạng" };
+            }
+            catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException)
+            {
+                _logger.LogError(ex, "Timeout during assign store");
+                return new AssignStoreResponse { Success = false, Message = "Hết thời gian chờ" };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error during assign store");
+                return new AssignStoreResponse { Success = false, Message = "Có lỗi xảy ra" };
+            }
+        }
+
+        public async Task<ReportStoreResponse> ReportStoreToQQAsync(ReportStoreRequest request, string token)
+        {
+            try
+            {
+                var baseUrl = _configuration["API:Affiliate:BaseUrl"];
+                var path = _configuration["API:Affiliate:ReportReferralStore"];
+                var endpoint = $"{baseUrl}{path}";
+
+                _logger.LogInformation("Calling ReportStoreToQQ API: {Endpoint}", endpoint);
+                _logger.LogInformation("Request data: UserId={UserId}, StoreId={StoreId}, ReportType={ReportType}", 
+                    request.UserId, request.StoreId, request.ReportType);
+
+                // Use multipart/form-data
+                using var formContent = new MultipartFormDataContent();
+                
+                if (!string.IsNullOrEmpty(request.UserId))
+                    formContent.Add(new StringContent(request.UserId), "UserId");
+                
+                if (!string.IsNullOrEmpty(request.StoreId))
+                    formContent.Add(new StringContent(request.StoreId), "StoreId");
+                
+                if (!string.IsNullOrEmpty(request.ObjectId))
+                    formContent.Add(new StringContent(request.ObjectId), "ObjectId");
+                
+                if (!string.IsNullOrEmpty(request.ReportType))
+                    formContent.Add(new StringContent(request.ReportType), "ReportType");
+                
+                if (!string.IsNullOrEmpty(request.Title))
+                    formContent.Add(new StringContent(request.Title), "Title");
+                else
+                    formContent.Add(new StringContent(string.Empty), "Title");
+                
+                if (!string.IsNullOrEmpty(request.Description))
+                    formContent.Add(new StringContent(request.Description), "Description");
+                else
+                    formContent.Add(new StringContent(string.Empty), "Description");
+                
+                // Files (optional)
+                if (request.Files != null && request.Files.Length > 0)
+                    formContent.Add(new ByteArrayContent(request.Files), "Files", "report_file.jpg");
+                else
+                    formContent.Add(new StringContent(string.Empty), "Files");
+                
+                if (!string.IsNullOrEmpty(request.CreateBy))
+                    formContent.Add(new StringContent(request.CreateBy), "CreateBy");
+                
+                if (!string.IsNullOrEmpty(request.UrlContent))
+                    formContent.Add(new StringContent(request.UrlContent), "UrlContent");
+                else
+                    formContent.Add(new StringContent(string.Empty), "UrlContent");
+
+                // Add Authorization header
+                using var requestMessage = new HttpRequestMessage(HttpMethod.Post, endpoint)
+                {
+                    Content = formContent
+                };
+                requestMessage.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.SendAsync(requestMessage);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                _logger.LogInformation("Report store response status: {Status}", response.StatusCode);
+                _logger.LogInformation("Report store response content: {Content}", responseContent);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = JsonSerializer.Deserialize<ReportStoreResponse>(responseContent, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+                    return result ?? new ReportStoreResponse { Success = false, Message = "Invalid response format" };
+                }
+                else
+                {
+                    _logger.LogError("Report store failed. Status: {Status}, Content: {Content}", response.StatusCode, responseContent);
+                    return new ReportStoreResponse { Success = false, Message = $"API call failed: {response.StatusCode}" };
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "Network error during report store");
+                return new ReportStoreResponse { Success = false, Message = "Lỗi kết nối mạng" };
+            }
+            catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException)
+            {
+                _logger.LogError(ex, "Timeout during report store");
+                return new ReportStoreResponse { Success = false, Message = "Hết thời gian chờ" };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error during report store");
+                return new ReportStoreResponse { Success = false, Message = "Có lỗi xảy ra" };
+            }
+        }
     }
 }

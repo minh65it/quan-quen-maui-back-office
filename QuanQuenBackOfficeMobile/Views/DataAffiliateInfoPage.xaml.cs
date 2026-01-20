@@ -10,25 +10,25 @@ public partial class DataAffiliateInfoPage : ContentPage
         BindingContext = viewModel;
     }
 
-    protected override void OnNavigatedTo(NavigatedToEventArgs args)
+    protected override void OnAppearing()
     {
-        base.OnNavigatedTo(args);
+        base.OnAppearing();
         if (BindingContext is DataAffiliateInfoViewModel vm)
         {
-            var route = Shell.Current?.CurrentState.Location.ToString() ?? string.Empty;
-            if (string.IsNullOrEmpty(route)) return;
-
-            try
+            // Lấy thông tin store từ Preferences (đã được lưu khi chọn store)
+            var storeId = Preferences.Get("selected_store_id", string.Empty);
+            var storeName = Preferences.Get("selected_store_name", string.Empty);
+            var address = Preferences.Get("selected_store_address", string.Empty);
+            
+            if (!string.IsNullOrEmpty(storeId))
             {
-                var uri = new Uri(route);
-                var query = uri.Query;
-                var parameters = System.Web.HttpUtility.ParseQueryString(query);
-                var storeId = parameters.Get("storeId");
-                var storeName = parameters.Get("storeName");
-                var address = parameters.Get("address");
                 vm.InitializeFromParams(storeId, storeName, address);
+                
+                // Xóa sau khi dùng
+                Preferences.Remove("selected_store_id");
+                Preferences.Remove("selected_store_name");
+                Preferences.Remove("selected_store_address");
             }
-            catch { }
         }
     }
 }

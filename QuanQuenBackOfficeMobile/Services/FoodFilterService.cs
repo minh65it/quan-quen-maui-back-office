@@ -149,7 +149,7 @@ namespace QuanQuenBackOfficeMobile.Services
             }
         }
 
-        public async Task<string> CreateFoodAsync(string storeId, string filterFoodId, string name, string description, decimal price, decimal priceSale, string foodUnitId, bool isCombo = false, bool isOutOfStock = false, CancellationToken cancellationToken = default)
+        public async Task<string> CreateFoodAsync(string storeId, string filterFoodId, string name, string description, decimal price, decimal priceSale, string foodUnitId, bool isCombo = false, bool isOutOfStock = false, Stream? imageStream = null, string? imageFileName = null, List<string>? attributeIds = null, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -177,6 +177,23 @@ namespace QuanQuenBackOfficeMobile.Services
                 formData.Add(new StringContent(isCombo.ToString().ToLower()), "IsCombo");
                 formData.Add(new StringContent(isOutOfStock.ToString().ToLower()), "IsOutOfStock");
 
+                // Thêm attributes nếu có
+                if (attributeIds != null && attributeIds.Count > 0)
+                {
+                    foreach (var attrId in attributeIds)
+                    {
+                        formData.Add(new StringContent(attrId), "Attributes");
+                    }
+                }
+
+                // Thêm file ảnh nếu có
+                if (imageStream != null && !string.IsNullOrEmpty(imageFileName))
+                {
+                    var imageContent = new StreamContent(imageStream);
+                    imageContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
+                    formData.Add(imageContent, "FileAvatar", imageFileName);
+                }
+
                 var response = await _httpClient.PostAsync(url, formData, cancellationToken);
 
                 if (!response.IsSuccessStatusCode)
@@ -195,6 +212,45 @@ namespace QuanQuenBackOfficeMobile.Services
             {
                 System.Diagnostics.Debug.WriteLine($"[FoodFilterService] Create Food ERROR: {ex.Message}");
                 throw new Exception($"Lỗi khi tạo món ăn: {ex.Message}", ex);
+            }
+        }
+
+        public async Task<List<FoodAttribute>> GetAttributesAsync(CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var baseUrl = _configuration["API:Store:BaseUrl"];
+                var endpoint = _configuration["API:Store:GetListAttribute"];
+                var token = await SecureStorage.GetAsync("auth_token");
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    throw new UnauthorizedAccessException("Token không tồn tại");
+                }
+
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                var url = $"{baseUrl}{endpoint}";
+                var response = await _httpClient.GetAsync(url, cancellationToken);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+                    throw new HttpRequestException($"API returned status code: {response.StatusCode}. Error: {errorContent}");
+                }
+
+                var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
+                var result = JsonSerializer.Deserialize<FoodAttributeListResponse>(responseContent, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                return result?.Result ?? new List<FoodAttribute>();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[FoodFilterService] Get Attributes ERROR: {ex.Message}");
+                throw new Exception($"Lỗi khi lấy danh sách thuộc tính: {ex.Message}", ex);
             }
         }
     }

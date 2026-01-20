@@ -314,41 +314,86 @@ namespace QuanQuenBackOfficeMobile.ViewModels
             try
             {
                 _logger.LogInformation("SelectStoreAsync tapped. StoreId: {StoreId}, StoreName: {StoreName}", store.StoreId, store.StoreName);
-                // Resolve page từ DI để giữ nguyên DI cho ViewModel bên trong
+                
+                _ = AssignStoreInBackgroundAsync(store.StoreId);
+                
+                // Lưu thông tin store vào Preferences để DataAffiliateInfoPage lấy
+                Preferences.Set("selected_store_id", store.StoreId);
+                Preferences.Set("selected_store_name", store.StoreName);
+                Preferences.Set("selected_store_address", store.Address);
+                
+                // Resolve page từ DI
                 var page = _serviceProvider.GetRequiredService<DataAffiliateInfoPage>();
-                if (page.BindingContext is DataAffiliateInfoViewModel infoVm)
-                {
-                    infoVm.InitializeFromParams(store.StoreId, store.StoreName, store.Address);
-                }
-
+                
                 await MainThread.InvokeOnMainThreadAsync(async () =>
                 {
-                    try
-                    {
-                        // Ưu tiên điều hướng qua Navigation của MainPage
-                        await App.Current.MainPage.Navigation.PushAsync(page);
-                        _logger.LogInformation("Pushed DataAffiliateInfoPage via App.Current.MainPage.Navigation.PushAsync for store: {StoreName}", store.StoreName);
-                    }
-                    catch (Exception exPush)
-                    {
-                        _logger.LogWarning(exPush, "PushAsync failed, trying PushModalAsync as fallback");
-                        try
-                        {
-                            await App.Current.MainPage.Navigation.PushModalAsync(page);
-                            _logger.LogInformation("Pushed DataAffiliateInfoPage via PushModalAsync fallback for store: {StoreName}", store.StoreName);
-                        }
-                        catch (Exception exModal)
-                        {
-                            _logger.LogError(exModal, "Navigation failed for DataAffiliateInfoPage");
-                            await Application.Current.MainPage.DisplayAlert("Lỗi", "Không thể điều hướng sang trang nhập thông tin.", "OK");
-                        }
-                    }
+                    await Application.Current.MainPage.Navigation.PushAsync(page);
+                    _logger.LogInformation("Navigated to DataAffiliateInfoPage for store: {StoreName}", store.StoreName);
                 });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error selecting store for navigation. StoreId: {StoreId}", store?.StoreId);
-                await Application.Current.MainPage.DisplayAlert("Lỗi", "Không thể điều hướng sang trang nhập thông tin.", "OK");
+                await Application.Current.MainPage.DisplayAlert("Lỗi", $"Không thể điều hướng sang trang nhập thông tin: {ex.Message}", "OK");
+            }
+        }
+
+        private async Task AssignStoreInBackgroundAsync(string storeId)
+        {
+            try
+            {
+                _logger.LogInformation("Starting background assign store for StoreId: {StoreId}", storeId);
+                
+                // Lấy token từ SecureStorage với fallback Preferences
+                var token = await SecureStorage.GetAsync("affiliate_token");
+                if (string.IsNullOrEmpty(token))
+                {
+                    token = Preferences.Get("affiliate_token", "");
+                }
+                
+                if (string.IsNullOrEmpty(token))
+                {
+                    _logger.LogWarning("Cannot assign store - token is empty");
+                    return;
+                }
+
+                // Lấy referralUserId từ SecureStorage với fallback Preferences
+                var referralUserId = await SecureStorage.GetAsync("affiliate_referral_id");
+                if (string.IsNullOrEmpty(referralUserId))
+                {
+                    referralUserId = Preferences.Get("affiliate_referral_id", "");
+                }
+                
+                if (string.IsNullOrEmpty(referralUserId))
+                {
+                    _logger.LogWarning("Cannot assign store - referralUserId is empty");
+                    return;
+                }
+
+                var request = new AssignStoreRequest
+                {
+                    ReferralUserId = referralUserId,
+                    StoreId = storeId,
+                    AssignedDate = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
+                    AssignedBy = referralUserId
+                };
+
+                var response = await _affiliateService.AssignStoreForReferralUserDataAsync(request, token);
+                
+                if (response?.Success == true)
+                {
+                    _logger.LogInformation("Store assigned successfully in background. StoreId: {StoreId}", storeId);
+                }
+                else
+                {
+                    _logger.LogWarning("Failed to assign store in background. StoreId: {StoreId}, Message: {Message}", 
+                        storeId, response?.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi nhưng không hiển thị cho user vì đây là background task
+                _logger.LogError(ex, "Error in background assign store. StoreId: {StoreId}", storeId);
             }
         }
 

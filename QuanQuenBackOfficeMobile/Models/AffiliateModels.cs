@@ -261,4 +261,81 @@ namespace QuanQuenBackOfficeMobile.Models
         public object? ValidateData { get; set; }
         public object? NoSMS { get; set; }
     }
+
+    // Affiliate Statistics Models
+    public class AffiliateStatisticsResponse
+    {
+        public string Message { get; set; }
+        public bool Success { get; set; }
+        public AffiliateStatisticsData Data { get; set; }
+        public string? Caption { get; set; }
+        public object? ValidateData { get; set; }
+        public object? NoSMS { get; set; }
+    }
+
+    public class AffiliateStatisticsData
+    {
+        public int TotalStores { get; set; }
+        public int PendingStores { get; set; }
+        public int ApprovedStores { get; set; }
+        public int InActiveStores { get; set; }
+        public int BlockedStores { get; set; }
+        public int TotalTransactions { get; set; }
+        public int PendingTransactions { get; set; }
+        public int FinishedTransactions { get; set; }
+        public int CanceledTransactions { get; set; }
+        public decimal TotalCommissionEarned { get; set; }
+        public decimal PendingCommission { get; set; }
+        public decimal AverageCommission { get; set; }
+        public int StoresWithContract { get; set; }
+        public int StoresWithoutContract { get; set; }
+        public int StoresWithTransaction { get; set; }
+        public int StoresWithoutTransaction { get; set; }
+        public double SuccessRate { get; set; }
+        public DateTime? LastStoreReferralDate { get; set; }
+        public DateTime? LastTransactionDate { get; set; }
+    }
+
+    // Assign Store Models
+    public class AssignStoreRequest
+    {
+        public string? ReferralUserId { get; set; }
+        public string? StoreId { get; set; }
+        public string? AssignedDate { get; set; }
+        public string? AssignedBy { get; set; }
+    }
+
+    public class AssignStoreResponse
+    {
+        public string? Message { get; set; }
+        public bool Success { get; set; }
+        public object? Data { get; set; }
+        public string? Caption { get; set; }
+        public object? ValidateData { get; set; }
+        public object? NoSMS { get; set; }
+    }
+
+    // Report Store Models
+    public class ReportStoreRequest
+    {
+        public string? UserId { get; set; }
+        public string? StoreId { get; set; }
+        public string? ObjectId { get; set; }
+        public string? ReportType { get; set; }
+        public string? Title { get; set; }
+        public string? Description { get; set; }
+        public byte[]? Files { get; set; }
+        public string? CreateBy { get; set; }
+        public string? UrlContent { get; set; }
+    }
+
+    public class ReportStoreResponse
+    {
+        public string? Message { get; set; }
+        public bool Success { get; set; }
+        public object? Data { get; set; }
+        public string? Caption { get; set; }
+        public object? ValidateData { get; set; }
+        public object? NoSMS { get; set; }
+    }
 }

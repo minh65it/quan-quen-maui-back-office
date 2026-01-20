@@ -28,6 +28,38 @@ public partial class CreateStoreViewModel : ObservableObject
     public string LicenseButtonBackgroundColor => CanAddMoreLicenseImages ? "#F5F5F5" : "Gray";
     public string LicenseButtonTextColor => CanAddMoreLicenseImages ? "#F58220" : "Gray";
 
+    // New: Identity card front/back and business registration single images
+    [ObservableProperty]
+    private ImageSource frontIdImage;
+    [ObservableProperty]
+    private ImageSource backIdImage;
+    [ObservableProperty]
+    private ImageSource businessRegistrationImage;
+
+    public bool HasFrontIdImage => FrontIdImage != null;
+    public bool HasBackIdImage => BackIdImage != null;
+    public bool HasBusinessRegistrationImage => BusinessRegistrationImage != null;
+
+    public bool CanSetFrontIdImage => !HasFrontIdImage;
+    public bool CanSetBackIdImage => !HasBackIdImage;
+    public bool CanSetBusinessRegistrationImage => !HasBusinessRegistrationImage;
+
+    public IAsyncRelayCommand PickFrontIdImageCommand { get; }
+    public IAsyncRelayCommand CaptureFrontIdImageCommand { get; }
+    public IRelayCommand RemoveFrontIdImageCommand { get; }
+
+    public IAsyncRelayCommand PickBackIdImageCommand { get; }
+    public IAsyncRelayCommand CaptureBackIdImageCommand { get; }
+    public IRelayCommand RemoveBackIdImageCommand { get; }
+
+    public IAsyncRelayCommand PickBusinessRegistrationImageCommand { get; }
+    public IAsyncRelayCommand CaptureBusinessRegistrationImageCommand { get; }
+    public IRelayCommand RemoveBusinessRegistrationImageCommand { get; }
+
+    private string frontIdLocalPath;
+    private string backIdLocalPath;
+    private string businessRegistrationLocalPath;
+
 
     [ObservableProperty]
     private ProvinceDto selectedProvince;
@@ -86,6 +118,19 @@ public partial class CreateStoreViewModel : ObservableObject
         PickLicenseImagesCommand = new AsyncRelayCommand(PickLicenseImagesAsync, () => CanAddMoreLicenseImages);
         CaptureLicenseImageCommand = new AsyncRelayCommand(CaptureLicenseImageAsync, () => CanAddMoreLicenseImages);
         RemoveLicenseImageCommand = new RelayCommand<ImageSource>(RemoveLicenseImage);
+
+        // New: init commands for three single-image sections
+        PickFrontIdImageCommand = new AsyncRelayCommand(PickFrontIdImageAsync, () => CanSetFrontIdImage);
+        CaptureFrontIdImageCommand = new AsyncRelayCommand(CaptureFrontIdImageAsync, () => CanSetFrontIdImage);
+        RemoveFrontIdImageCommand = new RelayCommand(RemoveFrontIdImage);
+
+        PickBackIdImageCommand = new AsyncRelayCommand(PickBackIdImageAsync, () => CanSetBackIdImage);
+        CaptureBackIdImageCommand = new AsyncRelayCommand(CaptureBackIdImageAsync, () => CanSetBackIdImage);
+        RemoveBackIdImageCommand = new RelayCommand(RemoveBackIdImage);
+
+        PickBusinessRegistrationImageCommand = new AsyncRelayCommand(PickBusinessRegistrationImageAsync, () => CanSetBusinessRegistrationImage);
+        CaptureBusinessRegistrationImageCommand = new AsyncRelayCommand(CaptureBusinessRegistrationImageAsync, () => CanSetBusinessRegistrationImage);
+        RemoveBusinessRegistrationImageCommand = new RelayCommand(RemoveBusinessRegistrationImage);
         
         // Debug log để kiểm tra trạng thái ban đầu
         System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] Constructor - LicenseImages count: {LicenseImages.Count}");
@@ -353,6 +398,10 @@ public partial class CreateStoreViewModel : ObservableObject
             StoreRegistrationData.DistrictId = SelectedDistrict.territoryId;
             StoreRegistrationData.WardId = SelectedWard.stateId;
             StoreRegistrationData.LicenseImagePaths = LicenseImages.Select(img => img.LocalPath).ToList();
+            // New: Save three single image paths
+            StoreRegistrationData.FileFrontPicIdentityCardPath = frontIdLocalPath;
+            StoreRegistrationData.FileBackPicIdentityCardPath = backIdLocalPath;
+            StoreRegistrationData.FileImageBusinessRegistrationPath = businessRegistrationLocalPath;
             
             // Debug log để kiểm tra dữ liệu ảnh
             System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] Số lượng ảnh đã chọn: {LicenseImages.Count}");
@@ -583,5 +632,174 @@ public partial class CreateStoreViewModel : ObservableObject
         
         PickLicenseImagesCommand.NotifyCanExecuteChanged();
         CaptureLicenseImageCommand.NotifyCanExecuteChanged();
+    }
+}
+
+// ------------- New methods for single-image pick/capture/remove -------------
+partial class CreateStoreViewModel
+{
+    private async Task PickFrontIdImageAsync()
+    {
+        try
+        {
+            var result = await MediaPicker.Default.PickPhotoAsync(new MediaPickerOptions { Title = "Chọn ảnh CMND/CCCD - mặt trước" });
+            if (result == null) return;
+            var copiedPath = await CopyFileToAppDirectoryAsync(result);
+            frontIdLocalPath = copiedPath;
+            FrontIdImage = ImageSource.FromFile(copiedPath);
+            OnPropertyChanged(nameof(HasFrontIdImage));
+            OnPropertyChanged(nameof(CanSetFrontIdImage));
+            PickFrontIdImageCommand.NotifyCanExecuteChanged();
+            CaptureFrontIdImageCommand.NotifyCanExecuteChanged();
+        }
+        catch (Exception ex)
+        {
+            await App.Current.MainPage.DisplayAlert("Lỗi", $"Không thể chọn ảnh: {ex.Message}", "OK");
+        }
+    }
+
+    private async Task CaptureFrontIdImageAsync()
+    {
+        try
+        {
+            if (!MediaPicker.Default.IsCaptureSupported)
+            {
+                await App.Current.MainPage.DisplayAlert("Lỗi", "Thiết bị không hỗ trợ chụp ảnh!", "OK");
+                return;
+            }
+            var file = await MediaPicker.Default.CapturePhotoAsync();
+            if (file == null) return;
+            var copiedPath = await CopyFileToAppDirectoryAsync(file);
+            frontIdLocalPath = copiedPath;
+            FrontIdImage = ImageSource.FromFile(copiedPath);
+            OnPropertyChanged(nameof(HasFrontIdImage));
+            OnPropertyChanged(nameof(CanSetFrontIdImage));
+            PickFrontIdImageCommand.NotifyCanExecuteChanged();
+            CaptureFrontIdImageCommand.NotifyCanExecuteChanged();
+        }
+        catch (Exception ex)
+        {
+            await App.Current.MainPage.DisplayAlert("Lỗi", $"Không thể chụp ảnh: {ex.Message}", "OK");
+        }
+    }
+
+    private void RemoveFrontIdImage()
+    {
+        FrontIdImage = null;
+        frontIdLocalPath = null;
+        OnPropertyChanged(nameof(HasFrontIdImage));
+        OnPropertyChanged(nameof(CanSetFrontIdImage));
+        PickFrontIdImageCommand.NotifyCanExecuteChanged();
+        CaptureFrontIdImageCommand.NotifyCanExecuteChanged();
+    }
+
+    private async Task PickBackIdImageAsync()
+    {
+        try
+        {
+            var result = await MediaPicker.Default.PickPhotoAsync(new MediaPickerOptions { Title = "Chọn ảnh CMND/CCCD - mặt sau" });
+            if (result == null) return;
+            var copiedPath = await CopyFileToAppDirectoryAsync(result);
+            backIdLocalPath = copiedPath;
+            BackIdImage = ImageSource.FromFile(copiedPath);
+            OnPropertyChanged(nameof(HasBackIdImage));
+            OnPropertyChanged(nameof(CanSetBackIdImage));
+            PickBackIdImageCommand.NotifyCanExecuteChanged();
+            CaptureBackIdImageCommand.NotifyCanExecuteChanged();
+        }
+        catch (Exception ex)
+        {
+            await App.Current.MainPage.DisplayAlert("Lỗi", $"Không thể chọn ảnh: {ex.Message}", "OK");
+        }
+    }
+
+    private async Task CaptureBackIdImageAsync()
+    {
+        try
+        {
+            if (!MediaPicker.Default.IsCaptureSupported)
+            {
+                await App.Current.MainPage.DisplayAlert("Lỗi", "Thiết bị không hỗ trợ chụp ảnh!", "OK");
+                return;
+            }
+            var file = await MediaPicker.Default.CapturePhotoAsync();
+            if (file == null) return;
+            var copiedPath = await CopyFileToAppDirectoryAsync(file);
+            backIdLocalPath = copiedPath;
+            BackIdImage = ImageSource.FromFile(copiedPath);
+            OnPropertyChanged(nameof(HasBackIdImage));
+            OnPropertyChanged(nameof(CanSetBackIdImage));
+            PickBackIdImageCommand.NotifyCanExecuteChanged();
+            CaptureBackIdImageCommand.NotifyCanExecuteChanged();
+        }
+        catch (Exception ex)
+        {
+            await App.Current.MainPage.DisplayAlert("Lỗi", $"Không thể chụp ảnh: {ex.Message}", "OK");
+        }
+    }
+
+    private void RemoveBackIdImage()
+    {
+        BackIdImage = null;
+        backIdLocalPath = null;
+        OnPropertyChanged(nameof(HasBackIdImage));
+        OnPropertyChanged(nameof(CanSetBackIdImage));
+        PickBackIdImageCommand.NotifyCanExecuteChanged();
+        CaptureBackIdImageCommand.NotifyCanExecuteChanged();
+    }
+
+    private async Task PickBusinessRegistrationImageAsync()
+    {
+        try
+        {
+            var result = await MediaPicker.Default.PickPhotoAsync(new MediaPickerOptions { Title = "Chọn ảnh Giấy phép ĐKKD" });
+            if (result == null) return;
+            var copiedPath = await CopyFileToAppDirectoryAsync(result);
+            businessRegistrationLocalPath = copiedPath;
+            BusinessRegistrationImage = ImageSource.FromFile(copiedPath);
+            OnPropertyChanged(nameof(HasBusinessRegistrationImage));
+            OnPropertyChanged(nameof(CanSetBusinessRegistrationImage));
+            PickBusinessRegistrationImageCommand.NotifyCanExecuteChanged();
+            CaptureBusinessRegistrationImageCommand.NotifyCanExecuteChanged();
+        }
+        catch (Exception ex)
+        {
+            await App.Current.MainPage.DisplayAlert("Lỗi", $"Không thể chọn ảnh: {ex.Message}", "OK");
+        }
+    }
+
+    private async Task CaptureBusinessRegistrationImageAsync()
+    {
+        try
+        {
+            if (!MediaPicker.Default.IsCaptureSupported)
+            {
+                await App.Current.MainPage.DisplayAlert("Lỗi", "Thiết bị không hỗ trợ chụp ảnh!", "OK");
+                return;
+            }
+            var file = await MediaPicker.Default.CapturePhotoAsync();
+            if (file == null) return;
+            var copiedPath = await CopyFileToAppDirectoryAsync(file);
+            businessRegistrationLocalPath = copiedPath;
+            BusinessRegistrationImage = ImageSource.FromFile(copiedPath);
+            OnPropertyChanged(nameof(HasBusinessRegistrationImage));
+            OnPropertyChanged(nameof(CanSetBusinessRegistrationImage));
+            PickBusinessRegistrationImageCommand.NotifyCanExecuteChanged();
+            CaptureBusinessRegistrationImageCommand.NotifyCanExecuteChanged();
+        }
+        catch (Exception ex)
+        {
+            await App.Current.MainPage.DisplayAlert("Lỗi", $"Không thể chụp ảnh: {ex.Message}", "OK");
+        }
+    }
+
+    private void RemoveBusinessRegistrationImage()
+    {
+        BusinessRegistrationImage = null;
+        businessRegistrationLocalPath = null;
+        OnPropertyChanged(nameof(HasBusinessRegistrationImage));
+        OnPropertyChanged(nameof(CanSetBusinessRegistrationImage));
+        PickBusinessRegistrationImageCommand.NotifyCanExecuteChanged();
+        CaptureBusinessRegistrationImageCommand.NotifyCanExecuteChanged();
     }
 }

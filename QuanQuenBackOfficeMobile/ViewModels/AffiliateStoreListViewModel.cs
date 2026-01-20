@@ -42,6 +42,7 @@ namespace QuanQuenBackOfficeMobile.ViewModels
         public ICommand RefreshStoresCommand { get; }
         public ICommand BackToCreateStoreCommand { get; }
         public ICommand NavigateToScanQRCommand { get; }
+        public ICommand NavigateToStatisticsCommand { get; }
 
         public AffiliateStoreListViewModel(IAffiliateService affiliateService)
         {
@@ -49,7 +50,8 @@ namespace QuanQuenBackOfficeMobile.ViewModels
             LoadStoresCommand = new AsyncRelayCommand(LoadStoresAsync);
             RefreshStoresCommand = new AsyncRelayCommand(RefreshStoresAsync);
             BackToCreateStoreCommand = new AsyncRelayCommand(BackToCreateStoreAsync);
-            NavigateToScanQRCommand = new AsyncRelayCommand(NavigateToScanQRAsync);
+            NavigateToScanQRCommand = new AsyncRelayCommand<string>(NavigateToScanQRAsync);
+            NavigateToStatisticsCommand = new AsyncRelayCommand(NavigateToStatisticsAsync);
         }
 
         public async Task InitializeAsync()
@@ -156,25 +158,56 @@ namespace QuanQuenBackOfficeMobile.ViewModels
             var addressParts = new[] { address, city }.Where(s => !string.IsNullOrEmpty(s));
             return addressParts.Any() ? string.Join(", ", addressParts) : "Chưa cập nhật";
         }
-
+    
         private string GetFormattedDate(DateTime date)
         {
             return date.ToString("dd/MM/yyyy");
         }
 
-        private async Task NavigateToScanQRAsync()
+        private async Task NavigateToScanQRAsync(string storeId)
         {
             try
             {
-                // Chuyển đến trang ScanQR
-                // Lưu ý: Cần chỉ định storeId nếu cần thiết
-                // Hiện tại sẽ chuyển đến trang ScanQR mà không chỉ định store cụ thể
-                var scanningQRPage = new ScanningQRPage();
-                await Application.Current.MainPage.Navigation.PushAsync(scanningQRPage);
+                if (string.IsNullOrEmpty(storeId))
+                {
+                    await Application.Current.MainPage.DisplayAlert("Lỗi", "Thông tin nhà hàng không hợp lệ", "OK");
+                    return;
+                }
+
+                System.Diagnostics.Debug.WriteLine($"[AffiliateStoreList] Navigating to ScanQR with StoreId: {storeId}");
+                
+                // Chuyển đến trang ScanQR với storeId bằng cách thay đổi MainPage
+                var scanningQRPage = new ScanningQRPage(storeId);
+                Application.Current.MainPage = new NavigationPage(scanningQRPage);
             }
             catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"[AffiliateStoreList] Error navigating to ScanQR: {ex.Message}");
                 await Application.Current.MainPage.DisplayAlert("Lỗi", $"Không thể chuyển đến trang ScanQR: {ex.Message}", "OK");
+            }
+        }
+
+        private async Task NavigateToStatisticsAsync()
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine($"[AffiliateStoreList] Navigating to Statistics");
+                
+                // Get the ViewModel from DI
+                var statisticsViewModel = IPlatformApplication.Current.Services.GetService<AffiliateStatisticsViewModel>();
+                var statisticsPage = new Views.AffiliateStatisticsPage(statisticsViewModel);
+                
+                // Wrap in NavigationPage and set as MainPage (similar to ScanQR navigation)
+                Application.Current.MainPage = new NavigationPage(statisticsPage)
+                {
+                    BarBackgroundColor = Color.FromArgb("#E67E22"),
+                    BarTextColor = Colors.White
+                };
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[AffiliateStoreList] Error navigating to Statistics: {ex.Message}");
+                await Application.Current.MainPage.DisplayAlert("Lỗi", $"Không thể chuyển đến trang thống kê: {ex.Message}", "OK");
             }
         }
     }

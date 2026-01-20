@@ -9,7 +9,6 @@ public partial class CreateStoreUserPasswordViewModel : ObservableObject
 {
     private readonly IStoreUserService _storeUserService;
     private readonly IStoreService _storeService;
-    private readonly IStoreMediaService _storeMediaService;
     [ObservableProperty]
     private string email;
 
@@ -50,9 +49,8 @@ public partial class CreateStoreUserPasswordViewModel : ObservableObject
     public IAsyncRelayCommand ShowPolicyCommand { get; }
     public IAsyncRelayCommand ShowTermsCommand { get; }
 
-    public CreateStoreUserPasswordViewModel(IStoreUserService storeUserService, IStoreService storeService, IStoreMediaService storeMediaService)
+    public CreateStoreUserPasswordViewModel(IStoreUserService storeUserService, IStoreService storeService)
     {
-        _storeMediaService = storeMediaService;
         _storeUserService = storeUserService;
         _storeService = storeService;
         TogglePasswordVisibilityCommand = new Command(TogglePasswordVisibility);
@@ -67,19 +65,6 @@ public partial class CreateStoreUserPasswordViewModel : ObservableObject
         // Debug log để kiểm tra dữ liệu nhận được
         System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Constructor - Email: {StoreRegistrationData.Email}");
         System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Constructor - StoreName: {StoreRegistrationData.StoreName}");
-        System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Constructor - LicenseImagePaths count: {StoreRegistrationData.LicenseImagePaths.Count}");
-        foreach (var path in StoreRegistrationData.LicenseImagePaths)
-        {
-            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Constructor - LicenseImagePath: {path}");
-        }
-        
-        // Kiểm tra xem dữ liệu có bị mất không
-        if (string.IsNullOrEmpty(StoreRegistrationData.StoreName) || StoreRegistrationData.LicenseImagePaths.Count == 0)
-        {
-            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Constructor - DỮ LIỆU BỊ MẤT!");
-            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Constructor - StoreName empty: {string.IsNullOrEmpty(StoreRegistrationData.StoreName)}");
-            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Constructor - LicenseImagePaths empty: {StoreRegistrationData.LicenseImagePaths.Count == 0}");
-        }
     }
 
     private void TogglePasswordVisibility()
@@ -113,12 +98,6 @@ public partial class CreateStoreUserPasswordViewModel : ObservableObject
             System.Diagnostics.Debug.WriteLine($"[DEBUG][Register] Bắt đầu đăng ký");
             System.Diagnostics.Debug.WriteLine($"[DEBUG][Register] StoreName: {StoreRegistrationData.StoreName}");
             System.Diagnostics.Debug.WriteLine($"[DEBUG][Register] Email: {StoreRegistrationData.Email}");
-            System.Diagnostics.Debug.WriteLine($"[DEBUG][Register] LicenseImagePaths count: {StoreRegistrationData.LicenseImagePaths.Count}");
-            foreach (var path in StoreRegistrationData.LicenseImagePaths)
-            {
-                System.Diagnostics.Debug.WriteLine($"[DEBUG][Register] LicenseImagePath: {path}");
-                System.Diagnostics.Debug.WriteLine($"[DEBUG][Register] File exists: {File.Exists(path)}");
-            }
 
             // Validate required fields
             if (string.IsNullOrWhiteSpace(Password))
@@ -218,7 +197,11 @@ public partial class CreateStoreUserPasswordViewModel : ObservableObject
                 RepresentativeName = StoreRegistrationData.RepresentativeName,
                 ProvinceId = StoreRegistrationData.ProvinceId,
                 BusinessType = StoreRegistrationData.BusinessType,
-                CreatedBy = storePIC
+                CreatedBy = storePIC,
+                // Pass file paths directly in request
+                FileFrontPicIdentityCardPath = StoreRegistrationData.FileFrontPicIdentityCardPath,
+                FileBackPicIdentityCardPath = StoreRegistrationData.FileBackPicIdentityCardPath,
+                FileImageBusinessRegistrationPath = StoreRegistrationData.FileImageBusinessRegistrationPath
             };
 
             var storeResponse = await _storeService.CreateStoreAsync(storeRequest, userToken);
@@ -238,93 +221,6 @@ public partial class CreateStoreUserPasswordViewModel : ObservableObject
             
             System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] StoreId từ CreateStore: {storeId}");
 
-            // Lấy danh sách file ảnh từ StoreRegistrationData
-            List<string> licenseImagePaths = StoreRegistrationData.LicenseImagePaths ?? new List<string>();
-            
-            // Debug log để kiểm tra dữ liệu ảnh
-            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] LicenseImagePaths count: {licenseImagePaths.Count}");
-            foreach (var path in licenseImagePaths)
-            {
-                System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] LicenseImagePath: {path}");
-                System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] File exists: {File.Exists(path)}");
-            }
-
-            // Kiểm tra xem có ảnh nào để upload không
-            if (licenseImagePaths.Count > 0)
-            {
-                System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Có {licenseImagePaths.Count} ảnh để upload");
-                
-                // Lấy categoryMediaId chỉ khi cần upload ảnh
-                var nameMedia = "Hồ sơ nhà hàng";
-                var categoryMediaId = await _storeMediaService.GetThumbnailCategoryMediaIdAsync(nameMedia);
-                
-                if (string.IsNullOrEmpty(categoryMediaId))
-                {
-                    PasswordError = "Không tìm thấy categoryMediaId cho hồ sơ nhà hàng!";
-                    return;
-                }
-
-                // Lấy userName để truyền vào createdBy
-                var createdBy = await SecureStorage.GetAsync("userName");
-                
-                // Đọc file thành mảng byte[]
-                var imageBytesList = new List<byte[]>();
-                foreach (var path in licenseImagePaths)
-                {
-                    System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Đang xử lý file: {path}");
-                    if (File.Exists(path))
-                    {
-                        try
-                        {
-                            var bytes = await File.ReadAllBytesAsync(path);
-                            imageBytesList.Add(bytes);
-                            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Đọc file thành công: {path}, size: {bytes.Length} bytes");
-                        }
-                        catch (Exception ex)
-                        {
-                            System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Lỗi đọc file {path}: {ex.Message}");
-                        }
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine($"[LOG][ERROR] File không tồn tại: {path}");
-                    }
-                }
-
-                // Chỉ upload khi có ảnh thực sự
-                if (imageBytesList.Count > 0)
-                {
-                    System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Bắt đầu upload {imageBytesList.Count} ảnh");
-                    System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] StoreId: {storeId}");
-                    System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] CategoryMediaId: {categoryMediaId}");
-                    System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] CreatedBy: {createdBy}");
-                    
-                    // Gọi upload ảnh
-                    var licenseResponse = await _storeMediaService.UploadMediasAsync(storeId, categoryMediaId, createdBy!, imageBytesList, false, false);
-
-                    // Xử lý kết quả upload
-                    if (!licenseResponse.IsSuccess)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Upload thất bại: {licenseResponse.Message}");
-                        PasswordError = licenseResponse.Message ?? "Upload ảnh giấy phép kinh doanh thất bại";
-                        return;
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] Upload thành công: {licenseResponse.Message}");
-                    }
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("[LOG][INFO] Không có ảnh hợp lệ để upload, bỏ qua bước upload");
-                }
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("[LOG][INFO] Không có ảnh giấy phép kinh doanh để upload");
-                System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] KHÔNG CÓ ẢNH NÀO ĐỂ UPLOAD!");
-                System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreUserPasswordViewModel] StoreRegistrationData.LicenseImagePaths: {StoreRegistrationData.LicenseImagePaths?.Count ?? 0}");
-            }
             // --- Chỉ khi cả hai API đều thành công mới chuyển trang ---
             if (response.IsSuccess && storeResponse.IsSuccess)
             {

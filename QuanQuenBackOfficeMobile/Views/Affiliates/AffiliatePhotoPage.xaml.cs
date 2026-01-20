@@ -10,8 +10,8 @@ namespace QuanQuenBackOfficeMobile.Views.Affiliates
         public AffiliatePhotoPage()
         {
             InitializeComponent();
-            var storeMediaService = App.Services.GetService<IStoreMediaService>();
-            BindingContext = new AffiliatePhotoViewModel(storeMediaService);
+            // Lấy ViewModel từ DI container (đã được đăng ký trong MauiProgram)
+            BindingContext = App.Services.GetService<AffiliatePhotoViewModel>();
         }
 
         protected override void OnAppearing()

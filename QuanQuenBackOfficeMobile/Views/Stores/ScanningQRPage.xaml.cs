@@ -1,7 +1,10 @@
 using ZXing.Net.Maui;
 using QuanQuenBackOfficeMobile.Models;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
+using QuanQuenBackOfficeMobile.ViewModels;
+using QuanQuenBackOfficeMobile.Views;
 using System.Linq;
+using Microsoft.Maui.Storage;
 
 namespace QuanQuenBackOfficeMobile.Views.Stores;
 
@@ -32,9 +35,46 @@ public partial class ScanningQRPage : ContentPage
         _storeId = storeId;
     }
 
-    private void CameraView_BarcodeDetected(object sender, ZXing.Net.Maui.BarcodeDetectionEventArgs e)
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        await CheckAndRestrictFeaturesAsync();
+    }
+
+    /// <summary>
+    /// Kiểm tra và hạn chế chức năng dựa trên token
+    /// </summary>
+    private async Task CheckAndRestrictFeaturesAsync()
+    {
+        try
+        {
+            // Kiểm tra xem user có phải là affiliate không
+            var isAffiliate = await SecureStorage.GetAsync("is_affiliate");
+            var hasAffiliateToken = !string.IsNullOrEmpty(await SecureStorage.GetAsync("affiliate_token"));
+            
+            if (!hasAffiliateToken)
+            {
+                hasAffiliateToken = !string.IsNullOrEmpty(Preferences.Get("affiliate_token", ""));
+            }
+
+            System.Diagnostics.Debug.WriteLine($"[ScanningQRPage] is_affiliate: {isAffiliate}, hasAffiliateToken: {hasAffiliateToken}");
+
+            // Nếu là affiliate, ẩn button tạo bàn
+            if (isAffiliate == "true" || hasAffiliateToken)
+            {
+                System.Diagnostics.Debug.WriteLine("[ScanningQRPage] Hiding create table button for affiliate user");
+                createTableButton.IsVisible = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[ScanningQRPage] Error checking user type: {ex.Message}");
+        }
+    }
+
+    private async void CameraView_BarcodeDetected(object sender, ZXing.Net.Maui.BarcodeDetectionEventArgs e)
     {        
-        MainThread.BeginInvokeOnMainThread(() =>
+        await MainThread.InvokeOnMainThreadAsync(async () =>
         {
             var first = e.Results?.FirstOrDefault();
             if (first is null)
@@ -51,9 +91,22 @@ public partial class ScanningQRPage : ContentPage
             barcodeResult.Text = $"✅ QR Code: {qrCodeText}";
             barcodeResult.TextColor = Colors.Green;
             
-            // QR trống (chưa liên kết) => vẫn cho cập nhật
+            // Luôn hiển thị button cập nhật QR
             confirmUpdateButton.IsVisible = true;
-            createTableButton.IsVisible = true;
+            
+            // Kiểm tra xem có phải affiliate không để quyết định hiển thị button tạo bàn
+            var isAffiliate = await SecureStorage.GetAsync("is_affiliate");
+            var hasAffiliateToken = !string.IsNullOrEmpty(await SecureStorage.GetAsync("affiliate_token"));
+            
+            if (!hasAffiliateToken)
+            {
+                hasAffiliateToken = !string.IsNullOrEmpty(Preferences.Get("affiliate_token", ""));
+            }
+
+            // Chỉ hiển thị button tạo bàn nếu KHÔNG phải affiliate
+            createTableButton.IsVisible = !(isAffiliate == "true" || hasAffiliateToken);
+            
+            System.Diagnostics.Debug.WriteLine($"[ScanningQRPage] QR detected - confirmButton: true, createTableButton: {createTableButton.IsVisible}");
         });
     }
 
@@ -91,8 +144,8 @@ public partial class ScanningQRPage : ContentPage
                 // Hiển thị thông báo thành công
                 await DisplayAlert("Thành công", "Đã cập nhật thông tin nhà hàng vào QR Code thành công!", "OK");
                 
-                // Quay lại trang trước
-                await Navigation.PopAsync();
+                // Quay lại trang trước - kiểm tra xem có phải affiliate không
+                await NavigateBackAsync();
             }
             else
             {
@@ -142,7 +195,7 @@ public partial class ScanningQRPage : ContentPage
                 barcodeResult.Text = "✅ Tạo bàn và gán QR thành công!";
                 barcodeResult.TextColor = Colors.Green;
                 await DisplayAlert("Thành công", "Đã tạo bàn và gán QRCode thành công.", "OK");
-                await Navigation.PopAsync();
+                await NavigateBackAsync();
             }
             else
             {
@@ -154,6 +207,62 @@ public partial class ScanningQRPage : ContentPage
         catch (Exception ex)
         {
             await DisplayAlert("Lỗi", $"Có lỗi xảy ra: {ex.Message}", "OK");
+        }
+    }
+
+    /// <summary>
+    /// Quay lại trang trước - xử lý khác nhau cho affiliate và user thường
+    /// </summary>
+    private async Task NavigateBackAsync()
+    {
+        try
+        {
+            // Kiểm tra xem có phải affiliate không
+            var isAffiliate = await SecureStorage.GetAsync("is_affiliate");
+            var hasAffiliateToken = !string.IsNullOrEmpty(await SecureStorage.GetAsync("affiliate_token"));
+            
+            if (!hasAffiliateToken)
+            {
+                hasAffiliateToken = !string.IsNullOrEmpty(Preferences.Get("affiliate_token", ""));
+            }
+
+            if (isAffiliate == "true" || hasAffiliateToken)
+            {
+                // Nếu là affiliate, quay về AffiliateStoreListPage
+                System.Diagnostics.Debug.WriteLine("[ScanningQRPage] Navigating back to AffiliateStoreListPage");
+                var affiliateStoreListViewModel = IPlatformApplication.Current.Services.GetService<AffiliateStoreListViewModel>();
+                Application.Current.MainPage = new AffiliateStoreListPage(affiliateStoreListViewModel);
+            }
+            else
+            {
+                // Nếu là user thường, dùng Navigation.PopAsync
+                System.Diagnostics.Debug.WriteLine("[ScanningQRPage] Using Navigation.PopAsync for regular user");
+                if (Navigation.NavigationStack.Count > 1)
+                {
+                    await Navigation.PopAsync();
+                }
+                else
+                {
+                    // Fallback nếu không có navigation stack
+                    await Shell.Current.GoToAsync("..");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[ScanningQRPage] Error navigating back: {ex.Message}");
+            // Fallback: thử PopAsync
+            try
+            {
+                if (Navigation.NavigationStack.Count > 1)
+                {
+                    await Navigation.PopAsync();
+                }
+            }
+            catch
+            {
+                // Ignore
+            }
         }
     }
 }
