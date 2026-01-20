@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:QuanQuenBackOfficeMobile.Converters"
+             x:Class="QuanQuenBackOfficeMobile.Views.DataAffiliateInfoPage"
+             Title="Nhập thông tin hợp đồng">
+
+    <ContentPage.Resources>
+        <converters:StringNotNullOrEmptyConverter x:Key="StringNotNullOrEmptyConverter" />
+    </ContentPage.Resources>
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Quay lại" 
+                     IconImageSource="arrow_back.png"
+                     Command="{Binding BackCommand}" 
+                     Order="Primary" 
+                     Priority="0" />
+        <ToolbarItem Text="Báo cáo" 
+                     Command="{Binding ShowReportPopupCommand}" 
+                     Order="Secondary" 
+                     Priority="1" />
+    </ContentPage.ToolbarItems>
+
+    <Grid>
+    <ScrollView>
+        <VerticalStackLayout Spacing="16" Padding="20">
+            <Label Text="Thông tin tạo hợp đồng" FontSize="20" FontAttributes="Bold" />
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Tên nhà hàng *" />
+                    <Entry Text="{Binding StoreName}" Placeholder="Nhập tên nhà hàng" />
+
+                    <Label Text="Địa chỉ *" />
+                    <Entry Text="{Binding Address}" Placeholder="Nhập địa chỉ" />
+
+                    <Label Text="SĐT nhà hàng *" />
+                    <Entry Text="{Binding PhoneNumber}" Keyboard="Telephone" Placeholder="Nhập SĐT" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Grid.Column="1" Spacing="10">
+                    <Label Text="Người đại diện *" />
+                    <Entry Text="{Binding RepresentativeName}" Placeholder="Nhập tên người đại diện" />
+
+                    <Label Text="Tên CTV *" />
+                    <Entry Text="{Binding AffiliateName}" Placeholder="Nhập tên CTV" />
+
+                    <Label Text="SĐT CTV *" />
+                    <Entry Text="{Binding AffiliatePhoneNumber}" Keyboard="Telephone" Placeholder="Nhập SĐT CTV" />
+                </VerticalStackLayout>
+            </Grid>
+
+            <Label Text="{Binding ErrorMessage}" TextColor="#F84135" />
+
+            <HorizontalStackLayout Spacing="12" HorizontalOptions="Center">
+                <Button Text="Hủy" Command="{Binding CancelCommand}" />
+                <Button Text="Tạo hợp đồng" Command="{Binding SubmitCommand}" BackgroundColor="#FC8312" TextColor="White" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+
+    <!-- Report Popup -->
+    <Frame IsVisible="{Binding ShowReportPopup}"
+           BackgroundColor="White"
+           Padding="24"
+           Margin="32"
+           HasShadow="True"
+           CornerRadius="12"
+           VerticalOptions="Center"
+           HorizontalOptions="Fill">
+        <VerticalStackLayout Spacing="16">
+            <Label Text="📢 Báo cáo nhà hàng"
+                   FontSize="20"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   TextColor="#FC8312" />
+            
+            <Label Text="{Binding StoreName}"
+                   FontSize="16"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   TextColor="#000000" />
+            
+            <Label Text="Nội dung báo cáo *"
+                   FontSize="14"
+                   TextColor="#666666" />
+            
+            <Editor Text="{Binding ReportDescription}"
+                    Placeholder="Nhập nội dung báo cáo (Ví dụ: Nhà hàng không chịu hợp tác...)"
+                    HeightRequest="120"
+                    BackgroundColor="#F5F5F5" />
+            
+            <Label Text="{Binding ReportErrorMessage}"
+                   FontSize="14"
+                   TextColor="#F84135"
+                   IsVisible="{Binding ReportErrorMessage, Converter={StaticResource StringNotNullOrEmptyConverter}}" />
+            
+            <HorizontalStackLayout Spacing="12" HorizontalOptions="Center">
+                <Button Text="Hủy"
+                        Command="{Binding HideReportPopupCommand}"
+                        BackgroundColor="#CCCCCC"
+                        TextColor="White"
+                        WidthRequest="120" />
+                
+                <Button Text="Gửi báo cáo"
+                        Command="{Binding SubmitReportCommand}"
+                        BackgroundColor="#F84135"
+                        TextColor="White"
+                        WidthRequest="120" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </Frame>
+
+    <!-- Loading Overlay -->
+    <Grid IsVisible="{Binding IsBusy}"
+          BackgroundColor="#80000000">
+        <ActivityIndicator IsRunning="{Binding IsBusy}"
+                           Color="#FC8312"
+                           WidthRequest="50"
+                           HeightRequest="50" />
+    </Grid>
+    </Grid>
+</ContentPage>
+
+

@@ -147,6 +147,13 @@ namespace QuanQuenBackOfficeMobile.Models
         public string RepresentativeName { get; set; }
         public string ProvinceId { get; set; }
         public string BusinessType { get; set; }
+        public string CreatedBy { get; set; } = string.Empty;
+
+        public string CategoryMaster { get; set; }
+        // Optional local file paths for multipart fields
+        public string? FileFrontPicIdentityCardPath { get; set; }
+        public string? FileBackPicIdentityCardPath { get; set; }
+        public string? FileImageBusinessRegistrationPath { get; set; }
     }
 
     public class ApiResponse
@@ -158,6 +165,18 @@ namespace QuanQuenBackOfficeMobile.Models
         public string Message { get; set; }
     }
 
+    public class CreateStoreResponse
+    {
+        [JsonPropertyName("success")]
+        public bool IsSuccess { get; set; }
+
+        [JsonPropertyName("message")]
+        public string Message { get; set; }
+
+        [JsonPropertyName("data")]
+        public string Data { get; set; } = string.Empty;
+    }
+
     // Static class to store registration data between pages
     public static class StoreRegistrationData
     {
@@ -167,6 +186,7 @@ namespace QuanQuenBackOfficeMobile.Models
         public static string District { get; set; } = string.Empty;
         public static string Ward { get; set; } = string.Empty;
         public static string Address { get; set; } = string.Empty;
+        public static string CatergoryMaster { get; set; } = string.Empty;
         public static string PhoneNumber { get; set; } = string.Empty;
         public static string Email { get; set; } = string.Empty;
         public static string BusinessType { get; set; } = string.Empty;
@@ -175,8 +195,14 @@ namespace QuanQuenBackOfficeMobile.Models
         public static string WardId { get; set; } = string.Empty;
         public static string Password { get; set; } = string.Empty;
         public static string StoreId { get; set; } = string.Empty;
+        public static string StoreUserId { get; set; } = string.Empty;
+        public static string UserToken { get; set; } = string.Empty; // Token từ RegisterUser endpoint
         public static List<FileResult> LicenseImageFiles { get; set; } = new();
         public static List<string> LicenseImagePaths { get; set; } = new();
+        // New: single-image paths for API multipart fields
+        public static string FileFrontPicIdentityCardPath { get; set; } = string.Empty;
+        public static string FileBackPicIdentityCardPath { get; set; } = string.Empty;
+        public static string FileImageBusinessRegistrationPath { get; set; } = string.Empty;
     }
 
     public class MyImageModel
@@ -231,4 +257,4 @@ namespace QuanQuenBackOfficeMobile.Models
         [JsonPropertyName("result")]
         public List<CategoryMediaItem> Result { get; set; } = new();
     }
-} 
+}

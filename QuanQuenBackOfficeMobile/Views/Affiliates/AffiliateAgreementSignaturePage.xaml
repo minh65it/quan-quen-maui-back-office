@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="QuanQuenBackOfficeMobile.Views.Affiliates.AffiliateAgreementSignaturePage"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             Title="Ký thỏa thuận">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="16" RowSpacing="12">
+        <Label Grid.Row="0" Text="Vui lòng ký vào khung bên dưới" />
+
+        <toolkit:DrawingView Grid.Row="1"
+                              x:Name="AgreementDrawingView"
+                              Lines="{Binding Lines}"
+                              HeightRequest="400"
+                              BackgroundColor="White" />
+
+        <HorizontalStackLayout Grid.Row="2" Spacing="12" HorizontalOptions="Center">
+            <Button Text="Lưu chữ ký" Clicked="SaveClicked" />
+        </HorizontalStackLayout>
+    </Grid>
+</ContentPage>
+
+

@@ -3,7 +3,9 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Configuration;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
+using QuanQuenBackOfficeMobile.ViewModels.Stores;
 
 namespace QuanQuenBackOfficeMobile.ViewModels.Stores;
 
@@ -72,8 +74,19 @@ public partial class StoreUserAuthenticationViewModel : ObservableObject
         var response = await _storeUserService.VerifyCodeEmailAsync(Email, OtpCode);
         if (response.IsSuccess)
         {
-            await App.Current.MainPage.DisplayAlert("Thành công", "Xác thực thành công!", "OK");
-            await Application.Current.MainPage.Navigation.PushAsync(new QuanQuenBackOfficeMobile.Views.PhotoStoreUser());
+            // Sau khi xác thực OTP thành công, đi đến trang Agreement Information
+            var contractService = App.Services.GetService<IContractService>();
+            var configuration = App.Services.GetService<IConfiguration>();
+            
+            if (contractService != null && configuration != null)
+            {
+                var viewModel = new StoreAgreementInformationViewModel(contractService, configuration);
+                await Application.Current.MainPage.Navigation.PushAsync(new QuanQuenBackOfficeMobile.Views.Stores.StoreAgreementInformationPage());
+            }
+            else
+            {
+                await App.Current.MainPage.DisplayAlert("Lỗi", "Không thể khởi tạo trang. Vui lòng thử lại.", "OK");
+            }
         }
         else
         {

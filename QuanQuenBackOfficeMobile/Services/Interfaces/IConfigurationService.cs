@@ -11,5 +11,6 @@ namespace QuanQuenBackOfficeMobile.Services.Interfaces
         string GetApiUrl(string serviceName);
         string GetApiPath(string serviceName, string pathName);
         string GetAssetUrl();
+        string GetGoogleMapsApiKey();
     }
 }

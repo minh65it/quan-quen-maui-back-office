@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:QuanQuenBackOfficeMobile.ViewModels.Stores"
+             xmlns:converters="clr-namespace:QuanQuenBackOfficeMobile.Converters"
+             xmlns:models="clr-namespace:QuanQuenBackOfficeMobile.Models"
+             x:Class="QuanQuenBackOfficeMobile.Views.Stores.StoreCreateFood"
+             x:DataType="viewmodels:StoreCreateFoodViewModel"
+             Title="Tạo món ăn mới"
+             BackgroundColor="#FAFAFA">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="16">
+            
+            <!-- Loading Indicator -->
+            <ActivityIndicator IsRunning="{Binding IsLoading}"
+                             IsVisible="{Binding IsLoading}"
+                             Color="#FF9800"
+                             HeightRequest="50" />
+
+            <!-- Form Card -->
+            <Frame Padding="20"
+                   CornerRadius="12"
+                   BorderColor="#E0E0E0"
+                   BackgroundColor="White"
+                   HasShadow="True"
+                   IsVisible="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}">
+                <VerticalStackLayout Spacing="16">
+                    
+                    <!-- Header -->
+                    <Label Text="🍽️ Thông tin món ăn" 
+                           FontAttributes="Bold" 
+                           FontSize="20" 
+                           TextColor="#FF9800" 
+                           HorizontalOptions="Center" />
+
+                    <!-- Filter Info -->
+                    <Frame Padding="12"
+                           BackgroundColor="#FFF3E0"
+                           BorderColor="#FF9800"
+                           CornerRadius="8"
+                           HasShadow="False">
+                        <Label Text="{Binding FilterName, StringFormat='Bộ lọc: {0}'}"
+                               FontSize="14"
+                               TextColor="#F57C00"
+                               FontAttributes="Bold" />
+                    </Frame>
+
+                    <!-- Image Section -->
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Ảnh món ăn" 
+                               FontSize="14" 
+                               TextColor="#666" />
+                        
+                        <!-- Image Preview -->
+                        <Frame Padding="0"
+                               CornerRadius="12"
+                               BorderColor="#E0E0E0"
+                               HeightRequest="200"
+                               IsVisible="{Binding HasSelectedImage}">
+                            <Grid>
+                                <Image Source="{Binding SelectedImage}"
+                                       Aspect="AspectFill" />
+                                <!-- Remove Button -->
+                                <Button Text="✕"
+                                        BackgroundColor="#F44336"
+                                        TextColor="White"
+                                        WidthRequest="40"
+                                        HeightRequest="40"
+                                        CornerRadius="20"
+                                        FontSize="20"
+                                        Padding="0"
+                                        HorizontalOptions="End"
+                                        VerticalOptions="Start"
+                                        Margin="8"
+                                        Command="{Binding RemoveImageCommand}" />
+                            </Grid>
+                        </Frame>
+
+                        <!-- Image Buttons -->
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8" IsVisible="{Binding HasSelectedImage, Converter={StaticResource InverseBoolConverter}}">
+                            <Button Grid.Column="0"
+                                    Text="📷 Chụp ảnh"
+                                    BackgroundColor="#2196F3"
+                                    TextColor="White"
+                                    CornerRadius="8"
+                                    HeightRequest="50"
+                                    Command="{Binding TakePhotoCommand}" />
+                            
+                            <Button Grid.Column="1"
+                                    Text="🖼️ Chọn ảnh"
+                                    BackgroundColor="#9C27B0"
+                                    TextColor="White"
+                                    CornerRadius="8"
+                                    HeightRequest="50"
+                                    Command="{Binding PickImageCommand}" />
+                        </Grid>
+                    </VerticalStackLayout>
+
+                    <!-- Food Name -->
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Tên món ăn *" 
+                               FontSize="14" 
+                               TextColor="#666" />
+                        <Entry Text="{Binding FoodName, Mode=TwoWay}"
+                               Placeholder="Ví dụ: Bún bò Huế, Phở bò..."
+                               BackgroundColor="White"
+                               TextColor="#333" />
+                    </VerticalStackLayout>
+
+                    <!-- Description -->
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Mô tả" 
+                               FontSize="14" 
+                               TextColor="#666" />
+                        <Editor Text="{Binding Description, Mode=TwoWay}"
+                                Placeholder="Mô tả món ăn (không bắt buộc)"
+                                BackgroundColor="White"
+                                TextColor="#333"
+                                HeightRequest="80" />
+                    </VerticalStackLayout>
+
+                    <!-- Price -->
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Giá *" 
+                               FontSize="14" 
+                               TextColor="#666" />
+                        <Entry Text="{Binding Price, Mode=TwoWay}"
+                               Placeholder="0"
+                               Keyboard="Numeric"
+                               BackgroundColor="White"
+                               TextColor="#333" />
+                    </VerticalStackLayout>
+
+                    <!-- Price Sale -->
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Giá khuyến mãi" 
+                               FontSize="14" 
+                               TextColor="#666" />
+                        <Entry Text="{Binding PriceSale, Mode=TwoWay}"
+                               Placeholder="0 (Mặc định bằng giá gốc)"
+                               Keyboard="Numeric"
+                               BackgroundColor="White"
+                               TextColor="#333" />
+                    </VerticalStackLayout>
+
+                    <!-- Attributes -->
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="🏷️ Thuộc tính món ăn" 
+                               FontSize="15" 
+                               TextColor="#333"
+                               FontAttributes="Bold" />
+                        
+                        <Frame Padding="12"
+                               CornerRadius="12"
+                               BorderColor="#E0E0E0"
+                               BackgroundColor="#FAFAFA"
+                               HasShadow="False"
+                               HeightRequest="250">
+                            <ScrollView>
+                                <VerticalStackLayout Spacing="0">
+                                    <CollectionView ItemsSource="{Binding Attributes}">
+                                        <CollectionView.ItemsLayout>
+                                            <LinearItemsLayout Orientation="Vertical" ItemSpacing="0" />
+                                        </CollectionView.ItemsLayout>
+                                        <CollectionView.ItemTemplate>
+                                            <DataTemplate x:DataType="models:FoodAttribute">
+                                                <Border StrokeThickness="0,0,0,1"
+                                                        Stroke="#F0F0F0"
+                                                        BackgroundColor="Transparent"
+                                                        Padding="6,8">
+                                                    <HorizontalStackLayout Spacing="10">
+                                                        <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                                  Color="#FF9800"
+                                                                  VerticalOptions="Center" />
+                                                        
+                                                        <Label Text="{Binding Name}"
+                                                               FontSize="13"
+                                                               TextColor="#333"
+                                                               VerticalOptions="Center"
+                                                               HorizontalOptions="FillAndExpand" />
+                                                    </HorizontalStackLayout>
+                                                </Border>
+                                            </DataTemplate>
+                                        </CollectionView.ItemTemplate>
+                                    </CollectionView>
+                                </VerticalStackLayout>
+                            </ScrollView>
+                        </Frame>
+                    </VerticalStackLayout>
+
+                    <!-- Action Buttons -->
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="0,16,0,0">
+                        <Button Grid.Column="0"
+                                Text="✅ Tạo món"
+                                BackgroundColor="#4CAF50"
+                                TextColor="White"
+                                CornerRadius="8"
+                                HeightRequest="50"
+                                FontSize="16"
+                                FontAttributes="Bold"
+                                Command="{Binding CreateFoodCommand}" />
+                        
+                        <Button Grid.Column="1"
+                                Text="❌ Hủy"
+                                BackgroundColor="#F44336"
+                                TextColor="White"
+                                CornerRadius="8"
+                                HeightRequest="50"
+                                FontSize="16"
+                                FontAttributes="Bold"
+                                Command="{Binding CancelCommand}" />
+                    </Grid>
+
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
+

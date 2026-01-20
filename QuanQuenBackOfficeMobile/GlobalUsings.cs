@@ -1,6 +1,5 @@
 ﻿global using Maui.Plugins.PageResolver;
 global using Plugin.Maui.Audio;
-global using SkiaSharp.Views.Maui.Controls.Hosting;
 global using QuanQuenBackOfficeMobile.Models;
 global using QuanQuenBackOfficeMobile.Services;
 global using CommunityToolkit.Maui.Maps;

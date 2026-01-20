@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:QuanQuenBackOfficeMobile.ViewModels"
+             xmlns:converters="clr-namespace:QuanQuenBackOfficeMobile.Converters"
+             x:Class="QuanQuenBackOfficeMobile.Views.AffiliateStatisticsPage"
+             x:DataType="viewmodels:AffiliateStatisticsViewModel"
+             Title="Thống Kê Cộng Tác Viên"
+             BackgroundColor="#FAFAFA">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+            
+            <!-- Card Style -->
+            <Style x:Key="StatCardStyle" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="White" />
+                <Setter Property="Padding" Value="16" />
+                <Setter Property="StrokeThickness" Value="0" />
+                <Setter Property="Margin" Value="15,8" />
+                <Setter Property="StrokeShape">
+                    <RoundRectangle CornerRadius="16"/>
+                </Setter>
+                <Setter Property="Shadow">
+                    <Shadow Brush="#22000000" Offset="0,2" Radius="4"/>
+                </Setter>
+            </Style>
+
+            <!-- Stat Item Style -->
+            <Style x:Key="StatItemStyle" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="#F8F9FA" />
+                <Setter Property="Padding" Value="12" />
+                <Setter Property="StrokeThickness" Value="0" />
+                <Setter Property="StrokeShape">
+                    <RoundRectangle CornerRadius="10"/>
+                </Setter>
+            </Style>
+
+            <!-- Title Style -->
+            <Style x:Key="SectionTitleStyle" TargetType="Label">
+                <Setter Property="FontSize" Value="18" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="#2C3E50" />
+                <Setter Property="Margin" Value="15,15,15,8" />
+            </Style>
+
+            <!-- Stat Label Style -->
+            <Style x:Key="StatLabelStyle" TargetType="Label">
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="TextColor" Value="#6C757D" />
+            </Style>
+
+            <!-- Stat Value Style -->
+            <Style x:Key="StatValueStyle" TargetType="Label">
+                <Setter Property="FontSize" Value="20" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="#2C3E50" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid>
+        <!-- Main Content -->
+        <ScrollView>
+            <VerticalStackLayout Spacing="0" Padding="0,0,0,20">
+                
+                <!-- Header -->
+                <Frame BackgroundColor="#E67E22"
+                       CornerRadius="0"
+                       Padding="20,30,20,20"
+                       HasShadow="False">
+                    <VerticalStackLayout Spacing="12">
+                        <HorizontalStackLayout Spacing="12">
+                            <Button Text="←"
+                                    Command="{Binding BackCommand}"
+                                    BackgroundColor="Transparent"
+                                    TextColor="White"
+                                    FontSize="24"
+                                    Padding="0"
+                                    WidthRequest="40"
+                                    HeightRequest="40"/>
+                            <VerticalStackLayout VerticalOptions="Center" Spacing="4">
+                                <Label Text="Thống Kê Cộng Tác Viên"
+                                       FontSize="22"
+                                       TextColor="White"
+                                       FontAttributes="Bold" />
+                                <Label Text="{Binding ReferralName}"
+                                       FontSize="14"
+                                       TextColor="#FFF3CD"/>
+                            </VerticalStackLayout>
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Loading Indicator -->
+                <ActivityIndicator IsRunning="{Binding IsLoading}"
+                                 IsVisible="{Binding IsLoading}"
+                                 Color="#E67E22"
+                                 WidthRequest="40" 
+                                 HeightRequest="40"
+                                 Margin="0,40"/>
+
+                <!-- Error Message -->
+                <Border IsVisible="{Binding HasError}"
+                        BackgroundColor="#FFEBEE"
+                        Padding="16"
+                        Margin="15"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle;CornerRadius=12">
+                    <Label Text="{Binding ErrorMessage}"
+                           TextColor="#D32F2F"
+                           FontSize="14"/>
+                </Border>
+
+                <!-- Statistics Content -->
+                <VerticalStackLayout IsVisible="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}">
+
+                    <!-- Store Statistics Section -->
+                    <Label Text="📊 Thống Kê Nhà Hàng" Style="{StaticResource SectionTitleStyle}"/>
+                    
+                    <Border Style="{StaticResource StatCardStyle}">
+                        <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,*" RowSpacing="12" ColumnSpacing="12">
+                            
+                            <!-- Total Stores -->
+                            <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource StatItemStyle}">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="Tổng số nhà hàng" Style="{StaticResource StatLabelStyle}"/>
+                                    <Label Text="{Binding TotalStores}" Style="{StaticResource StatValueStyle}" TextColor="#3498DB"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!-- Approved Stores -->
+                            <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource StatItemStyle}">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="Đã duyệt" Style="{StaticResource StatLabelStyle}"/>
+                                    <Label Text="{Binding ApprovedStores}" Style="{StaticResource StatValueStyle}" TextColor="#27AE60"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!-- Pending Stores -->
+                            <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource StatItemStyle}">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="Đang chờ" Style="{StaticResource StatLabelStyle}"/>
+                                    <Label Text="{Binding PendingStores}" Style="{StaticResource StatValueStyle}" TextColor="#F39C12"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!-- Inactive Stores -->
+                            <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource StatItemStyle}">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="Không hoạt động" Style="{StaticResource StatLabelStyle}"/>
+                                    <Label Text="{Binding InActiveStores}" Style="{StaticResource StatValueStyle}" TextColor="#95A5A6"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!-- With Contract -->
+                            <Border Grid.Row="2" Grid.Column="0" Style="{StaticResource StatItemStyle}">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="Có hợp đồng" Style="{StaticResource StatLabelStyle}"/>
+                                    <Label Text="{Binding StoresWithContract}" Style="{StaticResource StatValueStyle}" TextColor="#16A085"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!-- Without Contract -->
+                            <Border Grid.Row="2" Grid.Column="1" Style="{StaticResource StatItemStyle}">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="Chưa có hợp đồng" Style="{StaticResource StatLabelStyle}"/>
+                                    <Label Text="{Binding StoresWithoutContract}" Style="{StaticResource StatValueStyle}" TextColor="#E74C3C"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                        </Grid>
+                    </Border>
+
+                    <!-- Transaction Statistics Section -->
+                    <Label Text="💰 Thống Kê Giao Dịch" Style="{StaticResource SectionTitleStyle}"/>
+                    
+                    <Border Style="{StaticResource StatCardStyle}">
+                        <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,*" RowSpacing="12" ColumnSpacing="12">
+                            
+                            <!-- Total Transactions -->
+                            <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource StatItemStyle}">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="Tổng giao dịch" Style="{StaticResource StatLabelStyle}"/>
+                                    <Label Text="{Binding TotalTransactions}" Style="{StaticResource StatValueStyle}" TextColor="#3498DB"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!-- Finished Transactions -->
+                            <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource StatItemStyle}">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="Hoàn thành" Style="{StaticResource StatLabelStyle}"/>
+                                    <Label Text="{Binding FinishedTransactions}" Style="{StaticResource StatValueStyle}" TextColor="#27AE60"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!-- Pending Transactions -->
+                            <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource StatItemStyle}">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="Đang chờ" Style="{StaticResource StatLabelStyle}"/>
+                                    <Label Text="{Binding PendingTransactions}" Style="{StaticResource StatValueStyle}" TextColor="#F39C12"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!-- Canceled Transactions -->
+                            <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource StatItemStyle}">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="Đã hủy" Style="{StaticResource StatLabelStyle}"/>
+                                    <Label Text="{Binding CanceledTransactions}" Style="{StaticResource StatValueStyle}" TextColor="#E74C3C"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!-- Stores With Transaction -->
+                            <Border Grid.Row="2" Grid.Column="0" Style="{StaticResource StatItemStyle}">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="NH có giao dịch" Style="{StaticResource StatLabelStyle}"/>
+                                    <Label Text="{Binding StoresWithTransaction}" Style="{StaticResource StatValueStyle}" TextColor="#16A085"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!-- Stores Without Transaction -->
+                            <Border Grid.Row="2" Grid.Column="1" Style="{StaticResource StatItemStyle}">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="NH chưa GD" Style="{StaticResource StatLabelStyle}"/>
+                                    <Label Text="{Binding StoresWithoutTransaction}" Style="{StaticResource StatValueStyle}" TextColor="#95A5A6"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                        </Grid>
+                    </Border>
+
+                    <!-- Commission Statistics Section -->
+                    <Label Text="💵 Thống Kê Hoa Hồng" Style="{StaticResource SectionTitleStyle}"/>
+                    
+                    <Border Style="{StaticResource StatCardStyle}">
+                        <VerticalStackLayout Spacing="16">
+                            
+                            <!-- Total Commission -->
+                            <Border BackgroundColor="#E8F5E9" Padding="16" StrokeThickness="0" StrokeShape="RoundRectangle;CornerRadius=12">
+                                <VerticalStackLayout Spacing="6">
+                                    <Label Text="Tổng hoa hồng đã kiếm được" 
+                                           FontSize="14" 
+                                           TextColor="#2E7D32"/>
+                                    <Label Text="{Binding TotalCommissionEarned}" 
+                                           FontSize="26" 
+                                           FontAttributes="Bold"
+                                           TextColor="#1B5E20"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!-- Pending Commission -->
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                                <Border Grid.Column="0" Style="{StaticResource StatItemStyle}">
+                                    <VerticalStackLayout Spacing="4">
+                                        <Label Text="Hoa hồng chờ" Style="{StaticResource StatLabelStyle}"/>
+                                        <Label Text="{Binding PendingCommission}" FontSize="16" FontAttributes="Bold" TextColor="#F39C12"/>
+                                    </VerticalStackLayout>
+                                </Border>
+
+                                <Border Grid.Column="1" Style="{StaticResource StatItemStyle}">
+                                    <VerticalStackLayout Spacing="4">
+                                        <Label Text="Hoa hồng TB" Style="{StaticResource StatLabelStyle}"/>
+                                        <Label Text="{Binding AverageCommission}" FontSize="16" FontAttributes="Bold" TextColor="#3498DB"/>
+                                    </VerticalStackLayout>
+                                </Border>
+                            </Grid>
+
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Other Statistics Section -->
+                    <Label Text="📈 Thống Kê Khác" Style="{StaticResource SectionTitleStyle}"/>
+                    
+                    <Border Style="{StaticResource StatCardStyle}">
+                        <VerticalStackLayout Spacing="16">
+                            
+                            <!-- Success Rate -->
+                            <Border Style="{StaticResource StatItemStyle}">
+                                <HorizontalStackLayout Spacing="10">
+                                    <Label Text="🎯" FontSize="24" VerticalOptions="Center"/>
+                                    <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                                        <Label Text="Tỷ lệ thành công" Style="{StaticResource StatLabelStyle}"/>
+                                        <Label Text="{Binding SuccessRate}" FontSize="18" FontAttributes="Bold" TextColor="#27AE60"/>
+                                    </VerticalStackLayout>
+                                </HorizontalStackLayout>
+                            </Border>
+
+                            <!-- Last Store Referral Date -->
+                            <Border Style="{StaticResource StatItemStyle}">
+                                <HorizontalStackLayout Spacing="10">
+                                    <Label Text="🏪" FontSize="24" VerticalOptions="Center"/>
+                                    <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                                        <Label Text="Nhà hàng gần nhất" Style="{StaticResource StatLabelStyle}"/>
+                                        <Label Text="{Binding LastStoreReferralDate}" FontSize="14" FontAttributes="Bold" TextColor="#2C3E50"/>
+                                    </VerticalStackLayout>
+                                </HorizontalStackLayout>
+                            </Border>
+
+                            <!-- Last Transaction Date -->
+                            <Border Style="{StaticResource StatItemStyle}">
+                                <HorizontalStackLayout Spacing="10">
+                                    <Label Text="💳" FontSize="24" VerticalOptions="Center"/>
+                                    <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                                        <Label Text="Giao dịch gần nhất" Style="{StaticResource StatLabelStyle}"/>
+                                        <Label Text="{Binding LastTransactionDate}" FontSize="14" FontAttributes="Bold" TextColor="#2C3E50"/>
+                                    </VerticalStackLayout>
+                                </HorizontalStackLayout>
+                            </Border>
+
+                        </VerticalStackLayout>
+                    </Border>
+
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
+</ContentPage>
+

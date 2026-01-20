@@ -1,11 +1,16 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Camera.MAUI;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using QuanQuenBackOfficeMobile.Services;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
+using QuanQuenBackOfficeMobile.ViewModels;
 using QuanQuenBackOfficeMobile.ViewModels.Stores;
 using QuanQuenBackOfficeMobile.Views.Stores;
 using System.Reflection;
+using ZXing.Net.Maui.Controls;
 #if IOS && ANDROID
 using QuanQuenBackOfficeMobile.Controls;
+using Camera.MAUI;
 #endif
 
 namespace QuanQuenBackOfficeMobile;
@@ -17,13 +22,14 @@ public static class MauiProgram
 		var builder = MauiApp.CreateBuilder();
 		builder
 			.UseMauiApp<App>()
-			.UseSkiaSharp()
 #if ANDROID || IOS
 			.UseMauiMaps()
+			
 #endif
-			.UseMauiCommunityToolkitMediaElement()
+			.UseBarcodeReader()
+			.UseMauiCameraView()
+            .UseMauiCommunityToolkitMediaElement()
 			.UseMauiCommunityToolkit()
-			.UseMauiCommunityToolkitCamera()
 			.ConfigureFonts(fonts =>
 			{
 				fonts.AddFont("MaterialIcons-Regular.ttf", "MaterialSymbol");
@@ -41,7 +47,6 @@ public static class MauiProgram
         // Development environment - load appsettings.Development.json
         var resourceName = "QuanQuenBackOfficeMobile.appsettings.Development.json";
 #else
-        // Production environment - load appsettings.json
         var resourceName = "QuanQuenBackOfficeMobile.appsettings.json";
 #endif
 
@@ -60,7 +65,6 @@ public static class MauiProgram
                    var configService = sp.GetRequiredService<IConfigurationService>();
                    var baseUrl = configService.GetApiUrl("Identity");
                    client.BaseAddress = new Uri(baseUrl);
-                   client.Timeout = TimeSpan.FromSeconds(30);
 				   client.Timeout = TimeSpan.FromMinutes(5);
 
                });
@@ -70,9 +74,32 @@ public static class MauiProgram
             var configService = sp.GetRequiredService<IConfigurationService>();
             var baseUrl = configService.GetApiUrl("Store");
             client.BaseAddress = new Uri(baseUrl);
-            client.Timeout = TimeSpan.FromSeconds(30);
             client.Timeout = TimeSpan.FromMinutes(5); 
 
+        });
+
+        builder.Services.AddHttpClient<ITableAreaService, TableAreaService>((sp, client) =>
+        {
+            var configService = sp.GetRequiredService<IConfigurationService>();
+            var baseUrl = configService.GetApiUrl("Store");
+            client.BaseAddress = new Uri(baseUrl);
+            client.Timeout = TimeSpan.FromMinutes(2);
+        });
+
+        builder.Services.AddHttpClient<ITableService, TableService>((sp, client) =>
+        {
+            var configService = sp.GetRequiredService<IConfigurationService>();
+            var baseUrl = configService.GetApiUrl("Store");
+            client.BaseAddress = new Uri(baseUrl);
+            client.Timeout = TimeSpan.FromMinutes(2);
+        });
+
+        builder.Services.AddHttpClient<IFoodFilterService, FoodFilterService>((sp, client) =>
+        {
+            var configService = sp.GetRequiredService<IConfigurationService>();
+            var baseUrl = configService.GetApiUrl("Store");
+            client.BaseAddress = new Uri(baseUrl);
+            client.Timeout = TimeSpan.FromMinutes(2);
         });
 
         builder.Services.AddHttpClient<IStoreUserService, StoreUserService>((sp, client) =>
@@ -80,7 +107,6 @@ public static class MauiProgram
             var configService = sp.GetRequiredService<IConfigurationService>();
             var baseUrl = configService.GetApiUrl("Identity");
             client.BaseAddress = new Uri(baseUrl);
-            client.Timeout = TimeSpan.FromSeconds(30);
             client.Timeout = TimeSpan.FromMinutes(5); 
 
         });
@@ -90,23 +116,107 @@ public static class MauiProgram
             var configService = sp.GetRequiredService<IConfigurationService>();
             var baseUrl = configService.GetApiUrl("Store");
             client.BaseAddress = new Uri(baseUrl);
-            client.Timeout = TimeSpan.FromSeconds(30);
             client.Timeout = TimeSpan.FromMinutes(5); 
+        });
+
+        builder.Services.AddHttpClient<IQRCodeService, QRCodeService>((sp, client) =>
+        {
+            var configuration = sp.GetRequiredService<IConfiguration>();
+            var baseUrl = configuration["QRCode:BaseUrl"];
+            if (!string.IsNullOrEmpty(baseUrl))
+            {
+                client.BaseAddress = new Uri(baseUrl);
+            }
+            client.Timeout = TimeSpan.FromMinutes(5); 
+        });
+
+        // Register QR Code Scanning Service
+
+        builder.Services.AddHttpClient<IAiChatbotService, AiChatbotService>((sp, client) =>
+        {
+            var configService = sp.GetRequiredService<IConfigurationService>();
+            var baseUrl = configService.GetApiUrl("AiChatbot");
+            client.BaseAddress = new Uri(baseUrl);
+            client.Timeout = TimeSpan.FromMinutes(5);
+        });
+
+        builder.Services.AddHttpClient<IAffiliateService, AffiliateService>((sp, client) =>
+        {
+            var configuration = sp.GetRequiredService<IConfiguration>();
+            var baseUrl = configuration["API:Affiliate:BaseUrl"];
+            client.BaseAddress = new Uri(baseUrl);
+            client.Timeout = TimeSpan.FromMinutes(5);
+        });
+
+        builder.Services.AddHttpClient<IStoreStatisticService, StoreStatisticService>((sp, client) =>
+        {
+            var configuration = sp.GetRequiredService<IConfiguration>();
+            var baseUrl = configuration["API:Payment:BaseUrl"];
+            if (!string.IsNullOrEmpty(baseUrl))
+            {
+                client.BaseAddress = new Uri(baseUrl);
+            }
+            client.Timeout = TimeSpan.FromMinutes(2);
         });
 
       
 
         // Register ViewModels
         builder.Services.AddTransient<LoginViewModel>();
+        builder.Services.AddTransient<ServicePackagesViewModel>();
+        builder.Services.AddTransient<AffiliateLoginViewModel>();
+        builder.Services.AddTransient<AffiliateCreateStoreViewModel>();
+        builder.Services.AddTransient<AffiliateStoreUserPasswordViewModel>();
+        builder.Services.AddTransient<AffiliateStoreUserAuthenticationViewModel>();
+        builder.Services.AddTransient<AffiliateStoreListViewModel>();
+        builder.Services.AddTransient<AffiliateStatisticsViewModel>();
+        builder.Services.AddTransient<AffiliateListingAgentViewModel>();
+        builder.Services.AddTransient<DataAffiliatePreviewViewModel>();
+        builder.Services.AddTransient<DataAffiliateInfoViewModel>();
+        builder.Services.AddTransient<DataAffiliateSignatureViewModel>();
+        builder.Services.AddTransient<DataAffiliateFinalViewModel>();
+        builder.Services.AddTransient<QuanQuenBackOfficeMobile.ViewModels.Affiliates.AffiliateAgreementInformationViewModel>();
+        builder.Services.AddTransient<QuanQuenBackOfficeMobile.ViewModels.Affiliates.AffiliateAgreementPreviewViewModel>();
+        builder.Services.AddTransient<QuanQuenBackOfficeMobile.ViewModels.Affiliates.AffiliateAgreementSignatureViewModel>();
+        builder.Services.AddTransient<QuanQuenBackOfficeMobile.ViewModels.Affiliates.AffiliateAgreementPageViewModel>();
 		builder.Services.AddTransient<MainViewModel>();
 		builder.Services.AddTransient<CreateStoreUserPasswordViewModel>();
+		builder.Services.AddTransient<StoreInformationContractViewModel>();
+		builder.Services.AddTransient<ContractPreviewViewModel>();
+		builder.Services.AddTransient<ContractPreviewPage>();
+		builder.Services.AddTransient<ContractStoreViewModel>();
+		builder.Services.AddTransient<ContractStorePage>();
+		
+		// Register Services
+		builder.Services.AddTransient<IContractService, ContractService>();
+		builder.Services.AddTransient<IGeocodingService, GeocodingService>();
+		builder.Services.AddTransient<ILocationService, LocationService>();
+		
         // Register Views
         builder.Services.AddTransient<LoginPage>();
+        builder.Services.AddTransient<AffiliateLoginPage>();
+        builder.Services.AddTransient<AffiliateCreateStorePage>();
+        builder.Services.AddTransient<AffiliateStoreUserPasswordPage>();
+        builder.Services.AddTransient<AffiliateStoreUserAuthenticationPage>();
+        builder.Services.AddTransient<AffiliateStoreListPage>();
+        builder.Services.AddTransient<QuanQuenBackOfficeMobile.Views.AffiliateStatisticsPage>();
+        builder.Services.AddTransient<AffiliateListingAgentPage>();
+        builder.Services.AddTransient<DataAffiliatePreviewPage>();
+        builder.Services.AddTransient<DataAffiliateInfoPage>();
+        builder.Services.AddTransient<DataAffiliateSignaturePage>();
+        builder.Services.AddTransient<DataAffiliateFinalPage>();
+        builder.Services.AddTransient<QuanQuenBackOfficeMobile.Views.Affiliates.AffiliateAgreementInformationPage>();
+        builder.Services.AddTransient<QuanQuenBackOfficeMobile.Views.Affiliates.AffiliateAgreementPreviewPage>();
+        builder.Services.AddTransient<QuanQuenBackOfficeMobile.Views.Affiliates.AffiliateAgreementSignaturePage>();
+        builder.Services.AddTransient<QuanQuenBackOfficeMobile.Views.Affiliates.AffiliateAgreementPage>();
+        builder.Services.AddTransient<QuanQuenBackOfficeMobile.Views.Affiliates.AffiliatePhotoPage>();
+        builder.Services.AddTransient<QuanQuenBackOfficeMobile.ViewModels.Affiliates.AffiliatePhotoViewModel>();
+        builder.Services.AddTransient<ServicePackagesPage>();
 		builder.Services.AddTransient<RegisterPage>();
 		builder.Services.AddTransient<MainPage>();
 		builder.Services.AddTransient<CreateStorePage>();
-
-		builder.Services.AddSingleton<SampleViewModel>();
+		builder.Services.AddTransient<StoreInformationContractPage>();
+        builder.Services.AddSingleton<SampleViewModel>();
 
 		builder.Services.AddSingleton<MediaElementViewModel>();
 		builder.Services.AddSingleton<MediaElementPage>();
@@ -139,29 +249,80 @@ public static class MauiProgram
 		builder.Services.AddSingleton<ExampleMaterialFontUsageViewModel>();
 		builder.Services.AddSingleton<ExampleMaterialFontUsagePage>();
 
-		builder.Services.AddSingleton<LottieViewModel>();
-		builder.Services.AddSingleton<LottiePage>();
+		// Removed SkiaSharp Lottie registrations
+
+		builder.Services.AddSingleton<SupportCenterViewModel>();
+		builder.Services.AddSingleton<SupportCenterPage>();
 
 		builder.Services.AddTransient<StorePageViewModel>();
 		builder.Services.AddTransient<StorePage>();
 		builder.Services.AddTransient<StoreDetailViewModel>();
 		builder.Services.AddTransient<StoreDetailPage>();
+		builder.Services.AddTransient<StoreMapViewModel>();
+        builder.Services.AddTransient<StoreMapPage>();
+        builder.Services.AddTransient<StoreStatisticPage>();
+        builder.Services.AddTransient<StoreTableAreaViewModel>();
+        builder.Services.AddTransient<StoreTableAreaPage>();
+        builder.Services.AddTransient<StoreTableListViewModel>();
+        builder.Services.AddTransient<StoreTableListPage>();
+        builder.Services.AddTransient<StoreFilterFoodViewModel>();
+        builder.Services.AddTransient<StoreFilterFoodPage>();
+        builder.Services.AddTransient<StoreCreateFoodViewModel>();
+        builder.Services.AddTransient<StoreCreateFood>();
 
-		builder.Services.AddSingleton<ITokenService, TokenService>();
+        builder.Services.AddSingleton<ITokenService, TokenService>();
+        builder.Services.AddHttpClient<IServicePackagesService, ServicePackagesService>((sp, client) =>
+        {
+            var configuration = sp.GetRequiredService<IConfiguration>();
+            var baseUrl = configuration["API:Store:BaseUrl"];
+            if (!string.IsNullOrEmpty(baseUrl))
+            {
+                client.BaseAddress = new Uri(baseUrl);
+            }
+            client.Timeout = TimeSpan.FromMinutes(2);
+        });
+        builder.Services.AddHttpClient<ISystemConfigService, SystemConfigService>((sp, client) =>
+        {
+            var configuration = sp.GetRequiredService<IConfiguration>();
+            var baseUrl = configuration["API:Identity:BaseUrl"];
+            if (!string.IsNullOrEmpty(baseUrl))
+            {
+                client.BaseAddress = new Uri(baseUrl);
+            }
+            client.Timeout = TimeSpan.FromMinutes(2);
+        });
 
 		builder.Services.AddSingleton<GeographicApiService>();
 
 		builder.Services.AddTransient<CreateStoreViewModel>();
 
+		builder.Services.AddTransient<CreateSubStoreViewModel>();
+
 		builder.Services.AddTransient<PhotoStoreUserViewModel>();
 		builder.Services.AddTransient<PhotoStoreUser>();
 		builder.Services.AddTransient<VideoStoreUserViewModel>();
 		builder.Services.AddTransient<VideoStoreUserPage>();
+		builder.Services.AddTransient<CatergoryMasterService>();
+
+        // Register Scanning QR ViewModel and Page
+        builder.Services.AddTransient<ScanningQRPage>();
+
 
 		// Register Converters
 		builder.Services.AddSingleton<Converters.AvatarUrlConverter>();
+		builder.Services.AddSingleton<Converters.EnumToBoolConverter>();
 
-		builder.Services.UsePageResolver();
+        builder.Services.UsePageResolver();
+
+        // Shell route registrations for Data Affiliate flow (không cần add vào AppShell)
+        Routing.RegisterRoute("DataAffiliateInfoPage", typeof(QuanQuenBackOfficeMobile.Views.DataAffiliateInfoPage));
+        Routing.RegisterRoute("DataAffiliatePreviewPage", typeof(QuanQuenBackOfficeMobile.Views.DataAffiliatePreviewPage));
+        Routing.RegisterRoute("DataAffiliateSignaturePage", typeof(QuanQuenBackOfficeMobile.Views.DataAffiliateSignaturePage));
+        Routing.RegisterRoute("DataAffiliateFinalPage", typeof(QuanQuenBackOfficeMobile.Views.DataAffiliateFinalPage));
+        
+        // Store routes
+        Routing.RegisterRoute("StoreFilterFoodPage", typeof(QuanQuenBackOfficeMobile.Views.Stores.StoreFilterFoodPage));
+        Routing.RegisterRoute("StoreCreateFood", typeof(QuanQuenBackOfficeMobile.Views.Stores.StoreCreateFood));
 
 #if DEBUG
 		builder.Logging.AddDebug();
@@ -170,8 +331,10 @@ public static class MauiProgram
     builder.ConfigureMauiHandlers(handlers =>
     {
         handlers.AddHandler(typeof(CustomDropdownPicker), typeof(CustomDropdownPickerHandler));
+        handlers.AddHandler(typeof(CustomMap), typeof(CustomMapHandler));
+        handlers.AddHandler(typeof(Camera.MAUI.CameraView), typeof(Camera.MAUI.CameraViewHandler));
     });
 #endif
-		return builder.Build();
+        return builder.Build();
 	}
 }

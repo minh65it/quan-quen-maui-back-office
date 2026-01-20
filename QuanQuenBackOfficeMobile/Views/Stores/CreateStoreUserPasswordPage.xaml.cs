@@ -10,8 +10,7 @@ public partial class CreateStoreUserPasswordPage : ContentPage
 		InitializeComponent();
 		var userService = App.Services.GetService<IStoreUserService>();
 		var storeService = App.Services.GetService<IStoreService>();
-		var storeMediaService = App.Services.GetService<IStoreMediaService>();
-        var viewModel = new CreateStoreUserPasswordViewModel(userService!, storeService! ,storeMediaService! );
+        var viewModel = new CreateStoreUserPasswordViewModel(userService!, storeService!);
 		viewModel.Email = email;
 		BindingContext = viewModel;
 	}

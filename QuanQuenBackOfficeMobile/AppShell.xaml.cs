@@ -1,4 +1,6 @@
-﻿namespace QuanQuenBackOfficeMobile;
+﻿using QuanQuenBackOfficeMobile.Views;
+
+namespace QuanQuenBackOfficeMobile;
 
 public partial class AppShell : Shell
 {
@@ -6,6 +8,7 @@ public partial class AppShell : Shell
 	{
 		InitializeComponent();
 		Routing.RegisterRoute("Main", typeof(MainPage));
-
+		Routing.RegisterRoute("Login", typeof(LoginPage));
+		Routing.RegisterRoute("AffiliateLogin", typeof(AffiliateLoginPage));
     }
 }

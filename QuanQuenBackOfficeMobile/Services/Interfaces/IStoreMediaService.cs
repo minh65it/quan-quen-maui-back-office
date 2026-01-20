@@ -14,4 +14,9 @@ public interface IStoreMediaService
     /// Upload ảnh cho cửa hàng
     /// </summary>
     Task<ApiResponse> UploadMediasAsync(string storeId, string categoryMediaId, string createdBy, List<byte[]> imageBytesList, bool isSecurity = false, bool isMenu = false);
+
+    /// <summary>
+    /// Upload ảnh hóa đơn cho cửa hàng
+    /// </summary>
+    Task<ApiResponse> UploadInvoiceImageAsync(string storeId, int month, byte[] imageBytes, string fileName);
 } 

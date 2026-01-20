@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="QuanQuenBackOfficeMobile.Views.Stores.StoreStatisticPage"
+             Title="Thống kê hóa đơn">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style TargetType="Label">
+                <Setter Property="TextColor" Value="#212121" />
+            </Style>
+
+            <Style x:Key="CardFrameStyle" TargetType="Frame">
+                <Setter Property="CornerRadius" Value="12" />
+                <Setter Property="Padding" Value="14" />
+                <Setter Property="Margin" Value="0,8" />
+                <Setter Property="BackgroundColor" Value="#FFFFFF" />
+                <Setter Property="BorderColor" Value="#E6E6E6" />
+                <Setter Property="HasShadow" Value="True" />
+            </Style>
+
+            <Style x:Key="ChipStyle" TargetType="Frame">
+                <Setter Property="CornerRadius" Value="14" />
+                <Setter Property="Padding" Value="8,4" />
+                <Setter Property="HasShadow" Value="False" />
+                <Setter Property="Margin" Value="0,6,8,0" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*" Padding="16">
+        <!-- Title -->
+        <Grid Grid.Row="0" Padding="0,0,0,8">
+            <Label Text="Thống kê hóa đơn" FontSize="22" FontAttributes="Bold" />
+        </Grid>
+
+        <!-- Main Content -->
+        <RefreshView Grid.Row="1" IsRefreshing="{Binding IsLoading}" Command="{Binding LoadCommand}">
+            <CollectionView ItemsSource="{Binding Invoices}">
+                <!-- Empty View -->
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout Padding="24" Spacing="6" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Label Text="Chưa có dữ liệu" FontAttributes="Bold" TextColor="#777" />
+                        <Label Text="Kéo xuống để tải lại" FontSize="12" TextColor="#9E9E9E" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+
+                <!-- Invoice Item Template -->
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Style="{StaticResource CardFrameStyle}">
+                            <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+                                <!-- Store name & period chip -->
+                                <Label Grid.Column="0"
+                                       Text="{Binding storeName}"
+                                       FontAttributes="Bold"
+                                       FontSize="18" />
+
+                                <Frame Grid.Column="1"
+                                       Style="{StaticResource ChipStyle}"
+                                       BackgroundColor="#F3E5F5"
+                                       BorderColor="#E1BEE7">
+                                    <Label Text="{Binding period, StringFormat='{0:yyyy-MM}'}" TextColor="#6A1B9A" FontAttributes="Bold" />
+                                </Frame>
+
+                                <!-- Invoice ID -->
+                                <Grid Grid.Row="1" ColumnDefinitions="Auto,*" Padding="0,4,0,0">
+                                    <Label Text="Mã HĐ:" FontAttributes="Bold" />
+                                    <Label Grid.Column="1" Text="{Binding id}" TextColor="#616161" />
+                                </Grid>
+
+                                <!-- Metrics chips -->
+                                <HorizontalStackLayout Grid.Row="2" Grid.ColumnSpan="2" Spacing="8" Padding="0,6,0,0">
+                                    <Frame Style="{StaticResource ChipStyle}" BackgroundColor="#E3F2FD" BorderColor="#BBDEFB">
+                                        <HorizontalStackLayout Spacing="6">
+                                            <Label Text="Doanh thu" FontAttributes="Bold" FontSize="12" TextColor="#1565C0" />
+                                            <Label Text="{Binding revenueAmount, StringFormat='{}{0:N0}₫'}" TextColor="#1565C0" />
+                                        </HorizontalStackLayout>
+                                    </Frame>
+
+                                    <Frame Style="{StaticResource ChipStyle}" BackgroundColor="#FFF3E0" BorderColor="#FFE0B2">
+                                        <HorizontalStackLayout Spacing="6">
+                                            <Label Text="Chiết khấu" FontAttributes="Bold" FontSize="12" TextColor="#E65100" />
+                                            <Label Text="{Binding discountRate, StringFormat='{}{0:P0}'}" TextColor="#E65100" />
+                                        </HorizontalStackLayout>
+                                    </Frame>
+
+                                    <Frame Style="{StaticResource ChipStyle}" BackgroundColor="#E8F5E9" BorderColor="#C8E6C9">
+                                        <HorizontalStackLayout Spacing="6">
+                                            <Label Text="Phải trả" FontAttributes="Bold" FontSize="12" TextColor="#2E7D32" />
+                                            <Label Text="{Binding totalAmount, StringFormat='{}{0:N0}₫'}" TextColor="#2E7D32" />
+                                        </HorizontalStackLayout>
+                                    </Frame>
+                                </HorizontalStackLayout>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+
+                <!-- Footer Section -->
+                <CollectionView.Footer>
+                    <VerticalStackLayout Spacing="12" Padding="0,16,0,0">
+                        <Label Text="Đơn tạo thành công" FontSize="20" FontAttributes="Bold" />
+
+                        <!-- 🌟 Enhanced Filter Section -->
+                        <Frame BackgroundColor="#FAFAFA"
+                               BorderColor="#E0E0E0"
+                               CornerRadius="12"
+                               Padding="14"
+                               Margin="0,0,0,8"
+                               HasShadow="False">
+                            <VerticalStackLayout Spacing="10">
+                                <Label Text="Bộ lọc tìm kiếm"
+                                       FontAttributes="Bold"
+                                       FontSize="16"
+                                       TextColor="#424242" />
+
+                                <!-- City Picker -->
+                                <HorizontalStackLayout Spacing="10">
+                                    <Label Text="Thành phố:"
+                                           FontAttributes="Bold"
+                                           VerticalOptions="Center"
+                                           WidthRequest="90" />
+                                    <Picker ItemsSource="{Binding Cities}"
+                                            ItemDisplayBinding="{Binding name}"
+                                            SelectedItem="{Binding SelectedCity}"
+                                            HorizontalOptions="FillAndExpand"
+                                            BackgroundColor="White" />
+                                </HorizontalStackLayout>
+
+                                <!-- Date Range -->
+                                <HorizontalStackLayout Spacing="10">
+                                    <Label Text="Từ:"
+                                           FontAttributes="Bold"
+                                           VerticalOptions="Center"
+                                           WidthRequest="40" />
+                                    <DatePicker Date="{Binding FromDate}"
+                                                HorizontalOptions="FillAndExpand"
+                                                BackgroundColor="White"/>
+
+                                    <Label Text="Đến:"
+                                           FontAttributes="Bold"
+                                           VerticalOptions="Center"
+                                           WidthRequest="40" />
+                                    <DatePicker Date="{Binding ToDate}"
+                                                HorizontalOptions="FillAndExpand"
+                                                BackgroundColor="White"/>
+                                </HorizontalStackLayout>
+
+                                <!-- Search Button -->
+                                <HorizontalStackLayout HorizontalOptions="End">
+                                    <Button Text="🔍 Tìm kiếm"
+                                            Command="{Binding LoadOrdersCommand}"
+                                            BackgroundColor="#1976D2"
+                                            TextColor="White"
+                                            CornerRadius="22"
+                                            Padding="12,6"
+                                            FontAttributes="Bold"
+                                            WidthRequest="130" />
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                        </Frame>
+
+                        <!-- Orders List -->
+                        <CollectionView ItemsSource="{Binding Orders}">
+                            <CollectionView.EmptyView>
+                                <Label Text="Không có đơn phù hợp" HorizontalOptions="Center" TextColor="#9E9E9E" />
+                            </CollectionView.EmptyView>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Frame Style="{StaticResource CardFrameStyle}">
+                                        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="8">
+                                            <Label Text="Mã đơn:" FontAttributes="Bold" />
+                                            <Label Grid.Column="1" Text="{Binding id}" />
+
+                                            <Label Grid.Row="1" Text="Ngày tạo:" FontAttributes="Bold" />
+                                            <Label Grid.Row="1" Grid.Column="1" Text="{Binding createdDate, StringFormat='{0:yyyy-MM-dd HH:mm}'}" />
+
+                                            <Label Grid.Row="2" Text="Số lượng:" FontAttributes="Bold" />
+                                            <Label Grid.Row="2" Grid.Column="1" Text="{Binding totalQuantity}" />
+
+                                            <Label Grid.Row="3" Text="Tổng tiền:" FontAttributes="Bold" />
+                                            <Label Grid.Row="3" Grid.Column="1" Text="{Binding totalPrice, StringFormat='{}{0:N0}₫'}" TextColor="#2E7D32" />
+                                        </Grid>
+                                    </Frame>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+
+                        <!-- Loyal Customers Section -->
+                        <Label Text="Danh sách khách hàng thân thiết" FontSize="20" FontAttributes="Bold" Margin="0,16,0,0" />
+
+                        <!-- Frequency Filter -->
+                        <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+                            <Label Text="Tần suất:" FontAttributes="Bold" VerticalOptions="Center" />
+                            <Entry Text="{Binding Frequency}" Keyboard="Numeric" WidthRequest="80" HorizontalTextAlignment="Center" />
+                            <Button Text="🔍" Command="{Binding LoadLoyalCustomersCommand}" BackgroundColor="#1976D2" TextColor="White" CornerRadius="20" WidthRequest="44" HeightRequest="44" />
+                        </HorizontalStackLayout>
+
+                        <CollectionView ItemsSource="{Binding LoyalCustomers}">
+                            <CollectionView.EmptyView>
+                                <Label Text="Chưa có dữ liệu" HorizontalOptions="Center" TextColor="#9E9E9E" />
+                            </CollectionView.EmptyView>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Frame Style="{StaticResource CardFrameStyle}">
+                                        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="8">
+                                            <Label Text="UserId:" FontAttributes="Bold" />
+                                            <Label Grid.Column="1" Text="{Binding userId}" />
+
+                                            <Label Grid.Row="1" Text="Email:" FontAttributes="Bold" />
+                                            <Label Grid.Row="1" Grid.Column="1" Text="{Binding email}" />
+
+                                            <Label Grid.Row="2" Text="Phone:" FontAttributes="Bold" />
+                                            <Label Grid.Row="2" Grid.Column="1" Text="{Binding phone}" />
+                                        </Grid>
+                                    </Frame>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+
+                        <!-- Average Revenue Section -->
+                        <Label Text="Tổng Doanh Thu" FontSize="20" FontAttributes="Bold" Margin="0,16,0,0" />
+                        <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+                            <Frame Style="{StaticResource ChipStyle}" BackgroundColor="#E3F2FD" BorderColor="#BBDEFB">
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="Số đơn" FontAttributes="Bold" FontSize="12" TextColor="#1565C0" />
+                                    <Label Text="{Binding AverageRevenue.totalOrder}" TextColor="#1565C0" />
+                                </VerticalStackLayout>
+                            </Frame>
+                            <Frame Style="{StaticResource ChipStyle}" BackgroundColor="#E8F5E9" BorderColor="#C8E6C9">
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="Tổng doanh thu" FontAttributes="Bold" FontSize="12" TextColor="#2E7D32" />
+                                    <Label Text="{Binding AverageRevenue.totalPriceAllOrder, StringFormat='{}{0:N0}₫'}" TextColor="#2E7D32" />
+                                </VerticalStackLayout>
+                            </Frame>
+                            <Frame Style="{StaticResource ChipStyle}" BackgroundColor="#FFF3E0" BorderColor="#FFE0B2">
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="Doanh thu TB" FontAttributes="Bold" FontSize="12" TextColor="#E65100" />
+                                    <Label Text="{Binding AverageRevenue.averageRevenue, StringFormat='{}{0:N0}₫'}" TextColor="#E65100" />
+                                </VerticalStackLayout>
+                            </Frame>
+                        </Grid>
+
+                        <!-- Users In Orders Section -->
+                        <Label Text="Số lượng khách thực tế" FontSize="20" FontAttributes="Bold" Margin="0,16,0,0" />
+                        <CollectionView ItemsSource="{Binding UsersInOrders}">
+                            <CollectionView.EmptyView>
+                                <Label Text="Chưa có dữ liệu" HorizontalOptions="Center" TextColor="#9E9E9E" />
+                            </CollectionView.EmptyView>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Frame Style="{StaticResource CardFrameStyle}">
+                                        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="8">
+                                            <Label Text="Mã đơn:" FontAttributes="Bold" />
+                                            <Label Grid.Column="1" Text="{Binding id}" />
+
+                                            <Label Grid.Row="1" Text="Ngày tạo:" FontAttributes="Bold" />
+                                            <Label Grid.Row="1" Grid.Column="1" Text="{Binding createdDate, StringFormat='{0:yyyy-MM-dd HH:mm}'}" />
+
+                                            <Label Grid.Row="2" Text="Số khách:" FontAttributes="Bold" />
+                                            <Label Grid.Row="2" Grid.Column="1" Text="{Binding totalQuantity}" />
+
+                                            <Label Grid.Row="3" Text="Tổng tiền:" FontAttributes="Bold" />
+                                            <Label Grid.Row="3" Grid.Column="1" Text="{Binding totalPrice, StringFormat='{}{0:N0}₫'}" TextColor="#2E7D32" />
+                                        </Grid>
+                                    </Frame>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </CollectionView.Footer>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

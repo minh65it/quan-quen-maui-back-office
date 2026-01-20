@@ -48,17 +48,8 @@
             
             <!-- Action Buttons -->
             <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
-                <Button Text="📷 Chụp Ảnh" 
-                        Command="{Binding TakePhotoCommand}"
-                        BackgroundColor="{AppThemeBinding Light={StaticResource BlueColor}, Dark={StaticResource BlueColor}}" 
-                        TextColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}" 
-                        FontAttributes="Bold" 
-                        HeightRequest="45" 
-                        CornerRadius="22" 
-                        FontSize="14" />
-                
                 <Button Text="📁 Chọn Ảnh" 
-                        Command="{Binding AddImageCommand}"
+                        Command="{Binding PickPhotoCommand}"
                         BackgroundColor="{AppThemeBinding Light={StaticResource GreenColor}, Dark={StaticResource GreenColor}}" 
                         TextColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}" 
                         FontAttributes="Bold" 
@@ -71,39 +62,36 @@
             <CollectionView ItemsSource="{Binding MenuImages}" 
                           IsVisible="{Binding MenuImages.Count, Converter={StaticResource IsNotNullOrEmptyConverter}}">
                 <CollectionView.ItemsLayout>
-                    <GridItemsLayout Orientation="Vertical" 
-                                   Span="3" 
-                                   HorizontalItemSpacing="5" 
-                                   VerticalItemSpacing="5" />
+                    <LinearItemsLayout Orientation="Vertical" 
+                                     ItemSpacing="10" />
                 </CollectionView.ItemsLayout>
                 
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Frame BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
                                BorderColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
-                               CornerRadius="8"
+                               CornerRadius="12"
                                Padding="0"
-                               Margin="5"
-                               HeightRequest="80"
-                               WidthRequest="80">
+                               Margin="20"
+                               HeightRequest="300"
+                               HorizontalOptions="Fill">
                             <Grid>
                                 <Image Source="{Binding Images}"
                                        Aspect="AspectFill"
                                        HorizontalOptions="Fill"
-                                       VerticalOptions="Fill"
-               />
+                                       VerticalOptions="Fill" />
                                 <Frame BackgroundColor="{x:Null}"
                                        BorderColor="{AppThemeBinding Light={StaticResource Orange70Color}, Dark={StaticResource OrangeColor}}"
                                        Padding="0"
-                                       CornerRadius="12"
-                                       HeightRequest="18"
-                                       WidthRequest="18"
+                                       CornerRadius="15"
+                                       HeightRequest="30"
+                                       WidthRequest="30"
                                        HorizontalOptions="End"
                                        VerticalOptions="Start"
-                                       Margin="2">
+                                       Margin="10">
                                     <Image Source="multiply.png"
-                                           HeightRequest="14"
-                                           WidthRequest="14"
+                                           HeightRequest="20"
+                                           WidthRequest="20"
                                            VerticalOptions="Center"
                                            HorizontalOptions="Center" />
                                     <Frame.GestureRecognizers>

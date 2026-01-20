@@ -9,229 +9,219 @@
              xmlns:controls="clr-namespace:QuanQuenBackOfficeMobile.Controls"
              xmlns:converters="clr-namespace:QuanQuenBackOfficeMobile.Converters"
              Title="Đăng ký nhà hàng">
+
     <ContentPage.Resources>
         <ResourceDictionary>
             <converters:StringToBoolConverter x:Key="StringToBoolConverter" />
+
+            <!-- Style nút upload ảnh -->
+            <Style x:Key="UploadButtonStyle" TargetType="Button">
+                <Setter Property="HeightRequest" Value="44"/>
+                <Setter Property="FontSize" Value="15"/>
+                <Setter Property="CornerRadius" Value="12"/>
+                <Setter Property="BackgroundColor" Value="#FFF7EE"/>
+                <Setter Property="TextColor" Value="#F58220"/>
+                <Setter Property="BorderColor" Value="#F58220"/>
+                <Setter Property="BorderWidth" Value="1"/>
+            </Style>
         </ResourceDictionary>
     </ContentPage.Resources>
+
     <ScrollView>
         <VerticalStackLayout Padding="30" Spacing="10">
-            <!-- Logo và tên ứng dụng -->
+
             <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
                 <Image Source="logo_qq_new.png" HeightRequest="80" WidthRequest="80" />
             </VerticalStackLayout>
 
-            <!-- Tên Nhà hàng/Quán ăn -->
-            <Label Text="Tên Nhà hàng *"
-                   FontSize="14"
-                   TextColor="Black" />
+            <!-- Tên Nhà hàng -->
+            <Label Text="Tên Nhà hàng *" FontSize="14" TextColor="Black" />
             <Entry Placeholder="Tên Nhà hàng/Quán ăn"
                    Text="{Binding StoreName}"
-                   HeightRequest="44"
-                   FontSize="16"
-                   BackgroundColor="White" />
-            <Label Text="{Binding StoreNameError}"
-                   FontSize="12"
-                   TextColor="Red"
-                   IsVisible="{Binding StoreNameError, Converter={StaticResource StringToBoolConverter}}"
-                   Margin="0,2,0,0"/>
+                   HeightRequest="44" FontSize="16" BackgroundColor="White" />
+            <Label Text="{Binding StoreNameError}" FontSize="12" TextColor="Red"
+                   IsVisible="{Binding StoreNameError, Converter={StaticResource StringToBoolConverter}}"/>
 
-            <!-- Tên người đại diện -->
-            <Label Text="Người đại diện *"
-                   FontSize="14"
-                   TextColor="Black" />
+            <!-- Người đại diện -->
+            <Label Text="Người đại diện *" FontSize="14" TextColor="Black" />
             <Entry Placeholder="Nhập tên người đại diện"
                    Text="{Binding RepresentativeName}"
-                   HeightRequest="44"
-                   FontSize="16"
-                   BackgroundColor="White" />
-            <Label Text="{Binding RepresentativeNameError}"
-                   FontSize="12"
-                   TextColor="Red"
-                   IsVisible="{Binding RepresentativeNameError, Converter={StaticResource StringToBoolConverter}}"
-                   Margin="0,2,0,0"/>
+                   HeightRequest="44" FontSize="16" BackgroundColor="White" />
+            <Label Text="{Binding RepresentativeNameError}" FontSize="12" TextColor="Red"
+                   IsVisible="{Binding RepresentativeNameError, Converter={StaticResource StringToBoolConverter}}"/>
 
             <!-- Thành phố -->
-            <Label Text="Thành phố"
-                   FontSize="14"
-                   TextColor="Black" />
+            <Label Text="Thành phố" FontSize="14" TextColor="Black" />
             <controls:CustomDropdownPicker Title="Chọn Thành Phố ..."
-                    ItemsSource="{Binding ProvinceList}"
-                    ItemDisplayBinding="{Binding Name}"
-                    SelectedItem="{Binding SelectedProvince}"
-                    HeightRequest="44"
-                    FontSize="14"
-                    BackgroundColor="White" />
+                                           ItemsSource="{Binding ProvinceList}"
+                                           ItemDisplayBinding="{Binding Name}"
+                                           SelectedItem="{Binding SelectedProvince}"
+                                           HeightRequest="44"
+                                           FontSize="14"
+                                           BackgroundColor="White" />
 
             <!-- Quận -->
-            <Label Text="Quận"
-                   FontSize="14"
-                   TextColor="Black" />
+            <Label Text="Quận" FontSize="14" TextColor="Black" />
             <controls:CustomDropdownPicker Title="Chọn Quận ..."
-                    ItemsSource="{Binding DistrictList}"
-                    ItemDisplayBinding="{Binding Name}"
-                    SelectedItem="{Binding SelectedDistrict}"
-                    HeightRequest="44"
-                    FontSize="14"
-                    BackgroundColor="White" />
+                                           ItemsSource="{Binding DistrictList}"
+                                           ItemDisplayBinding="{Binding Name}"
+                                           SelectedItem="{Binding SelectedDistrict}"
+                                           HeightRequest="44"
+                                           FontSize="14"
+                                           BackgroundColor="White" />
 
             <!-- Phường -->
-            <Label Text="Phường"
-                   FontSize="14"
-                   TextColor="Black" />
+            <Label Text="Phường" FontSize="14" TextColor="Black" />
             <controls:CustomDropdownPicker Title="Chọn Phường ..."
-                    ItemsSource="{Binding WardList}"
-                    ItemDisplayBinding="{Binding Name}"
-                    SelectedItem="{Binding SelectedWard}"
-                    HeightRequest="44"
-                    FontSize="14"
-                    BackgroundColor="White" />
+                                           ItemsSource="{Binding WardList}"
+                                           ItemDisplayBinding="{Binding Name}"
+                                           SelectedItem="{Binding SelectedWard}"
+                                           HeightRequest="44"
+                                           FontSize="14"
+                                           BackgroundColor="White" />
 
-            <!-- Địa chỉ kinh doanh -->
-            <Label Text="Địa Chỉ *"
+            <!-- Địa chỉ -->
+            <Label Text="Địa Chỉ *" FontSize="14" TextColor="Black" />
+            <Entry Placeholder="Địa chỉ kinh doanh" Text="{Binding Address}" HeightRequest="44" FontSize="16" BackgroundColor="White" />
+            <Label Text="{Binding AddressError}" FontSize="12" TextColor="Red"
+                   IsVisible="{Binding AddressError, Converter={StaticResource StringToBoolConverter}}"/>
+
+            <!-- Số điện thoại -->
+            <Label Text="Số điện thoại đăng ký *" FontSize="14" TextColor="Black" />
+            <Entry Placeholder="Nhập số điện thoại" Text="{Binding PhoneNumber}" HeightRequest="44" FontSize="16" Keyboard="Telephone" BackgroundColor="White" />
+            <Label Text="{Binding PhoneError}" FontSize="12" TextColor="Red"
+                   IsVisible="{Binding PhoneError, Converter={StaticResource StringToBoolConverter}}"/>
+
+            <!-- Email -->
+            <Label Text="Email đăng ký *" FontSize="14" TextColor="Black" />
+            <Entry Placeholder="Nhập email" Text="{Binding Email}" HeightRequest="44" FontSize="16" Keyboard="Email" BackgroundColor="White" />
+            <Label Text="{Binding EmailError}" FontSize="12" TextColor="Red"
+                   IsVisible="{Binding EmailError, Converter={StaticResource StringToBoolConverter}}"/>
+
+            <!-- Thể loại nhà hàng -->
+            <Label Text="Thể loại cửa hàng *"
                    FontSize="14"
                    TextColor="Black" />
-            <Entry Placeholder="Địa chỉ kinh doanh"
-                   Text="{Binding Address}"
-                   HeightRequest="44"
-                   FontSize="16"
-                   BackgroundColor="White" />
-            <Label Text="{Binding AddressError}"
+            <controls:CustomDropdownPicker
+                ItemsSource="{Binding CategoryMasterList}"
+                ItemDisplayBinding="{Binding Name}"
+                Title="Chọn thể loại cửa hàng"
+                SelectedItem="{Binding SelectedCategory}"
+                HeightRequest="44"
+                FontSize="14"
+                BackgroundColor="White" />
+            <Label Text="{Binding CategoryMasterError}"
                    FontSize="12"
                    TextColor="Red"
-                   IsVisible="{Binding AddressError, Converter={StaticResource StringToBoolConverter}}"
-                   Margin="0,2,0,0"/>
-
-            <!-- Số điện thoại đăng ký -->
-            <Label Text="Số điện thoại đăng ký *"
-                   FontSize="14"
-                   TextColor="Black" />
-            <Entry Placeholder="Nhập số điện thoại"
-                   Text="{Binding PhoneNumber}"
-                   HeightRequest="44"
-                   FontSize="16"
-                   Keyboard="Telephone"
-                   BackgroundColor="White" />
-            <Label Text="{Binding PhoneError}"
-                   FontSize="12"
-                   TextColor="Red"
-                   IsVisible="{Binding PhoneError, Converter={StaticResource StringToBoolConverter}}"
-                   Margin="0,2,0,0"/>
-
-            <!-- Email đăng ký -->
-            <Label Text="Email đăng ký *"
-                   FontSize="14"
-                   TextColor="Black" />
-            <Entry Placeholder="Nhập email"
-                   Text="{Binding Email}"
-                   HeightRequest="44"
-                   FontSize="16"
-                   Keyboard="Email"
-                   BackgroundColor="White" />
-            <Label Text="{Binding EmailError}"
-                   FontSize="12"
-                   TextColor="Red"
-                   IsVisible="{Binding EmailError, Converter={StaticResource StringToBoolConverter}}"
+                   IsVisible="{Binding CategoryMasterError, Converter={StaticResource StringToBoolConverter}}"
                    Margin="0,2,0,0"/>
 
             <!-- Loại hình kinh doanh -->
-            <Label Text="Loại hình kinh doanh *"
-                   FontSize="14"
-                   TextColor="Black" />
-            <controls:CustomDropdownPicker ItemsSource="{Binding BusinessTypeList}" Title="Chọn loại hình kinh doanh"
-                    SelectedItem="{Binding SelectedBusinessType}"
-                    HeightRequest="44"
-                    FontSize="14"
-                    BackgroundColor="White" />
-            <Label Text="{Binding BusinessTypeError}"
-                   FontSize="12"
-                   TextColor="Red"
-                   IsVisible="{Binding BusinessTypeError, Converter={StaticResource StringToBoolConverter}}"
-                   Margin="0,2,0,0"/>
+            <Label Text="Loại hình kinh doanh *" FontSize="14" TextColor="Black" />
+            <controls:CustomDropdownPicker ItemsSource="{Binding BusinessTypeList}"
+                                           Title="Chọn loại hình kinh doanh"
+                                           SelectedItem="{Binding SelectedBusinessType}"
+                                           HeightRequest="44"
+                                           FontSize="14"
+                                           BackgroundColor="White" />
+            <Label Text="{Binding BusinessTypeError}" FontSize="12" TextColor="Red"
+                   IsVisible="{Binding BusinessTypeError, Converter={StaticResource StringToBoolConverter}}"/>
 
-            <Label Text="Ảnh giấy phép kinh doanh (tối đa 4 ảnh*)"
-                   FontSize="14"
-                   TextColor="Black" />
+            <!-- ✅ Mặt trước CCCD -->
+            <Label Text="CMND/CCCD - Mặt trước *" FontSize="14" TextColor="Black" />
             <HorizontalStackLayout Spacing="10">
-                <Button Text="Chụp ảnh giấy phép"
-                        Command="{Binding CaptureLicenseImageCommand}"
-                        IsEnabled="{Binding CanAddMoreLicenseImages}"
-                        HeightRequest="44"
-                        FontSize="16"
-                        BackgroundColor="#F5F5F5"
-                        TextColor="{Binding LicenseButtonTextColor}"
-                        BorderColor="#F58220"
-                        CornerRadius="12"/>
-                <Button Text="Chọn ảnh giấy phép"
-                        Command="{Binding PickLicenseImagesCommand}"
-                        IsEnabled="{Binding CanAddMoreLicenseImages}"
-                        HeightRequest="44"
-                        FontSize="16"
-                        BackgroundColor="#F5F5F5"
-                        TextColor="{Binding LicenseButtonTextColor}"
-                        BorderColor="#F58220"
-                        CornerRadius="12"/>
+                <Button Text="Chụp ảnh" Command="{Binding CaptureFrontIdImageCommand}" Style="{StaticResource UploadButtonStyle}" />
+                <Button Text="Chọn ảnh" Command="{Binding PickFrontIdImageCommand}" Style="{StaticResource UploadButtonStyle}" />
             </HorizontalStackLayout>
-            <CollectionView x:Name="RootPage"
-                ItemsSource="{Binding LicenseImages}"
-                HeightRequest="80"
-                Margin="0,5,0,0"
-                >
-                <CollectionView.ItemsLayout>
-                    <LinearItemsLayout Orientation="Horizontal"/>
-                </CollectionView.ItemsLayout>
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="models:MyImageModel">
-                        <Border HeightRequest="80" WidthRequest="80"
-                    Stroke="#E0E0E0" StrokeThickness="1"
-                    Background="White"
-                    Margin="2" Padding="0"
-                    HorizontalOptions="Center" VerticalOptions="Center">
+            <Grid Margin="0,8,0,0" HeightRequest="120" WidthRequest="120">
+                <Border StrokeThickness="1" Stroke="#D9D9D9" Background="White" Padding="0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="16"/>
+                    </Border.StrokeShape>
+                    <Grid>
+                        <Image Source="{Binding FrontIdImage}" Aspect="AspectFill"/>
+                        <Border Background="White" HeightRequest="24" WidthRequest="24"
+                                HorizontalOptions="End" VerticalOptions="Start" Margin="4"
+                                IsVisible="{Binding HasFrontIdImage}">
                             <Border.StrokeShape>
                                 <RoundRectangle CornerRadius="12"/>
                             </Border.StrokeShape>
-                            <Grid>
-                                <Image Source="{Binding Images}" HeightRequest="80" WidthRequest="80" Aspect="AspectFill" Margin="0"/>
-                                <Border Padding="0" HeightRequest="20" WidthRequest="20" Background="White" Stroke="White" StrokeThickness="1"
-                            HorizontalOptions="End" VerticalOptions="Start" Margin="2">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="12"/>
-                                    </Border.StrokeShape>
-                                    <Image Source="multiply.png"
-                               WidthRequest="16" HeightRequest="16"
-                               HorizontalOptions="Center" VerticalOptions="Center">
-                                        <Image.GestureRecognizers>
-                                            <TapGestureRecognizer
-                                    Command="{Binding BindingContext.RemoveLicenseImageCommand, Source={RelativeSource AncestorType={x:Type CollectionView}}}"
-                                    CommandParameter="{Binding Images}" />
-                                        </Image.GestureRecognizers>
-                                    </Image>
-                                </Border>
-                            </Grid>
+                            <Image Source="multiply.png" WidthRequest="18" HeightRequest="18">
+                                <Image.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding RemoveFrontIdImageCommand}"/>
+                                </Image.GestureRecognizers>
+                            </Image>
                         </Border>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-                <CollectionView.Footer>
-                    <ContentView WidthRequest="15"/>
-                </CollectionView.Footer>
-            </CollectionView>
-            <!-- Nút Tiếp theo -->
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- ✅ Mặt sau CCCD -->
+            <Label Text="CMND/CCCD - Mặt sau *" FontSize="14" TextColor="Black" />
+            <HorizontalStackLayout Spacing="10">
+                <Button Text="Chụp ảnh" Command="{Binding CaptureBackIdImageCommand}" Style="{StaticResource UploadButtonStyle}" />
+                <Button Text="Chọn ảnh" Command="{Binding PickBackIdImageCommand}" Style="{StaticResource UploadButtonStyle}" />
+            </HorizontalStackLayout>
+            <Grid Margin="0,8,0,0" HeightRequest="120" WidthRequest="120">
+                <Border StrokeThickness="1" Stroke="#D9D9D9" Background="White" Padding="0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="16"/>
+                    </Border.StrokeShape>
+                    <Grid>
+                        <Image Source="{Binding BackIdImage}" Aspect="AspectFill"/>
+                        <Border Background="White" HeightRequest="24" WidthRequest="24"
+                                HorizontalOptions="End" VerticalOptions="Start" Margin="4"
+                                IsVisible="{Binding HasBackIdImage}">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="12"/>
+                            </Border.StrokeShape>
+                            <Image Source="multiply.png" WidthRequest="18" HeightRequest="18">
+                                <Image.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding RemoveBackIdImageCommand}"/>
+                                </Image.GestureRecognizers>
+                            </Image>
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- ✅ Giấy phép kinh doanh -->
+            <Label Text="Giấy phép ĐKKD *" FontSize="14" TextColor="Black" />
+            <HorizontalStackLayout Spacing="10">
+                <Button Text="Chụp ảnh" Command="{Binding CaptureBusinessRegistrationImageCommand}" Style="{StaticResource UploadButtonStyle}" />
+                <Button Text="Chọn ảnh" Command="{Binding PickBusinessRegistrationImageCommand}" Style="{StaticResource UploadButtonStyle}" />
+            </HorizontalStackLayout>
+            <Grid Margin="0,8,0,0" HeightRequest="120" WidthRequest="120">
+                <Border StrokeThickness="1" Stroke="#D9D9D9" Background="White" Padding="0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="16"/>
+                    </Border.StrokeShape>
+                    <Grid>
+                        <Image Source="{Binding BusinessRegistrationImage}" Aspect="AspectFill"/>
+                        <Border Background="White" HeightRequest="24" WidthRequest="24"
+                                HorizontalOptions="End" VerticalOptions="Start" Margin="4"
+                                IsVisible="{Binding HasBusinessRegistrationImage}">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="12"/>
+                            </Border.StrokeShape>
+                            <Image Source="multiply.png" WidthRequest="18" HeightRequest="18">
+                                <Image.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding RemoveBusinessRegistrationImageCommand}"/>
+                                </Image.GestureRecognizers>
+                            </Image>
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+
             <Button Text="Tiếp theo"
                     Command="{Binding NextCommand}"
-                    IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
-                    HeightRequest="50"
-                    FontSize="18"
-                    FontAttributes="Bold"
-                    TextColor="White"
-                    CornerRadius="25"
-                    BackgroundColor="#F58220"
+                    HeightRequest="50" FontSize="18" FontAttributes="Bold"
+                    TextColor="White" CornerRadius="25" BackgroundColor="#F58220"
                     Margin="0,20,0,0"/>
 
-            <!-- Loading indicator -->
-            <ActivityIndicator IsRunning="{Binding IsBusy}"
-                             IsVisible="{Binding IsBusy}"
-                             HorizontalOptions="Center"
-                             VerticalOptions="Center"/>
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
+
         </VerticalStackLayout>
     </ScrollView>
-</ContentPage> 
+</ContentPage>
