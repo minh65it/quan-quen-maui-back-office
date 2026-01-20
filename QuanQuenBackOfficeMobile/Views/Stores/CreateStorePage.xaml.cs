@@ -14,6 +14,14 @@ public partial class CreateStorePage : ContentPage
 		BindingContext = vm;
 	}
 
+	protected override async void OnAppearing()
+	{
+		base.OnAppearing();
+
+		if (BindingContext is CreateStoreViewModel vm)
+			await vm.InitAsync();
+	}
+
 	private async void OnNextButtonClicked(object sender, EventArgs e)
 	{
 		if (string.IsNullOrWhiteSpace(_viewModel.Email))

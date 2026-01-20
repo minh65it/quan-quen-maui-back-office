@@ -1,7 +1,10 @@
+
+
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using QuanQuenBackOfficeMobile.Services;
 using QuanQuenBackOfficeMobile.Models;
 using QuanQuenBackOfficeMobile.Views.Stores;
@@ -10,14 +13,17 @@ using Microsoft.Maui.Storage;
 using System.IO;
 using System.Text.RegularExpressions;
 using Microsoft.Maui.ApplicationModel;
+using System.Linq;
 
 namespace QuanQuenBackOfficeMobile.ViewModels;
 
 public partial class CreateStoreViewModel : ObservableObject
 {
     private readonly GeographicApiService _geoService;
+    private readonly CatergoryMasterService _catergoryMasterService;
     public ObservableCollection<ProvinceDto> ProvinceList { get; } = new();
     public ObservableCollection<DistrictDto> DistrictList { get; } = new();
+    public ObservableCollection<CategoryMasterModel> CategoryMasterList { get; } = new();
     public ObservableCollection<WardDto> WardList { get; } = new();
     public ObservableCollection<string> BusinessTypeList { get; } = new();
     public ObservableCollection<MyImageModel> LicenseImages { get; } = new();
@@ -69,6 +75,8 @@ public partial class CreateStoreViewModel : ObservableObject
     private WardDto selectedWard;
     [ObservableProperty]
     private string selectedBusinessType;
+    [ObservableProperty]
+    private CategoryMasterModel selectCategotyMaster;
 
     [ObservableProperty]
     private string storeName;
@@ -100,6 +108,9 @@ public partial class CreateStoreViewModel : ObservableObject
     private string businessTypeError = "";
 
     [ObservableProperty]
+    private string categoryMasterError = "";
+
+    [ObservableProperty]
     private bool isBusy;
 
     public ICommand NextCommand { get; }
@@ -107,10 +118,13 @@ public partial class CreateStoreViewModel : ObservableObject
 
     private List<UploadImages> images = new();
 
-    public CreateStoreViewModel(GeographicApiService geoService)
+    public CreateStoreViewModel(
+        GeographicApiService geoService, CatergoryMasterService catergoryMasterService)
     {
         _geoService = geoService;
-        LoadProvincesAsync();
+        _catergoryMasterService = catergoryMasterService;
+        // LoadProvincesAsync();
+        // LoadCategoryMaster();
         BusinessTypeList.Add("Tư Nhân");
         BusinessTypeList.Add("Công Ty");
         BusinessTypeList.Add("Hộ Kinh Doanh");
@@ -176,14 +190,29 @@ public partial class CreateStoreViewModel : ObservableObject
         ValidateBusinessType();
     }
 
-    private async void LoadProvincesAsync()
+    public async Task InitAsync()
+{
+    try
+    {
+        await LoadProvincesAsync();
+        await LoadCategoryMaster();
+    }
+    catch (Exception ex)
+    {
+        await MainThread.InvokeOnMainThreadAsync(() =>
+            App.Current.MainPage.DisplayAlert("Lỗi", ex.Message, "OK"));
+    }
+}
+
+
+    private async Task LoadProvincesAsync()
     {
         ProvinceList.Clear();
         var provinces = await _geoService.GetProvincesAsync();
         foreach (var p in provinces)
             ProvinceList.Add(p);
     }
-    private async void LoadDistrictsAsync()
+    private async Task LoadDistrictsAsync()
     {
         DistrictList.Clear();
         WardList.Clear();
@@ -192,13 +221,22 @@ public partial class CreateStoreViewModel : ObservableObject
         foreach (var d in districts)
             DistrictList.Add(d);
     }
-    private async void LoadWardsAsync()
+    private async Task LoadWardsAsync()
     {
         WardList.Clear();
         if (SelectedDistrict?.territoryId == null) return;
         var wards = await _geoService.GetWardsAsync(SelectedDistrict.territoryId);
         foreach (var w in wards)
             WardList.Add(w);
+    }
+
+    private async Task LoadCategoryMaster()
+    {
+        var categories = await _catergoryMasterService.GetCategoryMastersAsync();
+        foreach (var c in categories)
+        {
+            CategoryMasterList.Add(c);
+        }
     }
 
     /// <summary>
@@ -211,18 +249,18 @@ public partial class CreateStoreViewModel : ObservableObject
 
         // Loại bỏ khoảng trắng và ký tự đặc biệt
         var cleanPhone = Regex.Replace(phoneNumber, @"[^\d]", "");
-        
+
         // Kiểm tra độ dài
         if (cleanPhone.Length != 10)
             return false;
-        
+
         // Kiểm tra format số điện thoại Việt Nam
         // Bắt đầu bằng 0, tiếp theo là 3, 5, 7, 8, 9 và có 9 chữ số tiếp theo
         var phonePattern = @"^0[3|5|7|8|9][0-9]{8}$";
         return Regex.IsMatch(cleanPhone, phonePattern);
     }
 
-  
+
 
     /// <summary>
     /// Validate email
@@ -345,6 +383,18 @@ public partial class CreateStoreViewModel : ObservableObject
         }
     }
 
+    private void ValidateCategoryMaster()
+    {
+        if (SelectCategotyMaster == null)
+        {
+            CategoryMasterError = "Vui lòng chọn thể loại cửa hàng";
+        }
+        else
+        {
+            CategoryMasterError = "";
+        }
+    }
+
     /// <summary>
     /// Validate địa chỉ (tỉnh/thành, quận/huyện, phường/xã)
     /// </summary>
@@ -364,6 +414,7 @@ public partial class CreateStoreViewModel : ObservableObject
         ValidateEmail();
         ValidateAddress();
         ValidateBusinessType();
+        ValidateCategoryMaster();
 
         return string.IsNullOrWhiteSpace(StoreNameError) &&
                string.IsNullOrWhiteSpace(RepresentativeNameError) &&
@@ -371,6 +422,7 @@ public partial class CreateStoreViewModel : ObservableObject
                string.IsNullOrWhiteSpace(EmailError) &&
                string.IsNullOrWhiteSpace(AddressError) &&
                string.IsNullOrWhiteSpace(BusinessTypeError) &&
+               //string.IsNullOrWhiteSpace(CategoryMasterError) &&
                ValidateLocation();
     }
 
@@ -397,7 +449,9 @@ public partial class CreateStoreViewModel : ObservableObject
             StoreRegistrationData.ProvinceId = SelectedProvince.zoneId;
             StoreRegistrationData.DistrictId = SelectedDistrict.territoryId;
             StoreRegistrationData.WardId = SelectedWard.stateId;
+            StoreRegistrationData.CatergoryMaster = SelectCategotyMaster.Id;
             StoreRegistrationData.LicenseImagePaths = LicenseImages.Select(img => img.LocalPath).ToList();
+
             // New: Save three single image paths
             StoreRegistrationData.FileFrontPicIdentityCardPath = frontIdLocalPath;
             StoreRegistrationData.FileBackPicIdentityCardPath = backIdLocalPath;
@@ -411,13 +465,13 @@ public partial class CreateStoreViewModel : ObservableObject
                 System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] LicenseImagePath: {path}");
                 System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] File exists: {File.Exists(path)}");
             }
-            
+
             // Debug log để kiểm tra dữ liệu cuối cùng trước khi chuyển trang
             System.Diagnostics.Debug.WriteLine($"[DEBUG][OnNextClicked] Dữ liệu cuối cùng:");
             System.Diagnostics.Debug.WriteLine($"[DEBUG][OnNextClicked] StoreName: {StoreRegistrationData.StoreName}");
             System.Diagnostics.Debug.WriteLine($"[DEBUG][OnNextClicked] Email: {StoreRegistrationData.Email}");
             System.Diagnostics.Debug.WriteLine($"[DEBUG][OnNextClicked] LicenseImagePaths count: {StoreRegistrationData.LicenseImagePaths.Count}");
-            
+
             await App.Current.MainPage.Navigation.PushAsync(new CreateStoreUserPasswordPage(Email));
         }
         catch (Exception ex)
@@ -429,10 +483,11 @@ public partial class CreateStoreViewModel : ObservableObject
     private async Task<string> CopyFileToAppDirectoryAsync(FileResult file)
     {
         var appDir = FileSystem.AppDataDirectory;
-        var fileName = Path.GetFileName(file.FullPath);
-        var destPath = Path.Combine(appDir, $"{Guid.NewGuid()}_{fileName}");
+        // Use FileName when FullPath can be null (platform dependent)
+        var safeFileName = file?.FileName ?? Path.GetFileName(file?.FullPath ?? Guid.NewGuid().ToString());
+        var destPath = Path.Combine(appDir, $"{Guid.NewGuid()}_{safeFileName}");
         using (var sourceStream = await file.OpenReadAsync())
-        using (var destStream = File.OpenWrite(destPath))
+        using (var destStream = File.Create(destPath))
         {
             await sourceStream.CopyToAsync(destStream);
         }
@@ -443,7 +498,7 @@ public partial class CreateStoreViewModel : ObservableObject
     private async Task PickLicenseImagesAsync()
     {
         System.Diagnostics.Debug.WriteLine("[LOG] Bắt đầu chọn ảnh từ thư viện...");
-        
+
         try
         {
             if (!CanAddMoreLicenseImages)
@@ -453,7 +508,7 @@ public partial class CreateStoreViewModel : ObservableObject
             }
 
             var result = await MediaPicker.Default.PickPhotoAsync(new MediaPickerOptions { Title = "Chọn ảnh giấy phép" });
-            
+
             if (result != null)
             {
                 if (LicenseImageFiles.Count >= 4)
@@ -461,9 +516,12 @@ public partial class CreateStoreViewModel : ObservableObject
                     System.Diagnostics.Debug.WriteLine("[LOG] Đã đủ 4 ảnh, dừng thêm.");
                     return;
                 }
-                if (LicenseImageFiles.Any(f => f.FullPath == result.FullPath))
+
+                // compare by FileName (fallback to FullPath) to avoid NRE on platforms without FullPath
+                var resultKey = result.FileName ?? result.FullPath;
+                if (LicenseImageFiles.Any(f => (f.FileName ?? f.FullPath) == resultKey))
                 {
-                    System.Diagnostics.Debug.WriteLine($"[LOG] Ảnh đã tồn tại: {result.FullPath}");
+                    System.Diagnostics.Debug.WriteLine($"[LOG] Ảnh đã tồn tại: {resultKey}");
                     return;
                 }
 
@@ -473,28 +531,28 @@ public partial class CreateStoreViewModel : ObservableObject
                     try
                     {
                         var copiedPath = await CopyFileToAppDirectoryAsync(result);
-                        
+
                         await MainThread.InvokeOnMainThreadAsync(() =>
                         {
                             LicenseImageFiles.Add(result);
-                            System.Diagnostics.Debug.WriteLine($"[LOG] Đã thêm file vào LicenseImageFiles: {result.FullPath}");
-                            
+                            System.Diagnostics.Debug.WriteLine($"[LOG] Đã thêm file vào LicenseImageFiles: {(result.FullPath ?? result.FileName)}");
+
                             var imgSource = ImageSource.FromFile(copiedPath);
                             LicenseImages.Add(new MyImageModel { Images = imgSource, LocalPath = copiedPath });
                             System.Diagnostics.Debug.WriteLine($"[LOG] Đã thêm vào LicenseImages (FromFile): {copiedPath}");
                             System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] PickLicenseImagesAsync - LicenseImages count sau khi thêm: {LicenseImages.Count}");
-                            
+
                             OnPropertyChanged(nameof(CanAddMoreLicenseImages));
                             OnPropertyChanged(nameof(LicenseButtonBackgroundColor));
                             OnPropertyChanged(nameof(LicenseButtonTextColor));
-                            
+
                             PickLicenseImagesCommand.NotifyCanExecuteChanged();
                             CaptureLicenseImageCommand.NotifyCanExecuteChanged();
                         });
                     }
                     catch (Exception ex)
                     {
-                        System.Diagnostics.Debug.WriteLine($"[LOG][ERROR] Không thể copy hoặc tạo ImageSource từ file: {result.FullPath} - {ex.Message}");
+                        System.Diagnostics.Debug.WriteLine($"[LOG][ERROR] Không thể copy hoặc tạo ImageSource từ file: {(result.FullPath ?? result.FileName)} - {ex.Message}");
                         await MainThread.InvokeOnMainThreadAsync(async () =>
                         {
                             await App.Current.MainPage.DisplayAlert("Lỗi", $"Không thể xử lý ảnh: {ex.Message}", "OK");
@@ -517,14 +575,14 @@ public partial class CreateStoreViewModel : ObservableObject
             System.Diagnostics.Debug.WriteLine($"[LOG][ERROR] Lỗi trong PickLicenseImagesAsync: {ex.Message}");
             await App.Current.MainPage.DisplayAlert("Lỗi", $"Có lỗi xảy ra khi chọn ảnh: {ex.Message}", "OK");
         }
-        
+
         System.Diagnostics.Debug.WriteLine($"[LOG] Tổng số ảnh hiện tại: {LicenseImages.Count}");
     }
 
     private async Task CaptureLicenseImageAsync()
     {
         System.Diagnostics.Debug.WriteLine("[LOG] Bắt đầu chụp ảnh...");
-        
+
         try
         {
             if (!CanAddMoreLicenseImages)
@@ -532,7 +590,7 @@ public partial class CreateStoreViewModel : ObservableObject
                 System.Diagnostics.Debug.WriteLine("[LOG] Không thể thêm ảnh mới, đã đủ 4 ảnh.");
                 return;
             }
-            
+
             if (!MediaPicker.Default.IsCaptureSupported)
             {
                 System.Diagnostics.Debug.WriteLine("[LOG] Thiết bị không hỗ trợ chụp ảnh!");
@@ -543,15 +601,15 @@ public partial class CreateStoreViewModel : ObservableObject
             var file = await MediaPicker.Default.CapturePhotoAsync();
             if (file != null)
             {
-                System.Diagnostics.Debug.WriteLine($"[LOG] Đã chụp ảnh: {file.FullPath}");
-                
+                System.Diagnostics.Debug.WriteLine($"[LOG] Đã chụp ảnh: {(file.FullPath ?? file.FileName)}");
+
                 // Xử lý file trên background thread
                 await Task.Run(async () =>
                 {
                     try
                     {
                         var copiedPath = await CopyFileToAppDirectoryAsync(file);
-                        
+
                         await MainThread.InvokeOnMainThreadAsync(() =>
                         {
                             LicenseImageFiles.Add(file);
@@ -559,18 +617,18 @@ public partial class CreateStoreViewModel : ObservableObject
                             LicenseImages.Add(new MyImageModel { Images = imgSource, LocalPath = copiedPath });
                             System.Diagnostics.Debug.WriteLine($"[LOG] Đã thêm vào LicenseImages (FromFile): {copiedPath}");
                             System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] CaptureLicenseImageAsync - LicenseImages count sau khi thêm: {LicenseImages.Count}");
-                            
+
                             OnPropertyChanged(nameof(CanAddMoreLicenseImages));
                             OnPropertyChanged(nameof(LicenseButtonBackgroundColor));
                             OnPropertyChanged(nameof(LicenseButtonTextColor));
-                            
+
                             PickLicenseImagesCommand.NotifyCanExecuteChanged();
                             CaptureLicenseImageCommand.NotifyCanExecuteChanged();
                         });
                     }
                     catch (Exception ex)
                     {
-                        System.Diagnostics.Debug.WriteLine($"[LOG][ERROR] Không thể copy hoặc tạo ImageSource từ file: {file.FullPath} - {ex.Message}");
+                        System.Diagnostics.Debug.WriteLine($"[LOG][ERROR] Không thể copy hoặc tạo ImageSource từ file: {(file.FullPath ?? file.FileName)} - {ex.Message}");
                         await MainThread.InvokeOnMainThreadAsync(async () =>
                         {
                             await App.Current.MainPage.DisplayAlert("Lỗi", $"Không thể xử lý ảnh: {ex.Message}", "OK");
@@ -598,7 +656,7 @@ public partial class CreateStoreViewModel : ObservableObject
             System.Diagnostics.Debug.WriteLine($"[LOG][ERROR] Lỗi trong CaptureLicenseImageAsync: {ex.Message}");
             await App.Current.MainPage.DisplayAlert("Lỗi", $"Có lỗi xảy ra khi chụp ảnh: {ex.Message}", "OK");
         }
-        
+
         System.Diagnostics.Debug.WriteLine($"[LOG] Tổng số ảnh hiện tại: {LicenseImages.Count}");
     }
 
@@ -606,21 +664,21 @@ public partial class CreateStoreViewModel : ObservableObject
     {
         System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] RemoveLicenseImage - Bắt đầu xóa ảnh");
         System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] RemoveLicenseImage - LicenseImages count trước khi xóa: {LicenseImages.Count}");
-        
+
         int idx = LicenseImages.IndexOf(LicenseImages.FirstOrDefault(i => i.Images == img));
         System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] RemoveLicenseImage - Index cần xóa: {idx}");
-        
+
         if (idx >= 0)
         {
             var removedImage = LicenseImages[idx];
             System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] RemoveLicenseImage - Xóa ảnh: {removedImage.LocalPath}");
-            
+
             LicenseImages.RemoveAt(idx);
             if (LicenseImageFiles.Count > idx)
                 LicenseImageFiles.RemoveAt(idx);
-                
+
             System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] RemoveLicenseImage - LicenseImages count sau khi xóa: {LicenseImages.Count}");
-            
+
             OnPropertyChanged(nameof(CanAddMoreLicenseImages));
             OnPropertyChanged(nameof(LicenseButtonBackgroundColor));
             OnPropertyChanged(nameof(LicenseButtonTextColor));
@@ -629,11 +687,12 @@ public partial class CreateStoreViewModel : ObservableObject
         {
             System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] RemoveLicenseImage - Không tìm thấy ảnh để xóa");
         }
-        
+
         PickLicenseImagesCommand.NotifyCanExecuteChanged();
         CaptureLicenseImageCommand.NotifyCanExecuteChanged();
     }
 }
+
 
 // ------------- New methods for single-image pick/capture/remove -------------
 partial class CreateStoreViewModel

@@ -225,7 +225,8 @@ public partial class AffiliateStoreUserPasswordViewModel : ObservableObject
                     CreatedBy = storePIC,
                     ReferralId = storePIC, // Sử dụng cùng referrer ID
                     Latitude = coordinates?.Latitude,
-                    Longitude = coordinates?.Longitude
+                    Longitude = coordinates?.Longitude,
+                    StoreTypeMasterId = AffiliateStoreData.StoreTypeMasterId
                 };
 
                 System.Diagnostics.Debug.WriteLine($"[DEBUG][AffiliateStoreUserPasswordViewModel] Gọi CreateAffiliateStoreAsync với token: {userToken?.Substring(0, Math.Min(20, userToken?.Length ?? 0))}...");

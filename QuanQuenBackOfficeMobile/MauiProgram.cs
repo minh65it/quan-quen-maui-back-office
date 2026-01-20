@@ -302,9 +302,10 @@ public static class MauiProgram
 		builder.Services.AddTransient<PhotoStoreUser>();
 		builder.Services.AddTransient<VideoStoreUserViewModel>();
 		builder.Services.AddTransient<VideoStoreUserPage>();
+		builder.Services.AddTransient<CatergoryMasterService>();
 
-		// Register Scanning QR ViewModel and Page
-		builder.Services.AddTransient<ScanningQRPage>();
+        // Register Scanning QR ViewModel and Page
+        builder.Services.AddTransient<ScanningQRPage>();
 
 
 		// Register Converters

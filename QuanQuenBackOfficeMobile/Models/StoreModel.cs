@@ -148,6 +148,8 @@ namespace QuanQuenBackOfficeMobile.Models
         public string ProvinceId { get; set; }
         public string BusinessType { get; set; }
         public string CreatedBy { get; set; } = string.Empty;
+
+        public string CategoryMaster { get; set; }
         // Optional local file paths for multipart fields
         public string? FileFrontPicIdentityCardPath { get; set; }
         public string? FileBackPicIdentityCardPath { get; set; }
@@ -184,6 +186,7 @@ namespace QuanQuenBackOfficeMobile.Models
         public static string District { get; set; } = string.Empty;
         public static string Ward { get; set; } = string.Empty;
         public static string Address { get; set; } = string.Empty;
+        public static string CatergoryMaster { get; set; } = string.Empty;
         public static string PhoneNumber { get; set; } = string.Empty;
         public static string Email { get; set; } = string.Empty;
         public static string BusinessType { get; set; } = string.Empty;
@@ -254,4 +257,4 @@ namespace QuanQuenBackOfficeMobile.Models
         [JsonPropertyName("result")]
         public List<CategoryMediaItem> Result { get; set; } = new();
     }
-} 
+}

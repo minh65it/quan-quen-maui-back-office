@@ -87,6 +87,12 @@ public class StoreTypeItemModel
     public string name { get; set; }
 }
 
+public class CategoryMasterItemModel
+{
+    public string id { get; set; }
+    public string name { get; set; }
+}
+
 // Generic order list response used by NumberOfUserInOrder
 public class ApiResponseOrderList
 {
