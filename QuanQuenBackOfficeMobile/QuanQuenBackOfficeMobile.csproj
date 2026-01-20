@@ -146,4 +146,10 @@
 	  <CodesignEntitlements>Platforms\iOS\Entitlements.plist</CodesignEntitlements>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-ios'">
+		<CodesignKey>iPhone Distribution</CodesignKey>
+		<CodesignProvision></CodesignProvision>
+		<CodesignRequireProvisioningProfile>false</CodesignRequireProvisioningProfile>
+		<ProvisioningType>manual</ProvisioningType>
+	</PropertyGroup>
 </Project>
