@@ -226,13 +226,23 @@ namespace QuanQuenBackOfficeMobile.ViewModels
                     {
                         // DataAffiliate - Navigate to AffiliateListingAgentPage
                         var affiliateListingAgentViewModel = IPlatformApplication.Current.Services.GetService<AffiliateListingAgentViewModel>();
-                        Application.Current.MainPage = new AffiliateListingAgentPage(affiliateListingAgentViewModel);
+                        var page = new AffiliateListingAgentPage(affiliateListingAgentViewModel);
+                        Application.Current.MainPage = new NavigationPage(page)
+                        {
+                            BarBackgroundColor = Color.FromArgb("#FC8312"),
+                            BarTextColor = Colors.White
+                        };
                     }
                     else
                     {
                         // ContractAffiliate - Navigate to AffiliateStoreListPage
                         var affiliateStoreListViewModel = IPlatformApplication.Current.Services.GetService<AffiliateStoreListViewModel>();
-                        Application.Current.MainPage = new AffiliateStoreListPage(affiliateStoreListViewModel);
+                        var page = new AffiliateStoreListPage(affiliateStoreListViewModel);
+                        Application.Current.MainPage = new NavigationPage(page)
+                        {
+                            BarBackgroundColor = Color.FromArgb("#FC8312"),
+                            BarTextColor = Colors.White
+                        };
                     }
                 }
                 else
