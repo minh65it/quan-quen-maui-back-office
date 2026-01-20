@@ -91,8 +91,8 @@ public partial class CreateStoreViewModel : ObservableObject
     {
         _geoService = geoService;
         _catergoryMasterService = catergoryMasterService;
-        LoadProvincesAsync();
-        LoadCategoryMaster();
+        // LoadProvincesAsync();
+        // LoadCategoryMaster();
         BusinessTypeList.Add("Tư Nhân");
         BusinessTypeList.Add("Công Ty");
         BusinessTypeList.Add("Hộ Kinh Doanh");
@@ -145,14 +145,29 @@ public partial class CreateStoreViewModel : ObservableObject
         ValidateBusinessType();
     }
 
-    private async void LoadProvincesAsync()
+    public async Task InitAsync()
+{
+    try
+    {
+        await LoadProvincesAsync();
+        await LoadCategoryMaster();
+    }
+    catch (Exception ex)
+    {
+        await MainThread.InvokeOnMainThreadAsync(() =>
+            App.Current.MainPage.DisplayAlert("Lỗi", ex.Message, "OK"));
+    }
+}
+
+
+    private async Task LoadProvincesAsync()
     {
         ProvinceList.Clear();
         var provinces = await _geoService.GetProvincesAsync();
         foreach (var p in provinces)
             ProvinceList.Add(p);
     }
-    private async void LoadDistrictsAsync()
+    private async Task LoadDistrictsAsync()
     {
         DistrictList.Clear();
         WardList.Clear();
@@ -161,7 +176,7 @@ public partial class CreateStoreViewModel : ObservableObject
         foreach (var d in districts)
             DistrictList.Add(d);
     }
-    private async void LoadWardsAsync()
+    private async Task LoadWardsAsync()
     {
         WardList.Clear();
         if (SelectedDistrict?.territoryId == null) return;
@@ -170,7 +185,7 @@ public partial class CreateStoreViewModel : ObservableObject
             WardList.Add(w);
     }
 
-    private async void LoadCategoryMaster()
+    private async Task LoadCategoryMaster()
     {
         var categories = await _catergoryMasterService.GetCategoryMastersAsync();
         foreach (var c in categories)
