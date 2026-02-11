@@ -385,7 +385,7 @@ public partial class CreateStoreViewModel : ObservableObject
 
     private void ValidateCategoryMaster()
     {
-        if (SelectCategotyMaster == null)
+        if (SelectCategotyMaster.Id == null)
         {
             CategoryMasterError = "Vui lòng chọn thể loại cửa hàng";
         }
@@ -438,18 +438,31 @@ public partial class CreateStoreViewModel : ObservableObject
 
             // Lưu thông tin vào StoreRegistrationData
             StoreRegistrationData.StoreName = StoreName;
+             System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] StoreName: {StoreRegistrationData.StoreName }");
             StoreRegistrationData.RepresentativeName = RepresentativeName;
+             System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] RepresentativeName: {StoreRegistrationData.RepresentativeName}");
             StoreRegistrationData.Province = SelectedProvince.Name;
+             System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] Province: {StoreRegistrationData.Province}");
             StoreRegistrationData.District = SelectedDistrict.Name;
+             System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] District: {StoreRegistrationData.District}");
             StoreRegistrationData.Ward = SelectedWard.Name;
+             System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] Ward: {StoreRegistrationData.Ward}");
             StoreRegistrationData.Address = Address;
+             System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] Address: {StoreRegistrationData.Address}");
             StoreRegistrationData.PhoneNumber = PhoneNumber;
+             System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] PhoneNumber: {StoreRegistrationData.PhoneNumber}");
             StoreRegistrationData.Email = Email;
+             System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] Email: {StoreRegistrationData.Email}");
             StoreRegistrationData.BusinessType = SelectedBusinessType;
+             System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] BusinessType: {StoreRegistrationData.BusinessType}");
             StoreRegistrationData.ProvinceId = SelectedProvince.zoneId;
+             System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] ProvinceId: {StoreRegistrationData.ProvinceId}");
             StoreRegistrationData.DistrictId = SelectedDistrict.territoryId;
+             System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] DistrictId: {StoreRegistrationData.DistrictId}");
             StoreRegistrationData.WardId = SelectedWard.stateId;
-            StoreRegistrationData.CatergoryMaster = SelectCategotyMaster.Id;
+             System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] WardId: {StoreRegistrationData.WardId}");
+            StoreRegistrationData.CatergoryMaster = SelectCategotyMaster.Id??"";
+             System.Diagnostics.Debug.WriteLine($"[DEBUG][CreateStoreViewModel] CatergoryMaster: {StoreRegistrationData.CatergoryMaster}");
             StoreRegistrationData.LicenseImagePaths = LicenseImages.Select(img => img.LocalPath).ToList();
 
             // New: Save three single image paths
