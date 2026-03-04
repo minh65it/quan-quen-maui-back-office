@@ -27,12 +27,11 @@
 			<Button
 				Command="{Binding NavigateBackCommand}"
 				CommandParameter="{Binding Source={x:Reference webview}}"
-				IsEnabled="{Binding Source={x:Reference webview}, Path=CanGoBack}"
+				
 				Text="Back" />
 			<Button
 				Command="{Binding NavigateForwardCommand}"
 				CommandParameter="{Binding Source={x:Reference webview}}"
-				IsEnabled="{Binding Source={x:Reference webview}, Path=CanGoForward}"
 				Text="Forward" />
 			<Button
 				Command="{Binding RefreshPageCommand}"

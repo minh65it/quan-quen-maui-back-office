@@ -8,7 +8,7 @@ namespace QuanQuenBackOfficeMobile.Models
     {
         [ObservableProperty]
         [JsonPropertyName("id")]
-        private string? id;
+        public string? id;
 
         [ObservableProperty]
         [JsonPropertyName("name")]

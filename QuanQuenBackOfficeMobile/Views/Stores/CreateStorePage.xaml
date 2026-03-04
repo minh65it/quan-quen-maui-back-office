@@ -106,7 +106,7 @@
                 ItemsSource="{Binding CategoryMasterList}"
                 ItemDisplayBinding="{Binding Name}"
                 Title="Chọn thể loại cửa hàng"
-                SelectedItem="{Binding SelectedCategory}"
+                SelectedItem="{Binding SelectCategotyMaster}"
                 HeightRequest="44"
                 FontSize="14"
                 BackgroundColor="White" />
