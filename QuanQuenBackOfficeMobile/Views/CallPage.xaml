@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="QuanQuenBackOfficeMobile.Views.CallPage">
+
+    <VerticalStackLayout Padding="40" Spacing="30">
+
+        <Label Text="Voice Call"
+               FontSize="28"
+               HorizontalOptions="Center" />
+
+        <Button Text="Join Call"
+                Clicked="Join_Clicked"/>
+
+        <Button Text="Mute"
+                Clicked="Mute_Clicked"/>
+
+        <Button Text="Speaker"
+                Clicked="Speaker_Clicked"/>
+
+        <Button Text="Leave"
+                BackgroundColor="Red"
+                TextColor="White"
+                Clicked="Leave_Clicked"/>
+
+    </VerticalStackLayout>
+</ContentPage>

@@ -152,5 +152,16 @@
 		<CodesignProvision></CodesignProvision>
 		<CodesignRequireProvisioningProfile>false</CodesignRequireProvisioningProfile>
 		<ProvisioningType>manual</ProvisioningType>
+		
 	</PropertyGroup>
+
+	<ItemGroup>
+		<AndroidLibrary Include="Libraries/agora-rtc-sdk.aar" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	<NativeReference Include="AgoraRtcKit.framework">
+		<Kind>Framework</Kind>
+	</NativeReference>
+	</ItemGroup>
 </Project>

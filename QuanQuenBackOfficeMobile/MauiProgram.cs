@@ -56,6 +56,7 @@ public static class MauiProgram
                 "Ensure the file is in the project root, Build Action=EmbeddedResource, and the namespace matches.");
 
         builder.Configuration.AddJsonStream(stream);
+        builder.Services.AddSingleton<IAgoraService, AgoraService>();
 
         // Register ConfigurationService
         builder.Services.AddSingleton<IConfigurationService, ConfigurationService>();
