@@ -9,8 +9,7 @@ using Microsoft.Maui.Storage;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
 using QuanQuenBackOfficeMobile.Views;
 
-namespace QuanQuenBackOfficeMobile.ViewModels
-{
+namespace QuanQuenBackOfficeMobile.ViewModels;
     public partial class AffiliateStoreUserAuthenticationViewModel : ObservableObject
     {
         private readonly IAffiliateService _affiliateService;
@@ -257,4 +256,3 @@ namespace QuanQuenBackOfficeMobile.ViewModels
             }
         }
     }
-}

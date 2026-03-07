@@ -7,8 +7,7 @@ using QuanQuenBackOfficeMobile.Models;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
 using QuanQuenBackOfficeMobile.Views;
 
-namespace QuanQuenBackOfficeMobile.ViewModels
-{
+namespace QuanQuenBackOfficeMobile.ViewModels;
     public class AffiliateListingAgentViewModel : INotifyPropertyChanged
     {
         private readonly IAffiliateService _affiliateService;
@@ -545,4 +544,4 @@ namespace QuanQuenBackOfficeMobile.ViewModels
             return true;
         }
     }
-}
+

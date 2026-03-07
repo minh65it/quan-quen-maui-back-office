@@ -10,8 +10,7 @@ using QuanQuenBackOfficeMobile.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
-namespace QuanQuenBackOfficeMobile.ViewModels
-{
+namespace QuanQuenBackOfficeMobile.ViewModels;
     public partial class AffiliateCreateStoreViewModel : ObservableObject
     {
         private readonly IAffiliateService _affiliateService;
@@ -288,4 +287,4 @@ namespace QuanQuenBackOfficeMobile.ViewModels
             BusinessTypeError = "";
         }
     }
-}
+

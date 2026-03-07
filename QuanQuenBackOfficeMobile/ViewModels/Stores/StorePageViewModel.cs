@@ -9,8 +9,7 @@ using System;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
 using System.Linq;
 
-namespace QuanQuenBackOfficeMobile.ViewModels
-{
+namespace QuanQuenBackOfficeMobile.ViewModels;
     public partial class StorePageViewModel : ObservableObject
     {
         private readonly IStoreService _storeService;
@@ -237,4 +236,3 @@ namespace QuanQuenBackOfficeMobile.ViewModels
             App.Current.MainPage.Navigation.PushAsync(page);
         }
     }
-} 

@@ -11,8 +11,7 @@ using QuanQuenBackOfficeMobile.Models;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
 using QuanQuenBackOfficeMobile.Views.Stores;
 
-namespace QuanQuenBackOfficeMobile.ViewModels
-{
+namespace QuanQuenBackOfficeMobile.ViewModels;
     public partial class AffiliateStoreListViewModel : ObservableObject
     {
         private readonly IAffiliateService _affiliateService;
@@ -211,4 +210,3 @@ namespace QuanQuenBackOfficeMobile.ViewModels
             }
         }
     }
-}

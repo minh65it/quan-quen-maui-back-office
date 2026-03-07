@@ -1,4 +1,4 @@
-﻿global using Maui.Plugins.PageResolver;
+﻿global using Plugin.Maui.SmartNavigation;
 global using Plugin.Maui.Audio;
 global using QuanQuenBackOfficeMobile.Models;
 global using QuanQuenBackOfficeMobile.Services;

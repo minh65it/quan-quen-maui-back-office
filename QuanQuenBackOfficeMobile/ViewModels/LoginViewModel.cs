@@ -7,8 +7,7 @@ using QuanQuenBackOfficeMobile.Services;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
 using QuanQuenBackOfficeMobile.Views;
 
-namespace QuanQuenBackOfficeMobile.ViewModels
-{
+namespace QuanQuenBackOfficeMobile.ViewModels;
     public class LoginViewModel : BaseViewModel
     {
         private readonly IAuthService _authService;
@@ -202,4 +201,3 @@ namespace QuanQuenBackOfficeMobile.ViewModels
             }
         }
     }
-} 

@@ -9,8 +9,7 @@ using QuanQuenBackOfficeMobile.Views;
 using QuanQuenBackOfficeMobile.ViewModels.Stores;
 using QuanQuenBackOfficeMobile.Views.Stores;
 
-namespace QuanQuenBackOfficeMobile.ViewModels
-{
+namespace QuanQuenBackOfficeMobile.ViewModels;
     public class AffiliateLoginViewModel : BaseViewModel
     {
         private readonly IAffiliateService _affiliateService;
@@ -260,4 +259,3 @@ namespace QuanQuenBackOfficeMobile.ViewModels
             }
         }
     }
-}

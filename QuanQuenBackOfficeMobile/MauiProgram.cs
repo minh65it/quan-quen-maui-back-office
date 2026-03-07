@@ -313,7 +313,9 @@ public static class MauiProgram
 		builder.Services.AddSingleton<Converters.AvatarUrlConverter>();
 		builder.Services.AddSingleton<Converters.EnumToBoolConverter>();
 
-        builder.Services.UsePageResolver();
+        builder
+            .UseMauiApp<App>()
+            .UseSmartNavigation();
 
         // Shell route registrations for Data Affiliate flow (không cần add vào AppShell)
         Routing.RegisterRoute("DataAffiliateInfoPage", typeof(QuanQuenBackOfficeMobile.Views.DataAffiliateInfoPage));

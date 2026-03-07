@@ -22,8 +22,7 @@ using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Platform;
 using Microsoft.Maui.Handlers;
 
-namespace QuanQuenBackOfficeMobile.ViewModels
-{
+namespace QuanQuenBackOfficeMobile.ViewModels;
     public partial class PhotoStoreUserViewModel : ObservableObject
     {
         private readonly IStoreMediaService _storeMediaService;
@@ -285,4 +284,3 @@ namespace QuanQuenBackOfficeMobile.ViewModels
         }
 
     }
-}

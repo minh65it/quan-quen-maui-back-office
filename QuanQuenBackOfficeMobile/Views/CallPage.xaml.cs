@@ -1,3 +1,5 @@
+namespace QuanQuenBackOfficeMobile.Views;
+
 public partial class CallPage : ContentPage
 {
     readonly IAgoraService _agora;

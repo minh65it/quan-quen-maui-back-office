@@ -8,8 +8,7 @@ using Microsoft.Maui.Storage;
 using QuanQuenBackOfficeMobile.Models;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
 
-namespace QuanQuenBackOfficeMobile.ViewModels
-{
+namespace QuanQuenBackOfficeMobile.ViewModels;
     public partial class AffiliateStatisticsViewModel : ObservableObject
     {
         private readonly IAffiliateService _affiliateService;
@@ -226,5 +225,4 @@ namespace QuanQuenBackOfficeMobile.ViewModels
             return date.Value.ToString("dd/MM/yyyy HH:mm");
         }
     }
-}
 
