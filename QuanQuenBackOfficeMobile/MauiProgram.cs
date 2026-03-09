@@ -8,41 +8,51 @@ using QuanQuenBackOfficeMobile.ViewModels.Stores;
 using QuanQuenBackOfficeMobile.Views.Stores;
 using System.Reflection;
 using ZXing.Net.Maui.Controls;
+using Plugin.Firebase.CloudMessaging;
+
 #if IOS && ANDROID
 using QuanQuenBackOfficeMobile.Controls;
 using Camera.MAUI;
+#endif
+
+
+#if IOS
+using Plugin.Firebase.Core.Platforms.iOS;
+#elif ANDROID
+using Plugin.Firebase.Core.Platforms.Android;
 #endif
 
 namespace QuanQuenBackOfficeMobile;
 
 public static class MauiProgram
 {
-	public static MauiApp CreateMauiApp()
-	{
-		var builder = MauiApp.CreateBuilder();
-		builder
-			.UseMauiApp<App>()
+    public static MauiApp CreateMauiApp()
+    {
+        var builder = MauiApp.CreateBuilder();
+        builder
+            .UseMauiApp<App>()
 #if ANDROID || IOS
 			.UseMauiMaps()
 			
 #endif
-			.UseBarcodeReader()
-			.UseMauiCameraView()
+            .UseBarcodeReader()
+            .UseMauiCameraView()
             .UseMauiCommunityToolkitMediaElement()
-			.UseMauiCommunityToolkit()
-			.ConfigureFonts(fonts =>
-			{
-				fonts.AddFont("MaterialIcons-Regular.ttf", "MaterialSymbol");
-				fonts.AddFont("FontAwesome6FreeBrands.otf", "FontAwesomeBrands");
-				fonts.AddFont("FontAwesome6FreeRegular.otf", "FontAwesomeRegular");
-				fonts.AddFont("FontAwesome6FreeSolid.otf", "FontAwesomeSolid");
-				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-			});
+            .UseMauiCommunityToolkit()
+            .RegisterFirebaseServices()
+            .ConfigureFonts(fonts =>
+            {
+                fonts.AddFont("MaterialIcons-Regular.ttf", "MaterialSymbol");
+                fonts.AddFont("FontAwesome6FreeBrands.otf", "FontAwesomeBrands");
+                fonts.AddFont("FontAwesome6FreeRegular.otf", "FontAwesomeRegular");
+                fonts.AddFont("FontAwesome6FreeSolid.otf", "FontAwesomeSolid");
+                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+            });
 
         // Load configuration based on environment
         var assembly = Assembly.GetExecutingAssembly();
-        
+
 #if DEBUG
         // Development environment - load appsettings.Development.json
         var resourceName = "QuanQuenBackOfficeMobile.appsettings.Development.json";
@@ -55,6 +65,19 @@ public static class MauiProgram
                 $"Embedded resource '{resourceName}' not found. " +
                 "Ensure the file is in the project root, Build Action=EmbeddedResource, and the namespace matches.");
 
+
+
+#if IOS
+        events.AddiOS(iOS => iOS.WillFinishLaunching((_, __) => {
+            CrossFirebase.Initialize();
+            FirebaseCloudMessagingImplementation.Initialize();
+            return false;
+        }));
+#elif ANDROID
+            events.AddAndroid(android => android.OnCreate((activity, _) =>
+            CrossFirebase.Initialize(activity)));
+#endif
+
         builder.Configuration.AddJsonStream(stream);
 
         // Register ConfigurationService
@@ -65,7 +88,7 @@ public static class MauiProgram
                    var configService = sp.GetRequiredService<IConfigurationService>();
                    var baseUrl = configService.GetApiUrl("Identity");
                    client.BaseAddress = new Uri(baseUrl);
-				   client.Timeout = TimeSpan.FromMinutes(5);
+                   client.Timeout = TimeSpan.FromMinutes(5);
 
                });
 
@@ -74,7 +97,7 @@ public static class MauiProgram
             var configService = sp.GetRequiredService<IConfigurationService>();
             var baseUrl = configService.GetApiUrl("Store");
             client.BaseAddress = new Uri(baseUrl);
-            client.Timeout = TimeSpan.FromMinutes(5); 
+            client.Timeout = TimeSpan.FromMinutes(5);
 
         });
 
@@ -107,7 +130,7 @@ public static class MauiProgram
             var configService = sp.GetRequiredService<IConfigurationService>();
             var baseUrl = configService.GetApiUrl("Identity");
             client.BaseAddress = new Uri(baseUrl);
-            client.Timeout = TimeSpan.FromMinutes(5); 
+            client.Timeout = TimeSpan.FromMinutes(5);
 
         });
 
@@ -116,7 +139,7 @@ public static class MauiProgram
             var configService = sp.GetRequiredService<IConfigurationService>();
             var baseUrl = configService.GetApiUrl("Store");
             client.BaseAddress = new Uri(baseUrl);
-            client.Timeout = TimeSpan.FromMinutes(5); 
+            client.Timeout = TimeSpan.FromMinutes(5);
         });
 
         builder.Services.AddHttpClient<IQRCodeService, QRCodeService>((sp, client) =>
@@ -127,7 +150,7 @@ public static class MauiProgram
             {
                 client.BaseAddress = new Uri(baseUrl);
             }
-            client.Timeout = TimeSpan.FromMinutes(5); 
+            client.Timeout = TimeSpan.FromMinutes(5);
         });
 
         // Register QR Code Scanning Service
@@ -159,7 +182,7 @@ public static class MauiProgram
             client.Timeout = TimeSpan.FromMinutes(2);
         });
 
-      
+
 
         // Register ViewModels
         builder.Services.AddTransient<LoginViewModel>();
@@ -179,19 +202,19 @@ public static class MauiProgram
         builder.Services.AddTransient<QuanQuenBackOfficeMobile.ViewModels.Affiliates.AffiliateAgreementPreviewViewModel>();
         builder.Services.AddTransient<QuanQuenBackOfficeMobile.ViewModels.Affiliates.AffiliateAgreementSignatureViewModel>();
         builder.Services.AddTransient<QuanQuenBackOfficeMobile.ViewModels.Affiliates.AffiliateAgreementPageViewModel>();
-		builder.Services.AddTransient<MainViewModel>();
-		builder.Services.AddTransient<CreateStoreUserPasswordViewModel>();
-		builder.Services.AddTransient<StoreInformationContractViewModel>();
-		builder.Services.AddTransient<ContractPreviewViewModel>();
-		builder.Services.AddTransient<ContractPreviewPage>();
-		builder.Services.AddTransient<ContractStoreViewModel>();
-		builder.Services.AddTransient<ContractStorePage>();
-		
-		// Register Services
-		builder.Services.AddTransient<IContractService, ContractService>();
-		builder.Services.AddTransient<IGeocodingService, GeocodingService>();
-		builder.Services.AddTransient<ILocationService, LocationService>();
-		
+        builder.Services.AddTransient<MainViewModel>();
+        builder.Services.AddTransient<CreateStoreUserPasswordViewModel>();
+        builder.Services.AddTransient<StoreInformationContractViewModel>();
+        builder.Services.AddTransient<ContractPreviewViewModel>();
+        builder.Services.AddTransient<ContractPreviewPage>();
+        builder.Services.AddTransient<ContractStoreViewModel>();
+        builder.Services.AddTransient<ContractStorePage>();
+
+        // Register Services
+        builder.Services.AddTransient<IContractService, ContractService>();
+        builder.Services.AddTransient<IGeocodingService, GeocodingService>();
+        builder.Services.AddTransient<ILocationService, LocationService>();
+
         // Register Views
         builder.Services.AddTransient<LoginPage>();
         builder.Services.AddTransient<AffiliateLoginPage>();
@@ -212,53 +235,53 @@ public static class MauiProgram
         builder.Services.AddTransient<QuanQuenBackOfficeMobile.Views.Affiliates.AffiliatePhotoPage>();
         builder.Services.AddTransient<QuanQuenBackOfficeMobile.ViewModels.Affiliates.AffiliatePhotoViewModel>();
         builder.Services.AddTransient<ServicePackagesPage>();
-		builder.Services.AddTransient<RegisterPage>();
-		builder.Services.AddTransient<MainPage>();
-		builder.Services.AddTransient<CreateStorePage>();
-		builder.Services.AddTransient<StoreInformationContractPage>();
+        builder.Services.AddTransient<RegisterPage>();
+        builder.Services.AddTransient<MainPage>();
+        builder.Services.AddTransient<CreateStorePage>();
+        builder.Services.AddTransient<StoreInformationContractPage>();
         builder.Services.AddSingleton<SampleViewModel>();
 
-		builder.Services.AddSingleton<MediaElementViewModel>();
-		builder.Services.AddSingleton<MediaElementPage>();
+        builder.Services.AddSingleton<MediaElementViewModel>();
+        builder.Services.AddSingleton<MediaElementPage>();
 
-		builder.Services.AddSingleton<WebViewViewModel>();
-		builder.Services.AddSingleton<WebViewPage>();
+        builder.Services.AddSingleton<WebViewViewModel>();
+        builder.Services.AddSingleton<WebViewPage>();
 
-		builder.Services.AddSingleton<AboutViewModel>();
-		builder.Services.AddSingleton<AboutPage>();
+        builder.Services.AddSingleton<AboutViewModel>();
+        builder.Services.AddSingleton<AboutPage>();
 
-		builder.Services.AddSingleton<LocalizationViewModel>();
-		builder.Services.AddSingleton<LocalizationPage>();
+        builder.Services.AddSingleton<LocalizationViewModel>();
+        builder.Services.AddSingleton<LocalizationPage>();
 
-		builder.Services.AddSingleton<MapViewModel>();
-		builder.Services.AddSingleton<MapPage>();
+        builder.Services.AddSingleton<MapViewModel>();
+        builder.Services.AddSingleton<MapPage>();
 
-		builder.Services.AddTransient<SampleDataService>();
-		builder.Services.AddTransient<SettingsDetailViewModel>();
-		builder.Services.AddTransient<SettingsDetailPage>();
+        builder.Services.AddTransient<SampleDataService>();
+        builder.Services.AddTransient<SettingsDetailViewModel>();
+        builder.Services.AddTransient<SettingsDetailPage>();
 
-		builder.Services.AddSingleton<SettingsViewModel>();
-		builder.Services.AddSingleton<SettingsPage>();
+        builder.Services.AddSingleton<SettingsViewModel>();
+        builder.Services.AddSingleton<SettingsPage>();
 
-		builder.Services.AddSingleton<DrawingExampleViewModel>();
-		builder.Services.AddSingleton<DrawingExamplePage>();
+        builder.Services.AddSingleton<DrawingExampleViewModel>();
+        builder.Services.AddSingleton<DrawingExamplePage>();
 
-		builder.Services.AddSingleton<ExampleFontAwesomeUsageViewModel>();
-		builder.Services.AddSingleton<ExampleFontAwesomeUsagePage>();
+        builder.Services.AddSingleton<ExampleFontAwesomeUsageViewModel>();
+        builder.Services.AddSingleton<ExampleFontAwesomeUsagePage>();
 
-		builder.Services.AddSingleton<ExampleMaterialFontUsageViewModel>();
-		builder.Services.AddSingleton<ExampleMaterialFontUsagePage>();
+        builder.Services.AddSingleton<ExampleMaterialFontUsageViewModel>();
+        builder.Services.AddSingleton<ExampleMaterialFontUsagePage>();
 
-		// Removed SkiaSharp Lottie registrations
+        // Removed SkiaSharp Lottie registrations
 
-		builder.Services.AddSingleton<SupportCenterViewModel>();
-		builder.Services.AddSingleton<SupportCenterPage>();
+        builder.Services.AddSingleton<SupportCenterViewModel>();
+        builder.Services.AddSingleton<SupportCenterPage>();
 
-		builder.Services.AddTransient<StorePageViewModel>();
-		builder.Services.AddTransient<StorePage>();
-		builder.Services.AddTransient<StoreDetailViewModel>();
-		builder.Services.AddTransient<StoreDetailPage>();
-		builder.Services.AddTransient<StoreMapViewModel>();
+        builder.Services.AddTransient<StorePageViewModel>();
+        builder.Services.AddTransient<StorePage>();
+        builder.Services.AddTransient<StoreDetailViewModel>();
+        builder.Services.AddTransient<StoreDetailPage>();
+        builder.Services.AddTransient<StoreMapViewModel>();
         builder.Services.AddTransient<StoreMapPage>();
         builder.Services.AddTransient<StoreStatisticPage>();
         builder.Services.AddTransient<StoreTableAreaViewModel>();
@@ -292,25 +315,25 @@ public static class MauiProgram
             client.Timeout = TimeSpan.FromMinutes(2);
         });
 
-		builder.Services.AddSingleton<GeographicApiService>();
+        builder.Services.AddSingleton<GeographicApiService>();
 
-		builder.Services.AddTransient<CreateStoreViewModel>();
+        builder.Services.AddTransient<CreateStoreViewModel>();
 
-		builder.Services.AddTransient<CreateSubStoreViewModel>();
+        builder.Services.AddTransient<CreateSubStoreViewModel>();
 
-		builder.Services.AddTransient<PhotoStoreUserViewModel>();
-		builder.Services.AddTransient<PhotoStoreUser>();
-		builder.Services.AddTransient<VideoStoreUserViewModel>();
-		builder.Services.AddTransient<VideoStoreUserPage>();
-		builder.Services.AddTransient<CatergoryMasterService>();
+        builder.Services.AddTransient<PhotoStoreUserViewModel>();
+        builder.Services.AddTransient<PhotoStoreUser>();
+        builder.Services.AddTransient<VideoStoreUserViewModel>();
+        builder.Services.AddTransient<VideoStoreUserPage>();
+        builder.Services.AddTransient<CatergoryMasterService>();
 
         // Register Scanning QR ViewModel and Page
         builder.Services.AddTransient<ScanningQRPage>();
 
 
-		// Register Converters
-		builder.Services.AddSingleton<Converters.AvatarUrlConverter>();
-		builder.Services.AddSingleton<Converters.EnumToBoolConverter>();
+        // Register Converters
+        builder.Services.AddSingleton<Converters.AvatarUrlConverter>();
+        builder.Services.AddSingleton<Converters.EnumToBoolConverter>();
 
         builder.Services.UsePageResolver();
 
@@ -319,15 +342,15 @@ public static class MauiProgram
         Routing.RegisterRoute("DataAffiliatePreviewPage", typeof(QuanQuenBackOfficeMobile.Views.DataAffiliatePreviewPage));
         Routing.RegisterRoute("DataAffiliateSignaturePage", typeof(QuanQuenBackOfficeMobile.Views.DataAffiliateSignaturePage));
         Routing.RegisterRoute("DataAffiliateFinalPage", typeof(QuanQuenBackOfficeMobile.Views.DataAffiliateFinalPage));
-        
+
         // Store routes
         Routing.RegisterRoute("StoreFilterFoodPage", typeof(QuanQuenBackOfficeMobile.Views.Stores.StoreFilterFoodPage));
         Routing.RegisterRoute("StoreCreateFood", typeof(QuanQuenBackOfficeMobile.Views.Stores.StoreCreateFood));
 
 #if DEBUG
-		builder.Logging.AddDebug();
+        builder.Logging.AddDebug();
 #endif
-		#if IOS && ANDROID
+#if IOS && ANDROID
     builder.ConfigureMauiHandlers(handlers =>
     {
         handlers.AddHandler(typeof(CustomDropdownPicker), typeof(CustomDropdownPickerHandler));
@@ -336,5 +359,5 @@ public static class MauiProgram
     });
 #endif
         return builder.Build();
-	}
+    }
 }

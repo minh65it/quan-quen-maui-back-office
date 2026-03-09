@@ -104,6 +104,7 @@
 		<PackageReference Include="Microsoft.Maui.Controls.Maps" Version="9.0.40" />
 		<PackageReference Include="Microsoft.Maui.Essentials" Version="9.0.40" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.6" />
+		<PackageReference Include="Plugin.Firebase.CloudMessaging" Version="4.0.1" />
 		<PackageReference Include="Plugin.Maui.Audio" Version="3.0.1" />
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.12.1" />
@@ -127,6 +128,14 @@
 	<ItemGroup>
 	  <Folder Include="Resources\Raw\pdfjs\" />
 	</ItemGroup>
+
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-ios'">
+		<GoogleServiceInfoPlist>GoogleService-Info.plist</GoogleServiceInfoPlist>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-android'">
+		<GoogleServiceInfoPlist>GoogleService-Info.plist</GoogleServiceInfoPlist>
+	</PropertyGroup>
 
 
 	<PropertyGroup Label="MauiAppAccelerator">

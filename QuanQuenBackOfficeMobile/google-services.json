@@ -1,0 +1,309 @@
+{
+  "project_info": {
+    "project_number": "741119685660",
+    "project_id": "quanquen-77117",
+    "storage_bucket": "quanquen-77117.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:741119685660:android:a66b5976c9e1c19caf5bd9",
+        "android_client_info": {
+          "package_name": "com.quan_quen_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "741119685660-bhbijp2i5a4su5lflh9fsnql9vp3uqa8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.quan_quen_app",
+            "certificate_hash": "3b9476e99d03b1c06bb223548781610de487ec39"
+          }
+        },
+        {
+          "client_id": "741119685660-k7c876ahvmbtaqgsifi08281fbc0350b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.quan_quen_app",
+            "certificate_hash": "bebaff6112e792501c332e623b4bbf9c8e60d23f"
+          }
+        },
+        {
+          "client_id": "741119685660-ol1i13i8o5q9at1vpqt0lk0h79ta3iot.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.quan_quen_app",
+            "certificate_hash": "5e5080b6bdd1ee423c49f8c5a39c82f69b2cf09a"
+          }
+        },
+        {
+          "client_id": "741119685660-rbgh54f1ap2nbv2tplaet8p8aqnnhdkc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.quan_quen_app",
+            "certificate_hash": "554ed5c2231035b26d0eafadddb489c94cb6bf24"
+          }
+        },
+        {
+          "client_id": "741119685660-901pbpb0ij9vgmnrf36ukv9lels6vj9m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRqgV4WAijtmKa9m3Zf32kZ4Ojj6eFyu0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "103176375140892469959",
+              "client_type": 3
+            },
+            {
+              "client_id": "741119685660-7u93un83b39hqe4r6dgdfponf8b1kes7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.quanquen.app-user",
+                "app_store_id": "6502036102"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:741119685660:android:9874fc66112cf49eaf5bd9",
+        "android_client_info": {
+          "package_name": "com.quanquen.boapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "741119685660-901pbpb0ij9vgmnrf36ukv9lels6vj9m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRqgV4WAijtmKa9m3Zf32kZ4Ojj6eFyu0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "103176375140892469959",
+              "client_type": 3
+            },
+            {
+              "client_id": "741119685660-7u93un83b39hqe4r6dgdfponf8b1kes7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.quanquen.app-user",
+                "app_store_id": "6502036102"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:741119685660:android:0dbc5bb55ca9351caf5bd9",
+        "android_client_info": {
+          "package_name": "com.quanquen.store"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "741119685660-901pbpb0ij9vgmnrf36ukv9lels6vj9m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRqgV4WAijtmKa9m3Zf32kZ4Ojj6eFyu0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "103176375140892469959",
+              "client_type": 3
+            },
+            {
+              "client_id": "741119685660-7u93un83b39hqe4r6dgdfponf8b1kes7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.quanquen.app-user",
+                "app_store_id": "6502036102"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:741119685660:android:05ff5833be421746af5bd9",
+        "android_client_info": {
+          "package_name": "com.quanquen.user"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "741119685660-901pbpb0ij9vgmnrf36ukv9lels6vj9m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRqgV4WAijtmKa9m3Zf32kZ4Ojj6eFyu0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "103176375140892469959",
+              "client_type": 3
+            },
+            {
+              "client_id": "741119685660-7u93un83b39hqe4r6dgdfponf8b1kes7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.quanquen.app-user",
+                "app_store_id": "6502036102"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:741119685660:android:8d16d85469876880af5bd9",
+        "android_client_info": {
+          "package_name": "com.vsirius.quan_quen_store"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "741119685660-kbrpqjvl2ru7j1ibuquuud48uq4ms8bc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.vsirius.quan_quen_store",
+            "certificate_hash": "e9efab14e7d774e7002d133357dded1066a83824"
+          }
+        },
+        {
+          "client_id": "741119685660-901pbpb0ij9vgmnrf36ukv9lels6vj9m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRqgV4WAijtmKa9m3Zf32kZ4Ojj6eFyu0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "103176375140892469959",
+              "client_type": 3
+            },
+            {
+              "client_id": "741119685660-7u93un83b39hqe4r6dgdfponf8b1kes7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.quanquen.app-user",
+                "app_store_id": "6502036102"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:741119685660:android:e4a91ad50558c893af5bd9",
+        "android_client_info": {
+          "package_name": "com.vsirius.quanquen.store"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "741119685660-901pbpb0ij9vgmnrf36ukv9lels6vj9m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRqgV4WAijtmKa9m3Zf32kZ4Ojj6eFyu0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "103176375140892469959",
+              "client_type": 3
+            },
+            {
+              "client_id": "741119685660-7u93un83b39hqe4r6dgdfponf8b1kes7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.quanquen.app-user",
+                "app_store_id": "6502036102"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:741119685660:android:a98d184d5cc19c44af5bd9",
+        "android_client_info": {
+          "package_name": "com.vsirius.quanquen.user"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "741119685660-901pbpb0ij9vgmnrf36ukv9lels6vj9m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRqgV4WAijtmKa9m3Zf32kZ4Ojj6eFyu0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "103176375140892469959",
+              "client_type": 3
+            },
+            {
+              "client_id": "741119685660-7u93un83b39hqe4r6dgdfponf8b1kes7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.quanquen.app-user",
+                "app_store_id": "6502036102"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
