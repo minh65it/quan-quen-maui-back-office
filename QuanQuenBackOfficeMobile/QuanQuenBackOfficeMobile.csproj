@@ -129,13 +129,13 @@
 	  <Folder Include="Resources\Raw\pdfjs\" />
 	</ItemGroup>
 
-	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-ios'">
-		<GoogleServiceInfoPlist>GoogleService-Info.plist</GoogleServiceInfoPlist>
-	</PropertyGroup>
+	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+    	<GoogleServicesJson Include="google-services.json" />
+	</ItemGroup>
 
-	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-android'">
-		<GoogleServiceInfoPlist>GoogleService-Info.plist</GoogleServiceInfoPlist>
-	</PropertyGroup>
+	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
+		<BundleResource Include="GoogleService-Info.plist" />
+	</ItemGroup>
 
 
 	<PropertyGroup Label="MauiAppAccelerator">

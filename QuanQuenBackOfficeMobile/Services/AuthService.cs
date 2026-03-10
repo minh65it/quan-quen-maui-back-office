@@ -7,6 +7,7 @@ using Microsoft.Maui.Storage;
 using QuanQuenBackOfficeMobile.Services.Interfaces;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using Plugin.Firebase.CloudMessaging;
 
 namespace QuanQuenBackOfficeMobile.Services
 {
@@ -39,6 +40,8 @@ namespace QuanQuenBackOfficeMobile.Services
                     Password = password
                 };
 
+
+
                 var response = await _httpClient.PostAsJsonAsync(url, loginRequest);
                 response.EnsureSuccessStatusCode();
 
@@ -49,7 +52,22 @@ namespace QuanQuenBackOfficeMobile.Services
                 });
 
                 if (result != null && result.IsLogin && !string.IsNullOrEmpty(result.Token))
-                    await SecureStorage.SetAsync(TokenKey, result.Token);
+
+                    await CrossFirebaseCloudMessaging.Current.CheckIfValidAsync();
+                var tokenNoti = await CrossFirebaseCloudMessaging.Current.GetTokenAsync();
+                Console.WriteLine($"FCM token: {tokenNoti}");
+
+                var baseUrlnoti = _configuration["API:CSR:BaseUrl"];
+                var pathnoti = _configuration["API:CSR:CreateNotificationCusDevice"];
+                var urlnoti = $"{baseUrlnoti}{pathnoti}";
+                var createNoti = new CreateNoti
+                {
+                    UserId = result.VsiriusUserDto.UserId,
+                    DeviceId = tokenNoti
+                };
+                await _httpClient.PostAsJsonAsync(urlnoti, createNoti);
+
+                await SecureStorage.SetAsync(TokenKey, result.Token);
 
                 return result ?? new LoginResponse { IsLogin = false };
             }
@@ -72,4 +90,4 @@ namespace QuanQuenBackOfficeMobile.Services
             }
         }
     }
-} 
+}

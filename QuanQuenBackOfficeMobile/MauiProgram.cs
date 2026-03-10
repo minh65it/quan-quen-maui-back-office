@@ -9,6 +9,10 @@ using QuanQuenBackOfficeMobile.Views.Stores;
 using System.Reflection;
 using ZXing.Net.Maui.Controls;
 using Plugin.Firebase.CloudMessaging;
+using Microsoft.Maui.LifecycleEvents;
+using Plugin.Firebase;
+
+
 
 #if IOS && ANDROID
 using QuanQuenBackOfficeMobile.Controls;
@@ -26,6 +30,27 @@ namespace QuanQuenBackOfficeMobile;
 
 public static class MauiProgram
 {
+    public static MauiAppBuilder RegisterFirebaseServices(this MauiAppBuilder builder)
+    {
+#if IOS
+        builder.ConfigureLifecycleEvents(events =>
+        {
+            events.AddiOS(iOS => iOS.WillFinishLaunching((_, __) => {
+                CrossFirebase.Initialize();
+                FirebaseCloudMessagingImplementation.Initialize();
+                return false;
+            }));
+        });
+#elif ANDROID
+        builder.ConfigureLifecycleEvents(events =>
+        {
+            events.AddAndroid(android => android.OnCreate((activity, _) =>
+                CrossFirebase.Initialize(activity, () => activity)));
+        });
+#endif
+        return builder;
+    }
+
     public static MauiApp CreateMauiApp()
     {
         var builder = MauiApp.CreateBuilder();
@@ -60,25 +85,12 @@ public static class MauiProgram
         var resourceName = "QuanQuenBackOfficeMobile.appsettings.json";
 #endif
 
-        using var stream = assembly.GetManifestResourceStream(resourceName)
-            ?? throw new InvalidOperationException(
-                $"Embedded resource '{resourceName}' not found. " +
-                "Ensure the file is in the project root, Build Action=EmbeddedResource, and the namespace matches.");
+using var stream = assembly.GetManifestResourceStream(resourceName)
+    ?? throw new InvalidOperationException(
+        $"Embedded resource '{resourceName}' not found. " +
+        "Ensure the file is in the project root, Build Action=EmbeddedResource, and the namespace matches.");
 
-
-
-#if IOS
-        events.AddiOS(iOS => iOS.WillFinishLaunching((_, __) => {
-            CrossFirebase.Initialize();
-            FirebaseCloudMessagingImplementation.Initialize();
-            return false;
-        }));
-#elif ANDROID
-            events.AddAndroid(android => android.OnCreate((activity, _) =>
-            CrossFirebase.Initialize(activity)));
-#endif
-
-        builder.Configuration.AddJsonStream(stream);
+builder.Configuration.AddJsonStream(stream);
 
         // Register ConfigurationService
         builder.Services.AddSingleton<IConfigurationService, ConfigurationService>();

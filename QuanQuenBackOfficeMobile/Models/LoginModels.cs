@@ -11,6 +11,14 @@ namespace QuanQuenBackOfficeMobile.Models
         public string Password { get; set; }
     }
 
+     public class CreateNoti
+    {
+        [JsonPropertyName("userId")]
+        public string UserId { get; set; }
+        [JsonPropertyName("deviceId")]
+        public string DeviceId { get; set; }
+    }
+
     public class LoginResponse
     {
         [JsonPropertyName("isLogin")]

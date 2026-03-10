@@ -13,6 +13,7 @@
 	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 	<uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+	
 	<uses-feature android:name="android.hardware.location" android:required="false" />
 	<uses-feature android:name="android.hardware.location.gps" android:required="false" />
 	<uses-feature android:name="android.hardware.location.network" android:required="false" />
@@ -26,6 +27,20 @@
 	<!-- Required only if your app needs to access audio files that other apps created -->
 	<uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
 	<uses-feature android:name="android.hardware.camera" android:required="true" />
+
+	 <!-- <receiver
+		android:name="com.google.firebase.iid.FirebaseInstanceIdInternalReceiver"
+		android:exported="false" />
+	<receiver
+		android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver"
+		android:exported="true"
+		android:permission="com.google.android.c2dm.permission.SEND">
+		<intent-filter>
+		<action android:name="com.google.android.c2dm.intent.RECEIVE" />
+		<action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+		<category android:name="${applicationId}" />
+		</intent-filter>
+	</receiver> -->
 	<queries>
 		<intent>
 			<action android:name="android.media.action.IMAGE_CAPTURE" />
